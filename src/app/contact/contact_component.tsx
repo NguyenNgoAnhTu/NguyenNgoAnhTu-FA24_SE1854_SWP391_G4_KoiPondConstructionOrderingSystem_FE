@@ -116,8 +116,6 @@ const ContactComponent: React.FC = () => {
               <span
                 className="text-red-32 phone:text-[12px] text-[13px] absolute -bottom-[15%] phone:-bottom-[15%] desktop:left-0 tablet:left-0 phone:right-0">{errors.content.message}</span>}
           </div>
- 
-
           <button type="submit"
                   className="rounded-[12px] mt-[10px] w-[130px] bg-[#1C6839] flex gap-[6px] px-[15px] py-[10px] text-[14px] font-bold text-whit hover:opacity-60">
             Gửi liên hệ <img src={SendIcon} alt="send"/>

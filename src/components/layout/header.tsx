@@ -10,15 +10,19 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-
-const [name, setName] = useState<string | null>(null);
-
+  const [showPopup, setShowPopup] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [name, setName] = useState<string | null>(null);
+  const toggleUserDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen); // Toggle user dropdown
+  };
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate("/login")
-    
-    
-}
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+  const handleSetting = () => {
+    setShowPopup(!showPopup);
+  };
 
   const handleScrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
@@ -33,8 +37,8 @@ const [name, setName] = useState<string | null>(null);
     if (typeof window !== "undefined" && window.localStorage) {
       const token = localStorage.getItem("token");
       setToken(token);
-      const name= localStorage.getItem("name");
-      setName(name)
+      const name = localStorage.getItem("name");
+      setName(name);
     }
   }, []);
   console.log(token);
@@ -98,15 +102,15 @@ const [name, setName] = useState<string | null>(null);
               {item.title}
             </Typography>
             {item.slug === "/services" && isServicesDropdownOpen && (
-              <div className="absolute w-[200px] bg-red-32 shadow-lg rounded-md p-2 z-50">
+              <div className="absolute w-[200px] bg-[#EBF8F2] shadow-lg rounded-md p-2 z-50">
                 <div
-                  className="cursor-pointer  hover:bg-gray-200 px-4 py-2 hover:bg-gray-A0"
+                  className="cursor-pointer  hover:bg-gray-200 px-4 py-2 hover:bg-[#1C6839]"
                   onClick={() => handleServiceClick("/pond-construction")}
                 >
                   <Typography>Pond-construction</Typography>
                 </div>
                 <div
-                  className="cursor-pointer hover:bg-gray-200 px-4 py-2 hover:bg-gray-A0"
+                  className="cursor-pointer hover:bg-gray-200 px-4 py-2 hover:bg-[#1C6839]"
                   onClick={() => handleServiceClick("/pond-cleaning")}
                 >
                   <Typography>Pond-Cleaning</Typography>
@@ -124,16 +128,33 @@ const [name, setName] = useState<string | null>(null);
         </div>
       </div>
       {token ? (
-        <div>
-          <Typography>{name}</Typography>
-          <Typography onClick={handleLogout} className="flex gap-[10px] w-full min-w-[273px] cursor-pointer whitespace-nowrap bg-transparent px-4 py-2 text-sm text-left font-normal pointer-events-auto text-neutral-700 hover:bg-[#C8EDFF] active:text-neutral-800 active:bg-neutral-100 focus:bg-neutral-100 focus:text-neutral-800 focus:outline-none active:no-underline dark:text-neutral-200 dark:hover:bg-neutral-600 dark:focus:bg-neutral-600 dark:active:bg-neutral-600">
-            Log out
+        <div className="relative">
+          <Typography
+            onClick={toggleUserDropdown}
+            className="cursor-pointer font-bold hover:bg-green"
+          >
+            {name}
           </Typography>
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50">
+              <div
+                className="cursor-pointer px-4 py-2 hover:bg-gray-A0"
+                onClick={handleSetting}
+              >
+                User Settings
+              </div>
+              <div
+                className="cursor-pointer px-4 py-2 hover:bg-gray-A0"
+                onClick={handleLogout}
+              >
+                Logout
+              </div>
+            </div>
+          )}
         </div>
       ) : (
-        <a className="  " href={`/login`}>
-          <button className=" mt-[10px] text-black w-[120px] h-[40px] bg-transparent rounded-md  border-black border-[1px] ">
-            {" "}
+        <a href="/login">
+          <button className="mt-[10px] text-black w-[120px] h-[40px] bg-transparent rounded-md border-black border-[1px]">
             Log in
           </button>
         </a>
@@ -163,7 +184,7 @@ const [name, setName] = useState<string | null>(null);
                         className="cursor-pointer hover:bg-gray-200 px-4 py-2"
                         onClick={() => handleServiceClick("/pond-construction")}
                       >
-                        pond-construction1
+                        pond-construction
                       </div>
                       <div
                         className="cursor-pointer hover:bg-gray-200 px-4 py-2"

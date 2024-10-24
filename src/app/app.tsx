@@ -9,11 +9,12 @@ import Dashboard from "app/dashboard/dashboard.tsx";
 import FormServiceProgress from "app/dashboard/forms/service-progress.tsx";
 import TableServiceProgress from "app/dashboard/tables/service-progress.tsx";
 import LayoutAdmin from "components/layout/dashboard";
-
+import User from "app/user/user";
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
   { path: "/pond-construction", element: <Pond_Construction /> },
+  { path: "/user", element: <User /> },
 ];
 
 const routesAdmin = [
