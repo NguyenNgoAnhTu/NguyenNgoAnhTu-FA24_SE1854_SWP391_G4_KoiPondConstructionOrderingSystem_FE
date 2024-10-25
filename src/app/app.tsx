@@ -10,10 +10,12 @@ import FormServiceProgress from "app/dashboard/forms/service-progress.tsx";
 import TableServiceProgress from "app/dashboard/tables/service-progress.tsx";
 import LayoutAdmin from "components/layout/dashboard";
 import User from "app/user/user";
+import Pond_Cleaning from "./pond-cleaning";
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
   { path: "/pond-construction", element: <Pond_Construction /> },
+  { path: "/pond-cleaning", element: <Pond_Cleaning /> },
   { path: "/user", element: <User /> },
 ];
 
