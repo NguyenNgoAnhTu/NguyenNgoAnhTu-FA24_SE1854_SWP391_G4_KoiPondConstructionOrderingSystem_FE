@@ -95,7 +95,7 @@ const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId 
         }
 
         alert("Service request saved!");
-        navigate("/admin/tables/table-service-progress");
+        navigate("/admin/tables/table-service-requests");
       } catch (error) {
         alert("Create service request failed!");
       } finally {
