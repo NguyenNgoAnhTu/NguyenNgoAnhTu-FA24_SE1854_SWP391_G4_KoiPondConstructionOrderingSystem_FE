@@ -12,7 +12,7 @@ import LayoutAdmin from "components/layout/dashboard";
 import User from "app/user/user";
 import Pond_Cleaning from "./pond-cleaning";
 import ConstructionHistory from "app/dashboard/tables/construction-history.tsx";
-
+import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
@@ -31,6 +31,10 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-service-progress",
     element: <TableServiceProgress />,
+  },
+  {
+    path: "/admin/tables/table-service-requests",
+    element: <TableServiceRequest />,
   },
   {
     path: "/admin/tables/table-construction-history",
