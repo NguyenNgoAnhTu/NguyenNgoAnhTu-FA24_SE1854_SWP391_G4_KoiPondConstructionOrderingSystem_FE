@@ -11,6 +11,8 @@ import TableServiceProgress from "app/dashboard/tables/service-progress.tsx";
 import LayoutAdmin from "components/layout/dashboard";
 import User from "app/user/user";
 import Pond_Cleaning from "./pond-cleaning";
+import ConstructionHistory from "app/dashboard/tables/construction-history.tsx";
+
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
@@ -29,6 +31,10 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-service-progress",
     element: <TableServiceProgress />,
+  },
+  {
+    path: "/admin/tables/table-construction-history",
+    element: <ConstructionHistory />,
   },
 ];
 

@@ -330,6 +330,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Service Progress
                             </NavLink>
                           </li>
+                          <li>
+                            <NavLink
+                              to="/admin/tables/table-service-progress"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Construction history
+                            </NavLink>
+                          </li>
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}
