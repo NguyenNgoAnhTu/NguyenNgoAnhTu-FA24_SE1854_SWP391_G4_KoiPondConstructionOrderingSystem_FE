@@ -1,228 +1,178 @@
-import Slider from "react-slick";
-import Typography from "components/typography/typography";
-import EventImg_1 from "assets/images/penhouse.jpg";
-import EventImg_2 from "assets/images/nhatban.jpg";
-import EventImg_3 from "assets/images/nhatban.jpg";
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
-import "./pond_slide.css"
-import {useState,useEffect} from "react"
-//import axios from "axios"
-interface PondConfig {
-  constructionTypeId: number;
-  minSize: number;
-  maxSize: number;
-  waterVolume: number;
-  minDepth: number;
-  maxDepth: number;
-  shape: string;
-  filtrationSystem: string;
-  phLevel: number;
-  waterTemperature: number;
-  pondLiner: string;
-  pondBottom: string;
-  decoration: string;
-  minEstimatedCost: number;
-  maxEstimatedCost: number;
-  imageUrl: string;
-  description: string;
-  note: string;
-  createDate: string; // You might want to use Date instead if working directly with Date objects
-  createBy: string;
-  updateDate: string; // Same as above, Date can be used directly here
-  updateBy: string;
-}
-const Pond_slide = () => {
-  const [data, setData] = useState<PondConfig | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const token = localStorage.getItem('token');
+import { Table, Button, Modal, Form, Input } from "antd";
+import { useState, useEffect } from "react";
 
-  if (token) {
-      console.log('Token:', token);
-  } else {
-      console.log('No token found');
-  }
+function Pond_slide() {
+  const [datas, setDatas] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [form] = Form.useForm();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/api/template', {
-          method: 'GET',
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:8080/api/pondDesignTemplate",
+        {
+          method: "GET",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}. ${errorText}`);
         }
-
-        const data = await response.json();
-        setData(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError(error instanceof Error ? error.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    };
 
-    fetchData();
-}, []);
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
-
-  console.log(data)
-  
-
-
-  const events = [
-    {
-        title: "Base*",
-        price: "$6K",
-        description: `Includes: 5×7 Pond, 15×13 and 5×7 Liner, 18’ Underlayment,
-          Signature Series Skimmer, Signature Series Biofalls, Aquasurge Pump 2000,
-          Rock Lid, 25’ 1.5’ Flex PVC, Dual Union Check Valve, 2 Tons Of Granite,
-          Boulders, Washed Riverstone, Up To 2’ Stream`,
-        image: EventImg_1,
-        completion: "Complete in 1-2 days",
-      },
-      {
-        title: "Base*",
-        price: "$6K",
-        description: `Includes: 5×7 Pond, 15×13 and 5×7 Liner, 18’ Underlayment,
-          Signature Series Skimmer, Signature Series Biofalls, Aquasurge Pump 2000,
-          Rock Lid, 25’ 1.5’ Flex PVC, Dual Union Check Valve, 2 Tons Of Granite,
-          Boulders, Washed Riverstone, Up To 2’ Stream`,
-        image: EventImg_2,
-        completion: "Complete in 1-2 days",
-      },
-      {
-        title: "Base*",
-        price: "$6K",
-        description: `Includes: 5×7 Pond, 15×13 and 5×7 Liner, 18’ Underlayment,
-          Signature Series Skimmer, Signature Series Biofalls, Aquasurge Pump 2000,
-          Rock Lid, 25’ 1.5’ Flex PVC, Dual Union Check Valve, 2 Tons Of Granite,
-          Boulders, Washed Riverstone, Up To 2’ Stream`,
-        image: EventImg_3,
-        completion: "Complete in 1-2 days",
-      },
-      {
-        title: "Base*",
-        price: "$6K",
-        description: `Includes: 5×7 Pond, 15×13 and 5×7 Liner, 18’ Underlayment,
-          Signature Series Skimmer, Signature Series Biofalls, Aquasurge Pump 2000,
-          Rock Lid, 25’ 1.5’ Flex PVC, Dual Union Check Valve, 2 Tons Of Granite,
-          Boulders, Washed Riverstone, Up To 2’ Stream`,
-        image: EventImg_2,
-        completion: "Complete in 1-2 days",
-      },
-      {
-        title: "Base*",
-        price: "$6K",
-        description: `Includes: 5×7 Pond, 15×13 and 5×7 Liner, 18’ Underlayment,
-          Signature Series Skimmer, Signature Series Biofalls, Aquasurge Pump 2000,
-          Rock Lid, 25’ 1.5’ Flex PVC, Dual Union Check Valve, 2 Tons Of Granite,
-          Boulders, Washed Riverstone, Up To 2’ Stream`,
-        image: EventImg_1,
-        completion: "Complete in 1-2 days",
-      },
-  ];
-
-  const settings = {
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3.5,
-    slidesToScroll: 1,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          infinite: true,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
+      const data = await response.json();
+      setDatas(data);
+    } catch (err) {
+      alert(err);
+    }
   };
 
-  return (
-    <div id="event" className="w-full h-auto bg-white z-50">
-      <div className="w-full h-auto flex flex-col items-center gap-20 phone:gap-[30px] pb-7 phone:pb-6">
-        <div className="flex gap-3 mt-[100px] phone:mt-[30px]">
-          <Typography
-            variant={"h1"}
-            color={"black-06"}
-            fontWeight={"bold"}
-            className="text-black-06 phone:!text-[24px]"
+  const handleFormCreate = async (values: any) => {
+    try {
+      const token = localStorage.getItem("token");
+      const requestBody = {
+        description: values.description,
+        address: values.address,
+        note: values.note,
+      };
+      const response = await fetch("http://localhost:8080/api/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setShowModal(false);
+      // alert("Request sent!");
+
+      const token2 = localStorage.getItem("token");
+      const requestBodyRequestDetail = {
+        pondDesignTemplateId: selectedId,
+        requestId: data.id,
+      };
+      const responseRequestDetail = await fetch(
+        "http://localhost:8080/api/requestDetail",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token2}`,
+          },
+          body: JSON.stringify(requestBodyRequestDetail),
+        }
+      );
+      alert("Request sent!");
+      if (!responseRequestDetail.ok) {
+        throw new Error("Network response was not ok");
+      }
+    } catch (err) {
+      alert(err);
+    }
+  };
+
+  const columns = [
+    { title: "Min Size", dataIndex: "minSize", key: "minSize" },
+    { title: "Max Size", dataIndex: "maxSize", key: "maxSize" },
+    { title: "Water Volume", dataIndex: "waterVolume", key: "waterVolume" },
+    { title: "Min Depth", dataIndex: "minDepth", key: "minDepth" },
+    { title: "Max Depth", dataIndex: "maxDepth", key: "maxDepth" },
+    { title: "Shape", dataIndex: "shape", key: "shape" },
+    {
+      title: "Filtration System",
+      dataIndex: "filtrationSystem",
+      key: "filtrationSystem",
+    },
+    { title: "pH Level", dataIndex: "phLevel", key: "phLevel" },
+    {
+      title: "Water Temperature",
+      dataIndex: "waterTemperature",
+      key: "waterTemperature",
+    },
+    { title: "Pond Liner", dataIndex: "pondLiner", key: "pondLiner" },
+    { title: "Pond Bottom", dataIndex: "pondBottom", key: "pondBottom" },
+    { title: "Decoration", dataIndex: "decoration", key: "decoration" },
+    {
+      title: "Min Estimated Cost",
+      dataIndex: "minEstimatedCost",
+      key: "minEstimatedCost",
+    },
+    {
+      title: "Max Estimated Cost",
+      dataIndex: "maxEstimatedCost",
+      key: "maxEstimatedCost",
+    },
+    {
+      title: "Image URL",
+      dataIndex: "imageUrl",
+      key: "imageUrl",
+    },
+    { title: "Description", dataIndex: "description", key: "description" },
+    {
+      title: "Action",
+      dataIndex: "pondDesignTemplateId",
+      key: "pondDesignTemplateId",
+      render: (pondDesignTemplateId: any) => (
+        <>
+          <Button
+            type="primary"
+            danger
+            onClick={() => {
+              setSelectedId(pondDesignTemplateId);
+              setShowModal(true);
+            }}
           >
-           Pond Pricing
-          </Typography>
-        </div>
-        
-        <Slider {...settings} className="w-full mx-auto mt-[50px]">
-          {events.map((event, index) => (
-            <a
-            href="/contact"
-              key={index}
-              className="bg-white flex flex-col items-center gap-10 w-full rounded-3xl shadow-md hover:opacity-60"
-            >
-              <div className="w-full">
-                <img
-                  src={event.image}
-                  alt=""
-                  className="w-full h-[300px] object-cover rounded-t-3xl"
-                />
-              </div>
+            Consult
+          </Button>
+        </>
+      ),
+    },
+  ];
 
-              {/* Phần hiển thị giá */}
-              <div className="flex justify-center -mt-16">
-                <div className="bg-[#EBF8F2] text-[#076839] text-[24px] font-bold rounded-full w-[80px] h-[80px] flex items-center justify-center">
-                  {event.price}
-                </div>
-              </div>
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-              {/* Phần mô tả */}
-              <div className="text-center px-5">
-                <Typography
-                  variant={"medium"}
-                  fontWeight={"bold"}
-                  className="text-[24px]"
-                >
-                  {event.title}
-                </Typography>
-                <Typography
-                  variant={"small"}
-                  className="text-gray-600 mt-2 text-sm"
-                >
-                  {event.description}
-                </Typography>
-                <Typography
-                  variant={"small"}
-                  fontWeight={"bold"}
-                  className="text-gray-800 mt-4"
-                >
-                  {event.completion}
-                </Typography>
-              </div>
-            </a>
-          ))}
-        </Slider>
-        
-      </div>
+  return (
+    <div>
+      <h1>Pond design templates:</h1>
+      <Table dataSource={datas} columns={columns}></Table>
+      <Modal
+        onCancel={() => setShowModal(false)}
+        onOk={() => form.submit()}
+        open={showModal}
+        title="Construction history"
+      >
+        <Form onFinish={handleFormCreate} form={form} labelCol={{ span: 24 }}>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true, message: "Cannot be blank!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Address"
+            name="address"
+            rules={[{ required: true, message: "Cannot be blank!" }]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item label="Note" name="note">
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
-};
+}
 
 export default Pond_slide;
