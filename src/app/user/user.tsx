@@ -1,6 +1,58 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { useEffect } from "react";
 
 const User = () => {
+  interface ServiceRequest {
+    serviceRequestId: string;
+    serviceCategory: {
+      serviceCategoryId: string;
+      type: string;
+      cost: number;
+      note: string;
+    };
+    description: string;
+    address: string;
+    note: string;
+  }
+
+  interface ServiceQuotation {
+    serviceQuotationId: string;
+    customer: {
+      name: string;
+      email: string;
+      role: string;
+    };
+    serviceRequest: {
+      serviceRequestId: string;
+      customer: {
+        name: string;
+        email: string;
+        role: string;
+      };
+      serviceCategory: {
+        serviceCategoryId: number;
+        type: string;
+        cost: number;
+        note: string;
+      };
+      address: string;
+    };
+    description: string;
+    note: string;
+    cost: number;
+    totalCost: number;
+    vat: number;
+    isActive: boolean;
+  }
+
+  const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
+  const [serviceQuotation, setServiceQuotation] = useState<ServiceQuotation[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [name, setName] = useState(localStorage.getItem("name") || "John Doe");
   const [email, setEmail] = useState(
     localStorage.getItem("email") || "john@example.com"
@@ -20,6 +72,88 @@ const User = () => {
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   //const [isEditingMobile, setIsEditingMobile] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [showServiceRequests, setShowServiceRequests] = useState(false);
+  const [showServiceQuotation, setShowServiceQuotation] = useState(false);
+  useEffect(() => {
+    const fetchServiceRequests = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          "http://localhost:8080/api/service-requests",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        setServiceRequests(data);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchServiceQuotation = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          "http://localhost:8080/api/service-quotations",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        setServiceQuotation(data);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServiceRequests();
+    fetchServiceQuotation();
+  }, [showServiceRequests, showServiceQuotation]);
+
+  if (loading) {
+    return <div className="text-center py-4">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red py-4">
+        Error: {error}
+        <button
+          onClick={() => window.location.reload()}
+          className="ml-4 text-blue-500 underline"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   const handleSave = (field: any, value: any) => {
     switch (field) {
@@ -71,95 +205,99 @@ const User = () => {
                     <p className="text-gray-400 text-sm">{address}</p>
                   </div>
                 </div>
-                {/* <hr className="my-4" />
-                <ul className="list-none">
-                  <li className="flex justify-between items-center py-2">
-                    <h6 className="mb-0 text-sm flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                <hr className="my-4" />
+                <nav className="mt-5">
+                  <ul className="flex flex-col gap-2">
+                    <li>
+                      <NavLink
+                        to="/user/profile"
+                        className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0"
                       >
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                      </svg>
-                      Website
-                    </h6>
-                    <span className="text-gray-500">https://bootdey.com</span>
-                  </li>
-                  <li className="flex justify-between items-center py-2">
-                    <h6 className="mb-0 text-sm flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                        <svg
+                          className="fill-current"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M9.0002 7.79065C11.0814 7.79065 12.7689 6.1594 12.7689 4.1344C12.7689 2.1094 11.0814 0.478149 9.0002 0.478149C6.91895 0.478149 5.23145 2.1094 5.23145 4.1344C5.23145 6.1594 6.91895 7.79065 9.0002 7.79065ZM9.0002 1.7719C10.3783 1.7719 11.5033 2.84065 11.5033 4.16252C11.5033 5.4844 10.3783 6.55315 9.0002 6.55315C7.62207 6.55315 6.49707 5.4844 6.49707 4.16252C6.49707 2.84065 7.62207 1.7719 9.0002 1.7719Z"
+                            fill=""
+                          />
+                          <path
+                            d="M10.8283 9.05627H7.17207C4.16269 9.05627 1.71582 11.5313 1.71582 14.5406V16.875C1.71582 17.2125 1.99707 17.5219 2.3627 17.5219C2.72832 17.5219 3.00957 17.2407 3.00957 16.875V14.5406C3.00957 12.2344 4.89394 10.3219 7.22832 10.3219H10.8564C13.1627 10.3219 15.0752 12.2063 15.0752 14.5406V16.875C15.0752 17.2125 15.3564 17.5219 15.7221 17.5219C16.0877 17.5219 16.3689 17.2407 16.3689 16.875V14.5406C16.2846 11.5313 13.8377 9.05627 10.8283 9.05627Z"
+                            fill=""
+                          />
+                        </svg>
+                        Profile
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink
+                        to="#"
+                        className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowServiceRequests(!showServiceRequests);
+                        }}
                       >
-                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                      </svg>
-                      Github
-                    </h6>
-                    <span className="text-gray-500">bootdey</span>
-                  </li>
-                  <li className="flex justify-between items-center py-2">
-                    <h6 className="mb-0 text-sm flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-2 text-blue-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                        <svg
+                          className="fill-current"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M16.5 9.75H1.5C1.0875 9.75 0.75 10.0875 0.75 10.5C0.75 10.9125 1.0875 11.25 1.5 11.25H16.5C16.9125 11.25 17.25 10.9125 17.25 10.5C17.25 10.0875 16.9125 9.75 16.5 9.75Z"
+                            fill=""
+                          />
+                          <path
+                            d="M16.5 13.5H1.5C1.0875 13.5 0.75 13.8375 0.75 14.25C0.75 14.6625 1.0875 15 1.5 15H16.5C16.9125 15 17.25 14.6625 17.25 14.25C17.25 13.8375 16.9125 13.5 16.5 13.5Z"
+                            fill=""
+                          />
+                          <path
+                            d="M16.5 6H1.5C1.0875 6 0.75 6.3375 0.75 6.75C0.75 7.1625 1.0875 7.5 1.5 7.5H16.5C16.9125 7.5 17.25 7.1625 17.25 6.75C17.25 6.3375 16.9125 6 16.5 6Z"
+                            fill=""
+                          />
+                        </svg>
+                        Service Requests
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink
+                        to="#"
+                        className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowServiceQuotation(!showServiceQuotation);
+                        }}
                       >
-                        <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-                      </svg>
-                      Twitter
-                    </h6>
-                    <span className="text-gray-500">@bootdey</span>
-                  </li>
-                  <li className="flex justify-between items-center py-2">
-                    <h6 className="mb-0 text-sm flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-2 text-pink-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <rect
-                          x="2"
-                          y="2"
-                          width="20"
-                          height="20"
-                          rx="5"
-                          ry="5"
-                        ></rect>
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                      </svg>
-                      Instagram
-                    </h6>
-                    <span className="text-gray-500">bootdey</span>
-                  </li>
-                  <li className="flex justify-between items-center py-2">
-                    <h6 className="mb-0 text-sm flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-2 text-blue-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                      </svg>
-                      Facebook
-                    </h6>
-                    <span className="text-gray-500">bootdey</span>
-                  </li>
-                </ul> */}
+                        <svg
+                          className="fill-current"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M16.8754 11.6719C16.5379 11.6719 16.2285 11.9531 16.2285 12.3187V14.8219C16.2285 15.075 16.0316 15.2719 15.7785 15.2719H2.22227C1.96914 15.2719 1.77227 15.075 1.77227 14.8219V3.15002C1.77227 2.89689 1.96914 2.70002 2.22227 2.70002H14.8285C15.0816 2.70002 15.2785 2.89689 15.2785 3.15002V6.44064C15.2785 6.77814 15.5598 7.08752 15.9254 7.08752C16.291 7.08752 16.5723 6.80627 16.5723 6.44064V3.15002C16.5723 2.18439 15.7941 1.40627 14.8285 1.40627H2.22227C1.25664 1.40627 0.478516 2.18439 0.478516 3.15002V14.8219C0.478516 15.7875 1.25664 16.5656 2.22227 16.5656H15.7785C16.7441 16.5656 17.5223 15.7875 17.5223 14.8219V12.3187C17.5223 11.9812 17.2129 11.6719 16.8754 11.6719Z"
+                            fill=""
+                          />
+                          <path
+                            d="M8.55074 12.3469C8.66324 12.4594 8.83199 12.5156 9.00074 12.5156C9.16949 12.5156 9.31012 12.4594 9.45074 12.3469L13.4726 8.43752C13.7257 8.1844 13.7257 7.79065 13.4726 7.53752C13.2195 7.2844 12.8257 7.2844 12.5726 7.53752L9.64762 10.4063V2.1094C9.64762 1.7719 9.36637 1.46252 9.00074 1.46252C8.66324 1.46252 8.35387 1.74377 8.35387 2.1094V10.4063L5.45699 7.53752C5.20387 7.2844 4.81012 7.2844 4.55699 7.53752C4.30387 7.79065 4.30387 8.1844 4.55699 8.43752L8.55074 12.3469Z"
+                            fill=""
+                          />
+                        </svg>
+                        Service Quotations
+                      </NavLink>
+                    </li>
+                    {/* Add more menu items as needed */}
+                  </ul>
+                </nav>
               </div>
             </div>
           </div>
@@ -235,29 +373,6 @@ const User = () => {
                   </div>
                 </div>
 
-                {/* <div className="grid grid-cols-3 gap-4 mb-3">
-                  <div>
-                    <h6 className="mb-0">Mobile</h6>
-                  </div>
-                  <div className="col-span-2 text-gray-500">
-                    {isEditingMobile ? (
-                      <input
-                        type="text"
-                        className="form-input w-full"
-                        value={mobile}
-                        onChange={(e) => setMobile(e.target.value)}
-                      />
-                    ) : (
-                      <div className="flex justify-between">
-                        <span>{mobile}</span>
-                        <button onClick={() => setIsEditingMobile(true)}>
-                          Edit
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div> */}
-
                 <div className="grid grid-cols-3 gap-4 mb-3">
                   <div>
                     <h6 className="mb-0">Address</h6>
@@ -297,46 +412,167 @@ const User = () => {
                 </div>
               </div>
             </div>
-            {/* <div className="mt-6">
-              <div className="card bg-white shadow-lg">
-                <div className="card-body p-6">
-                  <h5 className="mb-4">Project Status</h5>
-                  <p>Web Design</p>
-                  <div className="w-full bg-gray-200 h-1 mb-4">
-                    <div
-                      className="bg-gray-A0 h-1"
-                      style={{ width: "80%" }}
-                    ></div>
-                  </div>
-                  <p>Website Markup</p>
-                  <div className="w-full bg-gray-200 h-1 mb-4">
-                    <div className="bg-red h-1" style={{ width: "72%" }}></div>
-                  </div>
-                  <p>One Page</p>
-                  <div className="w-full bg-gray-200 h-1 mb-4">
-                    <div
-                      className="bg-green h-1"
-                      style={{ width: "89%" }}
-                    ></div>
-                  </div>
-                  <p>Mobile Template</p>
-                  <div className="w-full bg-gray-200 h-1 mb-4">
-                    <div
-                      className="bg-yellow h-1"
-                      style={{ width: "55%" }}
-                    ></div>
-                  </div>
-                  <p>Backend API</p>
-                  <div className="w-full bg-gray-200 h-1">
-                    <div
-                      className="bg-brown h-1"
-                      style={{ width: "66%" }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
           </div>
+          {/* Service Requests */}
+          {showServiceRequests && (
+            <div className="container mx-auto mt-8">
+              <div className="overflow-hidden rounded-lg border border-b-black-27 shadow-md">
+                <table className="min-w-full">
+                  <thead className="bg-gray-A0 border">
+                    <tr>
+                      {[
+                        "Service Request ID",
+                        "Category Type",
+                        "Cost",
+                        "Description",
+                        "Address",
+                        "Note",
+                        "Actions",
+                      ].map((header) => (
+                        <th
+                          key={header}
+                          className="px-6 py-3 text-left text-xs font-medium text-black-15 uppercase tracking-wider text-center"
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {serviceRequests.map((service: ServiceRequest) => (
+                      <tr
+                        key={service.serviceRequestId}
+                        className="hover:bg-gray-50 transition duration-200"
+                      >
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {service.serviceRequestId}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {service.serviceCategory.type || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {service.serviceCategory.cost || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {service.description}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {service.address || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {service.note || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          {/* <button
+                                  type="button"
+                                  className="mx-1 text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                >
+                                  Create Quotation
+                                </button> */}
+
+                          <button
+                            type="button"
+                            className="mx-1 text-white bg-red hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {/* Service Quotation */}
+          {showServiceQuotation && (
+            <div className="container mx-auto mt-8">
+              <div className="overflow-hidden rounded-lg border border-b-black-27 shadow-md">
+                <table className="min-w-full">
+                  <thead className="bg-gray-A0 border">
+                    <tr>
+                      {[
+                        "Quotation ID",
+                        "Category Type",
+                        "Category Cost",
+                        "Customer Name",
+                        "Request ID",
+                        "Description",
+                        "Address",
+                        "Total Cost",
+                        "VAT",
+                        "Active Status",
+                        "Actions",
+                      ].map((header) => (
+                        <th
+                          key={header}
+                          className="px-6 py-3 text-left text-xs font-medium text-black-15 uppercase tracking-wider text-center"
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {serviceQuotation.map((quotation: ServiceQuotation) => (
+                      <tr
+                        key={quotation.serviceQuotationId}
+                        className="hover:bg-gray-50 transition duration-200"
+                      >
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.serviceQuotationId}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.serviceRequest.serviceCategory.type ||
+                            "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.serviceRequest.serviceCategory.cost ||
+                            "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.customer.name || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.serviceRequest.serviceRequestId}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.description}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.serviceRequest.address || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.totalCost || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.vat || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-black-15 text-center">
+                          {quotation.isActive ? "Active" : "Inactive"}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <button
+                            type="button"
+                            className="mx-1 text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className="mx-1 text-white bg-red hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
