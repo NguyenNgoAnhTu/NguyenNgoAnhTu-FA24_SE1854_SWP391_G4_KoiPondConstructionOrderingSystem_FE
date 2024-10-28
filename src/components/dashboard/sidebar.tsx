@@ -338,6 +338,32 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                        <li>
+                            <NavLink
+                              to="/admin/tables/table-service-requests"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Table Service Request
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/admin/tables/table-service-quotation"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Table Service Quotation
+                            </NavLink>
+                          </li>
+
+                          <li>
+                            <NavLink
+                              to="/admin/tables/table-service-details"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Table Service Detail
+                            </NavLink>
+                          </li>
+                          
                           <li>
                             <NavLink
                               to="/admin/tables/table-service-progress"

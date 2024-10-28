@@ -1,64 +1,31 @@
 import { useEffect, useState } from "react";
-import FormQuotation from "../forms/FormQuotation";
 
-function ServiceRequestTable() {
-  interface ServiceRequest {
-    serviceRequestId: string;
-    serviceCategory: {
-      serviceCategoryId: string;
-      type: string;
-      cost: number;
-      note: string;
+function ServiceProgressTable() {
+  interface ServiceProgress {
+    serviceProgressID: string;
+    serviceDetail: {
+      serviceDetailId: string;
     };
-    description: string;
-    address: string;
-    note: string;
+    startDate: string;
+    endDate?: string;
+    step?: string;
+    isConfirmed: boolean;
+    isPaid: boolean;
+    isActive: boolean;
   }
 
-  const [serviceRequestData, setServiceRequestData] = useState<
-    ServiceRequest[]
+  const [serviceProgressData, setServiceProgressData] = useState<
+    ServiceProgress[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedService, setSelectedService] = useState<ServiceRequest | null>(null);
-  const [showQuotationForm, setShowQuotationForm] = useState(false);
-  const handleDelete = async (serviceRequestId: string) => {
-    if (window.confirm("Are you sure you want to delete this service request?")) {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8080/api/service-requests/${serviceRequestId}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        
-        if (!response.ok) {
-          throw new Error("Failed to delete service request");
-        }
-  
-        // Remove the deleted item from the state
-        setServiceRequestData(prevData => 
-          prevData.filter(request => request.serviceRequestId !== serviceRequestId)
-        );
-        
-        alert("Service request deleted successfully!");
-      } catch (error) {
-        alert("Failed to delete service request!");
-        console.error("Error:", error);
-      }
-    }
-  };
+
   useEffect(() => {
-    const fetchServiceRequest = async () => {
+    const fetchServiceProgress = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          "http://localhost:8080/api/service-requests",
+          "http://localhost:8080/api/service-progress",
           {
             method: "GET",
             headers: {
@@ -73,7 +40,7 @@ function ServiceRequestTable() {
         }
 
         const data = await response.json();
-        setServiceRequestData(data);
+        setServiceProgressData(data);
       } catch (error: unknown) {
         if (error instanceof Error) {
           setError(error.message);
@@ -83,7 +50,7 @@ function ServiceRequestTable() {
       }
     };
 
-    fetchServiceRequest();
+    fetchServiceProgress();
   }, []);
 
   if (loading) {
@@ -104,7 +71,7 @@ function ServiceRequestTable() {
     );
   }
 
-  if (serviceRequestData.length === 0) {
+  if (serviceProgressData.length === 0) {
     return <div className="text-center py-4">No data available.</div>;
   }
 
@@ -115,12 +82,15 @@ function ServiceRequestTable() {
           <thead className="bg-gray-A0 border">
             <tr>
               {[
-                "Service Request ID",
-                "Category Type",
-                "Cost",
-                "Description",
-                "Address",
-                "Note",
+                "Index",
+                "Service Progress ID",
+                "Service Detail ID",
+                "Start Date",
+                "End Date",
+                "Step",
+                "Is Confirmed",
+                "Is Paid",
+                "Is Active",
                 "Actions",
               ].map((header) => (
                 <th
@@ -133,63 +103,62 @@ function ServiceRequestTable() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {serviceRequestData.map((service: ServiceRequest) => (
+            {serviceProgressData.map((service, index) => (
               <tr
-                key={service.serviceRequestId}
+                key={service.serviceProgressID}
                 className="hover:bg-gray-50 transition duration-200"
               >
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {service.serviceRequestId}
-                </td>
-
-                <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {service.serviceCategory.type || "N/A"}
+                  {index + 1}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {service.serviceCategory.cost || "N/A"}
+                  {service.serviceProgressID}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {service.description}
+                  {service.serviceDetail?.serviceDetailId || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {service.address || "N/A"}
+                  {new Date(service.startDate).toLocaleString()}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {service.note || "N/A"}
+                  {service.endDate
+                    ? new Date(service.endDate).toLocaleString()
+                    : "Unfinished"}
+                </td>
+                <td className="px-6 py-4 text-sm text-black-15 text-center">
+                  {service.step || "N/A"}
+                </td>
+                <td className="px-6 py-4 text-sm text-black-15 text-center">
+                  {service.isConfirmed ? "✔️" : "❌"}
+                </td>
+                <td className="px-6 py-4 text-sm text-black-15 text-center">
+                  {service.isPaid ? "✔️" : "❌"}
+                </td>
+                <td className="px-6 py-4 text-sm text-black-15 text-center">
+                  {service.isActive ? "✔️" : "❌"}
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <button
                     type="button"
                     className="mx-1 text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    onClick={() => {
-                      setSelectedService(service);
-                      setShowQuotationForm(true);
-                    }}
                   >
-                    Create Quotation
+                    Edit
                   </button>
 
                   <button
-          type="button"
-          className="mx-1 text-white bg-red hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          onClick={() => handleDelete(service.serviceRequestId)}
-        >
-          Delete
-        </button>
+                    type="button"
+                    className="mx-1 text-white bg-red hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {showQuotationForm && selectedService && (
-        <FormQuotation
-          onClose={() => setShowQuotationForm(false)}
-          serviceRequest={selectedService}
-        />
-      )}
     </div>
   );
 }
 
-export default ServiceRequestTable;
+export default ServiceProgressTable;
