@@ -13,6 +13,11 @@ import User from "app/user/user";
 import Pond_Cleaning from "./pond-cleaning";
 import ConstructionHistory from "app/dashboard/tables/construction-history.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
+import DesignProfile from "app/dashboard/tables/designProfile";
+import Quotation from "app/dashboard/forms/quotation.tsx";
+import QuotationTable from "app/dashboard/tables/quotation.tsx";
+import DesignProfileForm from "app/dashboard/forms/design-profile.tsx"
+import DesignProfileManager from "app/dashboard/tables/designprofile-manager.tsx"
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
@@ -39,6 +44,26 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-construction-history",
     element: <ConstructionHistory />,
+  },
+  {
+    path: "/admin/forms/quotation",
+    element: <Quotation />,
+  },
+  {
+    path: "/admin/tables/table-designProfile",
+    element: <DesignProfile />,
+  },
+  {
+    path: "/admin/forms/design-profile-form",
+    element: <DesignProfileForm />,
+  },
+  {
+    path: "/admin/tables/designProfile-manager",
+    element: <DesignProfileManager />,
+  },
+  {
+    path: "/admin/tables/table-quotation",
+    element: <QuotationTable />,
   },
 ];
 
