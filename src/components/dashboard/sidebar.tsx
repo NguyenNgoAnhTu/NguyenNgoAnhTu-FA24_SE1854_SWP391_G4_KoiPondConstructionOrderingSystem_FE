@@ -230,6 +230,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Form Service Progress
                             </NavLink>
                           </li>
+                          <li>
+                            <NavLink
+                              to="/admin/forms/design-profile-form"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Form Design Profile
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/admin/forms/quotation"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Form Quotation
+                            </NavLink>
+                          </li>
 
                           {/* <!-- nơi viết link form vào siderbar --> */}
                           <li>
@@ -336,6 +352,30 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
                             >
                               Construction history
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/admin/tables/table-quotation"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Table Quotation
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/admin/tables/table-designProfile"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Table Design Profile
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/admin/tables/designProfile-manager"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Table Design Profile Manager
                             </NavLink>
                           </li>
                         </ul>
