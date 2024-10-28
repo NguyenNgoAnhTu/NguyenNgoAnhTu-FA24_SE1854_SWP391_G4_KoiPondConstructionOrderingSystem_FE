@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import CloseCircle from "assets/images/close-circle.png";
+//import CloseCircle from "assets/images/close-circle.png";
 interface FormCleaningProps {
   onClose: () => void;
-  serviceCategoryId: string; // Add this prop
+   serviceCategoryId: number; // Add this prop
+      categoryType: string;
+  
 }
-const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId }) => {
+const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId, categoryType }) => {
   const [formData, setFormData] = useState({
     categoryID: serviceCategoryId, // Set initial value from prop
+    categoryType: categoryType,
     description: "",
     address: "",
     note: "",
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
-    categoryID: "",
+    categoryType : "",
     description: "",
     address: "",
     note: "",
@@ -25,8 +28,9 @@ const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId 
     setFormData((prevFormData) => ({
       ...prevFormData,
       categoryID: serviceCategoryId,
+      categoryType: categoryType,
     }));
-  }, [serviceCategoryId]);
+  }, [serviceCategoryId, categoryType]);
   // Handle input changes
   const handleChange = (
     e:
@@ -85,6 +89,7 @@ const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId 
                 description: formData.description,
               address: formData.address,
               note: formData.note,
+              //categoryType: formData.categoryType,
             }),
           }
         );
@@ -95,7 +100,7 @@ const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId 
         }
 
         alert("Service request saved!");
-        navigate("/admin/tables/table-service-requests");
+        navigate("/user");
       } catch (error) {
         alert("Create service request failed!");
       } finally {
@@ -108,25 +113,32 @@ const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId 
     <div className="max-w-lg mx-auto bg-white shadow-lg rounded-lg p-8 mt-10">
       <div className="text-2xl font-bold mb-6 text-gray-800">
         Service Request
-        <img src={CloseCircle} alt="close" width={20} height={20} onClick={onClose} />
+        {/* <img src={CloseCircle} alt="close" width={20} height={20} onClick={onClose} /> */}
       </div>
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
-          <label className="block text-black-15 mb-2">Service Category ID</label>
+          <label className="block text-black-15 mb-2">Service Category Type</label>
           <div className="relative">
+          <input
+      type="text"
+      name="categoryType"
+      value={formData.categoryType}
+      className="w-full p-3 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue bg-gray-50"
+      readOnly
+    />
             <input
-              type="text"
+              type="hidden"
               name="categoryID"
               value={formData.categoryID}
               onChange={handleChange}
               className={`w-full p-3 border ${
-                errors.categoryID ? "border-red" : "border-black"
+                errors.categoryType ? "border-red" : "border-black"
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue`}
               placeholder="Enter service category ID"
               readOnly 
             />
-            {errors.categoryID && (
-              <p className="text-red text-sm mt-1">{errors.categoryID}</p>
+            {errors.categoryType && (
+              <p className="text-red text-sm mt-1">{errors.categoryType}</p>
             )}
           </div>
         </div>
@@ -185,7 +197,7 @@ const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId 
             )}
           </div>
         </div>
-
+        <div className="flex gap-4">
         <button
           type="submit"
           className={`w-full bg-green hover:bg-green text-white font-bold py-3 rounded-md transition duration-200 ${
@@ -193,8 +205,16 @@ const FormCleaning: React.FC<FormCleaningProps> = ({ onClose, serviceCategoryId 
           }`}
           disabled={loading}
         >
-          {loading ? "Loading..." : "Create Service Progress"}
+          {loading ? "Loading..." : "Create Service Request"}
         </button>
+        <button
+    type="button"
+    onClick={onClose}
+    className="flex-1 bg-green hover:bg-green text-white font-bold py-3 rounded-md transition duration-200"
+  >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

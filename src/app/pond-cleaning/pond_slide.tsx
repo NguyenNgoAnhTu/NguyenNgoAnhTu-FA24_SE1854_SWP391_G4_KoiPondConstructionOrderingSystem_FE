@@ -21,10 +21,13 @@ const Pond_slide = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
+  const [categoryType, setCategoryType] = useState<string | null>(null);
 
-  const handleOpen = (id: number) => {
+  const handleOpen = (id: number, type: string) => {
     setSelectedServiceId(id); // Set the selected serviceCategoryId
+    setCategoryType(type);
     setShowPopup(true); // Show the popup
+    
   };
 
   useEffect(() => {
@@ -104,7 +107,7 @@ const Pond_slide = () => {
         <Slider {...settings} className="w-full mx-auto mt-[50px]">
           {blog.map((data: PondConfig) => (
             <a
-              onClick={() => handleOpen(data.serviceCategoryId)} // Pass the id to handleOpen
+              onClick={() => handleOpen(data.serviceCategoryId, data.type)} // Pass the id and type to handleOpen
               key={data.serviceCategoryId}
               className="bg-white flex flex-col items-center gap-10 w-full rounded-3xl shadow-md hover:opacity-60"
             >
@@ -128,7 +131,7 @@ const Pond_slide = () => {
                   fontWeight={"bold"}
                   className="text-[24px]"
                 >
-                  {data.description}
+                  {data.type}
                 </Typography>
                 <Typography
                   variant={"small"}
@@ -141,7 +144,7 @@ const Pond_slide = () => {
                   fontWeight={"bold"}
                   className="text-gray-800 mt-4"
                 >
-                  {data.description}
+                  {data.note}
                 </Typography>
               </div>
             </a>
@@ -151,7 +154,9 @@ const Pond_slide = () => {
       {showPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div>
-            <FormCleaning onClose={() => setShowPopup(false)} serviceCategoryId={selectedServiceId} />
+            <FormCleaning onClose={() => setShowPopup(false)} serviceCategoryId={selectedServiceId} 
+              categoryType={categoryType}
+              />
           </div>
         </div>
       )}

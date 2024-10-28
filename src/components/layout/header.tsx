@@ -10,7 +10,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-  const [showPopup, setShowPopup] = useState(false);
+ // const [showPopup, setShowPopup] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [name, setName] = useState<string | null>(null);
   const toggleUserDropdown = () => {
@@ -21,7 +21,7 @@ const Header = () => {
     navigate("/login");
   };
   const handleSetting = () => {
-    setShowPopup(!showPopup);
+    navigate("/user")
   };
 
   const handleScrollToSection = (sectionId: string) => {

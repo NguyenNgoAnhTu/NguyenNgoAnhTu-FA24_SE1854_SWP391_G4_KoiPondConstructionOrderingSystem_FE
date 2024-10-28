@@ -18,6 +18,8 @@ import Quotation from "app/dashboard/forms/quotation.tsx";
 import QuotationTable from "app/dashboard/tables/quotation.tsx";
 import DesignProfileForm from "app/dashboard/forms/design-profile.tsx"
 import DesignProfileManager from "app/dashboard/tables/designprofile-manager.tsx"
+import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
+import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
@@ -40,6 +42,14 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-service-requests",
     element: <TableServiceRequest />,
+  },
+  {
+    path: "/admin/tables/table-service-quotation",
+    element: <TableServiceQuotation />,
+  }, 
+  {
+    path: "/admin/tables/table-service-details",
+    element: <TableServiceDetail />,
   },
   {
     path: "/admin/tables/table-construction-history",
