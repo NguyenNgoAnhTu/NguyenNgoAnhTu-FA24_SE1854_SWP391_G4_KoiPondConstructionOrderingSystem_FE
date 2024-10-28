@@ -117,7 +117,7 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("This design profile is already completed!");
       }
       console.log("Construction history created successfully!");
       setShowModal(false);
@@ -148,7 +148,7 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("This design profile is either already finished or has a document!");
       }
       console.log("Construction history created successfully!");
       setShowFormDocumentModal(false);
@@ -172,10 +172,11 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("This design profile has already completed!");
       }
       console.log("Construction finished successfully!");
       alert("Construction finished!");
+      fetchData();
     } catch (err) {
       alert(err);
     }
