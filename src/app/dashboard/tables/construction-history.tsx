@@ -306,6 +306,7 @@ function ConstructionHistory() {
           >
             View document
           </Button>
+          
           <Popconfirm title="Finish" description="Do you want to finish this construction?" onConfirm={() => handleFinish(designProfileId)}>
             <Button type="primary" danger>Finish</Button>
           </Popconfirm>

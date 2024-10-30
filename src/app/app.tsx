@@ -13,6 +13,8 @@ import User from "app/user/user";
 import Pond_Cleaning from "./pond-cleaning";
 import ConstructionHistory from "app/dashboard/tables/construction-history.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
+import ConsultForm from "app/dashboard/forms/consult.tsx";
+import Consult from "app/dashboard/tables/consult";
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
@@ -35,6 +37,14 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-service-requests",
     element: <TableServiceRequest />,
+  },
+  {
+    path: "/admin/forms/form-consult",
+    element: <ConsultForm />,
+  },
+  {
+    path: "/admin/tables/table-consult",
+    element: <Consult />,
   },
   {
     path: "/admin/tables/table-construction-history",

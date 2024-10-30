@@ -231,6 +231,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             </NavLink>
                           </li>
 
+                          <li>
+                            <NavLink
+                              to="/admin/forms/form-consult"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Form Consult
+                            </NavLink>
+                          </li>
+
                           {/* <!-- nơi viết link form vào siderbar --> */}
                           <li>
                             <NavLink
@@ -332,10 +341,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           </li>
                           <li>
                             <NavLink
-                              to="/admin/tables/table-service-progress"
+                              to="/admin/tables/table-construction-history"
                               className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
                             >
                               Construction history
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/admin/tables/table-consult"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Consult
                             </NavLink>
                           </li>
                         </ul>
