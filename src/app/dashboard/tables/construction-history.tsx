@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Button, Form, Input, Modal, Popconfirm, Table } from "antd";
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Table,
+} from "antd";
 
 function ConstructionHistory() {
   const [datas, setDatas] = useState([]);
@@ -18,7 +26,6 @@ function ConstructionHistory() {
     description: string;
     confirmCustomerName: string;
     confirmConstructorName: string;
-  
   };
 
   const fetchData = async () => {
@@ -132,6 +139,7 @@ function ConstructionHistory() {
       const token = localStorage.getItem("token");
       const requestBody = {
         description: values.description,
+        confirmDate: values.confirmDate,
         confirmCustomerName: values.confirmCustomerName,
         confirmConstructorName: values.confirmConstructorName,
         designProfileId: selectedDesignProfileId, // Include the stored ID
@@ -148,7 +156,9 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        throw new Error("This design profile is either already finished or has a document!");
+        throw new Error(
+          "This design profile is either already finished or has a document!"
+        );
       }
       console.log("Construction history created successfully!");
       setShowFormDocumentModal(false);
@@ -270,9 +280,11 @@ function ConstructionHistory() {
       render: (designProfileId: any) => (
         <>
           <Button
-            type="primary"
-            danger
-            style={{ marginRight: "3px" }}
+            style={{
+              marginRight: "3px",
+              backgroundColor: "DodgerBlue",
+              color: "white",
+            }}
             onClick={() => {
               setSelectedDesignProfileId(designProfileId);
               setShowModal(true);
@@ -281,17 +293,21 @@ function ConstructionHistory() {
             Create history
           </Button>
           <Button
-            type="primary"
-            danger
-            style={{ marginRight: "3px" }}
+            style={{
+              marginRight: "3px",
+              backgroundColor: "LimeGreen",
+              color: "white",
+            }}
             onClick={() => fetchDataHistory(designProfileId)}
           >
             View history
           </Button>
           <Button
-            type="primary"
-            danger
-            style={{ marginRight: "3px" }}
+            style={{
+              marginRight: "3px",
+              backgroundColor: "DodgerBlue",
+              color: "white",
+            }}
             onClick={() => {
               setSelectedDesignProfileId(designProfileId);
               setShowFormDocumentModal(true);
@@ -302,13 +318,26 @@ function ConstructionHistory() {
           <Button
             type="primary"
             danger
-            style={{ marginRight: "3px" }}
+            style={{
+              marginRight: "3px",
+              backgroundColor: "LimeGreen",
+              color: "white",
+            }}
             onClick={() => fetchDataDocument(designProfileId)}
           >
             View document
           </Button>
-          <Popconfirm title="Finish" description="Do you want to finish this construction?" onConfirm={() => handleFinish(designProfileId)}>
-            <Button type="primary" danger>Finish</Button>
+          <Popconfirm
+            title="Finish"
+            color="red"
+            cancelButtonProps={{ style: { color: "white" } }}
+            okButtonProps={{ style: { borderColor: "white" } }}
+            description="Do you want to finish this construction?"
+            onConfirm={() => handleFinish(designProfileId)}
+          >
+            <Button style={{ backgroundColor: "red", color: "white" }}>
+              Finish
+            </Button>
           </Popconfirm>
         </>
       ),
@@ -322,6 +351,9 @@ function ConstructionHistory() {
         onOk={() => form.submit()}
         open={showModal}
         title="Construction history"
+        okButtonProps={{
+          style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
+        }}
       >
         <Form onFinish={handleFormCreate} form={form} labelCol={{ span: 24 }}>
           <Form.Item
@@ -345,14 +377,28 @@ function ConstructionHistory() {
         onOk={() => form.submit()}
         open={showFormDocumentModal}
         title="Acceptance document"
+        okButtonProps={{
+          style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
+        }}
       >
-        <Form onFinish={handleDocumentCreate} form={form} labelCol={{ span: 24 }}>
+        <Form
+          onFinish={handleDocumentCreate}
+          form={form}
+          labelCol={{ span: 24 }}
+        >
           <Form.Item
             label="Description"
             name="description"
             rules={[{ required: true, message: "Cannot be blank!" }]}
           >
             <Input.TextArea />
+          </Form.Item>
+          <Form.Item
+            label="Confirm date"
+            name="confirmDate"
+            rules={[{ required: true, message: "Please select a date!" }]}
+          >
+            <DatePicker />
           </Form.Item>
           <Form.Item
             label="Customer"
@@ -375,6 +421,9 @@ function ConstructionHistory() {
         title="Construction histories"
         onCancel={() => setShowHistoryModal(false)}
         onOk={() => setShowHistoryModal(false)}
+        okButtonProps={{
+          style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
+        }}
       >
         <Table dataSource={datasHistory} columns={columnsHistory}></Table>
       </Modal>
@@ -383,6 +432,9 @@ function ConstructionHistory() {
         title="Acceptance documents"
         onCancel={() => setShowDocumentModal(false)}
         onOk={() => setShowDocumentModal(false)}
+        okButtonProps={{
+          style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
+        }}
       >
         <Table dataSource={datasDocument} columns={columnsDocument}></Table>
       </Modal>
