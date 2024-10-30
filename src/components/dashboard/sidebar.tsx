@@ -246,6 +246,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Form Quotation
                             </NavLink>
                           </li>
+                          <li>
+                            <NavLink
+                              to="/admin/forms/form-consult"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Form Consult
+                            </NavLink>
+                          </li>
 
                           {/* <!-- nơi viết link form vào siderbar --> */}
                           <li>
@@ -402,6 +410,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
                             >
                               Table Design Profile Manager
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/admin/tables/table-consult"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Table Consult
                             </NavLink>
                           </li>
                         </ul>
