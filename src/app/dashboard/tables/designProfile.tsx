@@ -187,7 +187,7 @@
 
 
 import { useEffect, useState } from "react";
-import { Button, Form, Input, Modal, Table } from "antd";
+import { Button, Form, Input, Modal, Table, Popconfirm } from "antd";
 
 function DesignProfile() {
   const [datas, setDatas] = useState([]);
@@ -405,14 +405,24 @@ function DesignProfile() {
       title: "Action",
       key: "action",
       render: ( design : any) => (
-        <Button
-        type="primary"
-        danger
-        style={{ marginRight: "3px" }}
-          onClick={() => handleFinishDesign(design.designId)}
-        >
-          Finish
-        </Button>
+        // <Button
+        // type="primary"
+        // danger
+        // style={{ marginRight: "3px" }}
+        //   onClick={() => handleFinishDesign(design.designId)}
+        // >
+        //   Finish
+        // </Button>
+        <Popconfirm
+            title="Finish"
+            color="red"
+            description="Do you want to finish this construction?"
+            onConfirm={() => handleFinishDesign(design.designId) }
+          >
+            <Button style={{ backgroundColor: "red", color: "white" }}>
+              Finish
+            </Button>
+          </Popconfirm>
         
         // {!design.designStatus && ( // Hiển thị nút Confirm nếu chưa xác nhận
         //   <Button type="link" onClick={() => handleConfirm(record.quotationId)}>
