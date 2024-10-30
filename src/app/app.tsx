@@ -20,6 +20,8 @@ import DesignProfileForm from "app/dashboard/forms/design-profile.tsx"
 import DesignProfileManager from "app/dashboard/tables/designprofile-manager.tsx"
 import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
+import ConsultForm from "app/dashboard/forms/consult.tsx";
+import Consult from "app/dashboard/tables/consult";
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
@@ -70,6 +72,14 @@ const routesAdmin = [
   {
     path: "/admin/tables/designProfile-manager",
     element: <DesignProfileManager />,
+  },
+  {
+    path: "/admin/forms/form-consult",
+    element: <ConsultForm />,
+  },
+  {
+    path: "/admin/tables/table-consult",
+    element: <Consult />,
   },
   {
     path: "/admin/tables/table-quotation",
