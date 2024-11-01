@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
 
   const navigate = useNavigate();
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -59,46 +59,41 @@ const LoginPage = () => {
     if (validateForm()) {
       setLoading(true);
       // Simulating API call
-       
+
 
       const response = await fetch("http://localhost:8080/api/login", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            email:   formData.username,
-            password: formData.password,
+          email: formData.username,
+          password: formData.password,
         }),
-    });
-   
-    if (response.ok) {
-        setTimeout(async () => {
-            const data = await response.json();
-            console.info(data)
-            localStorage.setItem(
-                "token",
-                data.token
-            );    
-            console.log(data.token)  
-            navigate("/"); 
-            localStorage.setItem("name", data.name);
-            console.log(data.name)
-        }, 2000);
+      });
 
-        setTimeout(() => {
-          setLoading(false);
-          alert("Login successful!");
+      if (response.ok) {
+        setTimeout(async () => {
+          const data = await response.json();
+          console.info(data)
+          localStorage.setItem(
+            "token",
+            data.token
+          );
+          console.log(data.token)
+          navigate("/admin/dashboard");
+          localStorage.setItem("name", data.name);
+          console.log(data.name)
         }, 2000);
       }
-     
-    else {
-    setTimeout(() => {
-      setLoading(false);
-      alert("Login fail!");
-    }, 2000);
-  }
-}
+
+      else {
+        setTimeout(() => {
+          setLoading(false);
+          alert("Login fail!");
+        }, 2000);
+      }
+    }
   };
 
   return (
@@ -133,11 +128,10 @@ const LoginPage = () => {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors ${
-                errors.username
-                  ? "border-red focus:ring-red"
-                  : "border-gray focus:ring-blue"
-              }`}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.username
+                ? "border-red focus:ring-red"
+                : "border-gray focus:ring-blue"
+                }`}
               aria-invalid={errors.username ? "true" : "false"}
               aria-describedby="username-error"
             />
@@ -161,11 +155,10 @@ const LoginPage = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors ${
-                  errors.password
-                    ? "border-red focus:ring-red"
-                    : "border-gray focus:ring-blue"
-                }`}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.password
+                  ? "border-red focus:ring-red"
+                  : "border-gray focus:ring-blue"
+                  }`}
                 aria-invalid={errors.password ? "true" : "false"}
                 aria-describedby="password-error"
               />
@@ -188,9 +181,8 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-green text-black bg-[#076839] font-semibold py-2 px-4 rounded-md hover:bg-[#5C813F] focus:outline-none focus:ring-2 focus:ring-blue focus:ring-opacity-50 transition-colors ${
-                loading ? "opacity-75 cursor-not-allowed" : ""
-              }`}
+              className={`w-full bg-green text-black bg-[#076839] font-semibold py-2 px-4 rounded-md hover:bg-[#5C813F] focus:outline-none focus:ring-2 focus:ring-blue focus:ring-opacity-50 transition-colors ${loading ? "opacity-75 cursor-not-allowed" : ""
+                }`}
             >
               {loading ? (
                 <>

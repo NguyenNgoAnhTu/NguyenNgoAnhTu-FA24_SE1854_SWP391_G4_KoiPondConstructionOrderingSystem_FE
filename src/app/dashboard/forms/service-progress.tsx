@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Select } from 'antd';
 
 const ServiceProgressForm = () => {
   const [formData, setFormData] = useState({
     serviceDetailID: "",
-    step: "",
+    step: "Not started", // default value for step
     description: "",
   });
   const [loading, setLoading] = useState(false);
@@ -14,14 +15,18 @@ const ServiceProgressForm = () => {
     description: "",
   });
 
-  const navigate = useNavigate(); // Ensure navigate is correctly imported and initialized
+  const options = [
+    { value: "Not started", label: "Not started" },
+    { value: "On hold", label: "On hold" },
+    { value: "In progress", label: "In progress" },
+    { value: "Complete", label: "Complete" },
+    { value: "Canceled", label: "Canceled" }
+  ];
+
+  const navigate = useNavigate();
 
   // Handle input changes
-  const handleChange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -30,6 +35,14 @@ const ServiceProgressForm = () => {
     setErrors({
       ...errors,
       [name]: "",
+    });
+  };
+
+  // Handle Select component changes for step
+  const handleStepChange = (value: string) => {
+    setFormData({
+      ...formData,
+      step: value,
     });
   };
 
@@ -43,23 +56,17 @@ const ServiceProgressForm = () => {
       isValid = false;
     }
 
-    if (!formData.step.trim()) {
-      newErrors.step = "Step is required";
-      isValid = false;
-    }
-
     setErrors(newErrors);
     return isValid;
   };
 
   // Handle form submit
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
       setLoading(true);
       const token = localStorage.getItem("token");
-
       try {
         const response = await fetch(
           "http://localhost:8080/api/service-progress",
@@ -69,11 +76,7 @@ const ServiceProgressForm = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({
-              serviceDetailID: formData.serviceDetailID,
-              step: formData.step,
-              description: formData.description,
-            }),
+            body: JSON.stringify(formData),
           }
         );
 
@@ -87,7 +90,7 @@ const ServiceProgressForm = () => {
       } catch (error) {
         alert("Create service progress failed!");
       } finally {
-        setLoading(false); // Reset loading state
+        setLoading(false);
       }
     }
   };
@@ -106,9 +109,8 @@ const ServiceProgressForm = () => {
               name="serviceDetailID"
               value={formData.serviceDetailID}
               onChange={handleChange}
-              className={`w-full p-3 border ${
-                errors.serviceDetailID ? "border-red" : "border-black"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-blue`}
+              className={`w-full p-3 border ${errors.serviceDetailID ? "border-red" : "border-black"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue`}
               placeholder="Enter service detail ID"
             />
             {errors.serviceDetailID && (
@@ -120,19 +122,12 @@ const ServiceProgressForm = () => {
         <div className="mb-6">
           <label className="block text-black-15 mb-2">Step</label>
           <div className="relative">
-            <input
-              type="text"
-              name="step"
-              value={formData.step}
-              onChange={handleChange}
-              className={`w-full p-3 border ${
-                errors.step ? "border-red" : "border-black"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400`}
-              placeholder="Enter step"
+            <Select
+              defaultValue="Not started"
+              style={{ width: '100%' }}
+              onChange={handleStepChange}
+              options={options}
             />
-            {errors.step && (
-              <p className="text-red text-sm mt-1">{errors.step}</p>
-            )}
           </div>
         </div>
 
@@ -143,9 +138,8 @@ const ServiceProgressForm = () => {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className={`w-full p-3 border ${
-                errors.description ? "border-red" : "border-black"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-blue`}
+              className={`w-full p-3 border ${errors.description ? "border-red" : "border-black"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue`}
               placeholder="Describe the progress of this step"
             ></textarea>
             {errors.description && (
@@ -156,9 +150,8 @@ const ServiceProgressForm = () => {
 
         <button
           type="submit"
-          className={`w-full bg-green hover:bg-green text-white font-bold py-3 rounded-md transition duration-200 ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`w-full bg-green hover:bg-green-dark text-white font-bold py-3 rounded-md transition duration-200 ${loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           disabled={loading}
         >
           {loading ? "Loading..." : "Create Service Progress"}
