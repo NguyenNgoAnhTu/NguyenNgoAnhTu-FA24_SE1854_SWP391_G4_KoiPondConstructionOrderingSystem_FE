@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Button,
-  DatePicker,
-  Form,
-  Input,
-  Modal,
-  Popconfirm,
-  Table,
-} from "antd";
+import { Button, DatePicker, Form, Input, Modal, Popconfirm, Table } from "antd";
 
 function ConstructionHistory() {
   const [datas, setDatas] = useState([]);
@@ -28,11 +20,11 @@ function ConstructionHistory() {
     confirmConstructorName: string;
   };
 
-  const fetchData = async () => {
+  const fetchData = async (address: any) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:8080/api/construction_history/get-design_profiles-by-constructor",
+        `http://localhost:8080/api/construction_history/get-design_profiles-by-constructor-and-address?address=${encodeURIComponent(address)}`,
         {
           method: "GET",
           headers: {
@@ -186,14 +178,14 @@ function ConstructionHistory() {
       }
       console.log("Construction finished successfully!");
       alert("Construction finished!");
-      fetchData();
+      fetchData("");
     } catch (err) {
       alert(err);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData("");
   }, []);
 
   const columnsHistory = [
@@ -329,7 +321,7 @@ function ConstructionHistory() {
           </Button>
           <Popconfirm
             title="Finish"
-            color="red"
+            color="orange"
             cancelButtonProps={{ style: { color: "white" } }}
             okButtonProps={{ style: { borderColor: "white" } }}
             description="Do you want to finish this construction?"
@@ -345,6 +337,13 @@ function ConstructionHistory() {
   ];
   return (
     <div>
+    <Input.Search
+        placeholder="Address"
+        enterButton="Search"
+        size="large"
+        onSearch={(value)=>fetchData(value)}
+        style={{ marginLeft: 18, width: '82%', backgroundColor: 'DodgerBlue' }}
+      />
       <Table dataSource={datas} columns={columns}></Table>
       <Modal
         onCancel={() => setShowModal(false)}
