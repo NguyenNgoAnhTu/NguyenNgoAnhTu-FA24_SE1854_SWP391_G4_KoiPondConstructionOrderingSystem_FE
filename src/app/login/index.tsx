@@ -84,6 +84,7 @@ const LoginPage = () => {
           navigate("/admin/dashboard");
           localStorage.setItem("name", data.name);
           console.log(data.name)
+          localStorage.setItem("customerId", data.customerId);
         }, 2000);
       }
 
