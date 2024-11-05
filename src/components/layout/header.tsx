@@ -10,9 +10,9 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
   const [token, setToken] = useState<string | null>(null);
- // const [showPopup, setShowPopup] = useState(false);
+  //  const [showPopup, setShowPopup] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [name, setName] = useState<string | null>(null);
+  //const [name, setName] = useState<string | null>(null);
   const toggleUserDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen); // Toggle user dropdown
   };
@@ -21,7 +21,7 @@ const Header = () => {
     navigate("/login");
   };
   const handleSetting = () => {
-    navigate("/user")
+    navigate("/user");
   };
 
   const handleScrollToSection = (sectionId: string) => {
@@ -37,8 +37,8 @@ const Header = () => {
     if (typeof window !== "undefined" && window.localStorage) {
       const token = localStorage.getItem("token");
       setToken(token);
-      const name = localStorage.getItem("name");
-      setName(name);
+     // const name = localStorage.getItem("name");
+     // setName(name);
     }
   }, []);
   console.log(token);
@@ -131,9 +131,15 @@ const Header = () => {
         <div className="relative">
           <Typography
             onClick={toggleUserDropdown}
-            className="cursor-pointer font-bold hover:bg-green"
+            className="cursor-pointer"
           >
-            {name}
+             <img
+                    src="https://i.pinimg.com/564x/72/32/98/72329823360e56269897813a3dbd99b6.jpg"
+                    alt="Admin"
+                    className="rounded-full p-1 bg-blue-500"
+                    width="110"
+                    
+                  />
           </Typography>
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50">

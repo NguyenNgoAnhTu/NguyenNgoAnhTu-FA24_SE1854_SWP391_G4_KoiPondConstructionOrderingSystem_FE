@@ -1,6 +1,9 @@
 import Slider from "react-slick";
 import Typography from "components/typography/typography";
 import EventImg_1 from "assets/images/average-pond-maintenance.webp";
+import EventImg_2 from "assets/images/Moms-pond.png";
+import EventImg_3 from "assets/images/high-end-pond-maintenance.webp";
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./pond_slide.css";
@@ -16,6 +19,7 @@ interface PondConfig {
 }
 
 const Pond_slide = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [blog, setBlog] = useState<any>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,7 +33,7 @@ const Pond_slide = () => {
     setShowPopup(true); // Show the popup
     
   };
-
+  const images = [EventImg_1, EventImg_2, EventImg_3];
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -105,7 +109,7 @@ const Pond_slide = () => {
         </div>
 
         <Slider {...settings} className="w-full mx-auto mt-[50px]">
-          {blog.map((data: PondConfig) => (
+          {blog.map((data: PondConfig,index:any) => (
             <a
               onClick={() => handleOpen(data.serviceCategoryId, data.type)} // Pass the id and type to handleOpen
               key={data.serviceCategoryId}
@@ -113,7 +117,7 @@ const Pond_slide = () => {
             >
               <div className="w-full">
                 <img
-                  src={EventImg_1}
+                  src={images[index % images.length]}
                   alt=""
                   className="w-full h-[300px] object-cover rounded-t-3xl"
                 />
@@ -154,14 +158,16 @@ const Pond_slide = () => {
       {showPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div>
-            <FormCleaning onClose={() => setShowPopup(false)} serviceCategoryId={selectedServiceId} 
-              categoryType={categoryType}
-              />
+            <FormCleaning 
+              onClose={() => setShowPopup(false)} 
+              serviceCategoryId={selectedServiceId || 0}
+              categoryType={categoryType || ''}
+            />
           </div>
         </div>
       )}
     </div>
   );
 };
-
+  
 export default Pond_slide;
