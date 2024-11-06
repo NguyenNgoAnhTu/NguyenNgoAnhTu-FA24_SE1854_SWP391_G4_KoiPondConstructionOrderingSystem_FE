@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
 import "./user.css";
+import { toast } from "react-toastify";
 const User = () => {
   interface ServiceRequest {
     serviceRequestId: string;
@@ -14,6 +15,7 @@ const User = () => {
     description: string;
     address: string;
     note: string;
+    status: string;
   }
 
   interface ServiceQuotation {
@@ -37,13 +39,14 @@ const User = () => {
         note: string;
       };
       address: string;
+      status: string;
     };
     description: string;
     note: string;
     cost: number;
     totalCost: number;
     vat: number;
-    isActive: boolean;
+    confirm: boolean;
   }
 
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
@@ -77,6 +80,51 @@ const User = () => {
   //const [customerId] = useState(localStorage.getItem("customerId") || "");
   const [modal, setModal] = useState(false);
   const [visibleCount, setVisibleCount] = useState(3); // initially show 3 cards
+  const handleConfirmToggle = async (quotationId: string) => {
+    // Only show confirmation dialog if not already confirmed
+    const quotation = serviceQuotation.find(
+      (q) => q.serviceQuotationId === quotationId
+    );
+    if (!quotation?.confirm) {
+      if (
+        window.confirm(
+          "Are you sure you want to confirm this quotation? This action cannot be undone."
+        )
+      ) {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(
+            `http://localhost:8080/api/service-quotations/${quotationId}/toggle-confirm`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to toggle confirmation status");
+          }
+
+          const updatedQuotation = await response.json();
+          setServiceQuotation((prevData) =>
+            prevData.map((quotation) =>
+              quotation.serviceQuotationId === quotationId
+                ? updatedQuotation
+                : quotation
+            )
+          );
+
+          toast.success("Quotation confirmed successfully!");
+        } catch (error) {
+          console.error("Error toggling confirmation status:", error);
+          toast.error("Failed to confirm quotation");
+        }
+      }
+    }
+  };
 
   const handleShowMore = () => {
     setVisibleCount((prevCount) => prevCount + 3); // show 3 more cards on each click
@@ -230,7 +278,6 @@ const User = () => {
                 <hr className="my-4" />
                 <nav className="mt-5">
                   <ul className="flex flex-col gap-2">
-                   
                     <div
                       className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0"
                       onClick={handleOpen}
@@ -476,6 +523,9 @@ const User = () => {
                       <p className="text-sm text-gray-700 mb-2">
                         <strong>Note:</strong> {service.note || "N/A"}
                       </p>
+                      <p className="text-sm text-gray-700 mb-2">
+                        <strong>Status:</strong> {service.status || "N/A"}
+                      </p>
 
                       <div className="flex justify-center mt-4">
                         {/* Optional 'Create Quotation' button */}
@@ -510,70 +560,78 @@ const User = () => {
 
           {/* Service Quotation */}
           {showServiceQuotation && (
-      <div className="container mx-auto mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {serviceQuotation.slice(0, visibleCount).map((quotation) => (
-            <div
-              key={quotation.serviceQuotationId}
-              className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-            >
-              <h3 className="text-lg font-semibold text-center mb-4">
-                Quotation ID: {quotation.serviceQuotationId}
-              </h3>
+            <div className="container mx-auto mt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {serviceQuotation.slice(0, visibleCount).map((quotation) => (
+                  <div
+                    key={quotation.serviceQuotationId}
+                    className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+                  >
+                    <h3 className="text-lg font-semibold text-center mb-4">
+                      Quotation ID: {quotation.serviceQuotationId}
+                    </h3>
 
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Category Type:</strong> {quotation.serviceRequest.serviceCategory.type || "N/A"}
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Category Cost:</strong> {quotation.serviceRequest.serviceCategory.cost || "N/A"}
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Customer Name:</strong> {quotation.customer.name || "N/A"}
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Request ID:</strong> {quotation.serviceRequest.serviceRequestId}
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Description:</strong> {quotation.description}
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Address:</strong> {quotation.serviceRequest.address || "N/A"}
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Total Cost:</strong> {quotation.totalCost || "N/A"}
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>VAT:</strong> {quotation.vat || "N/A"}
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Active Status:</strong> {quotation.isActive ? "Active" : "Inactive"}
-              </p>
-
-              <div className="flex justify-center mt-4">
-             
-                <button
-                  type="button"
-                  className="mx-1 text-red bg-white hover:bg-red hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
-                >
-                  Delete
-                </button>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Category Type:</strong>{" "}
+                      {quotation.serviceRequest.serviceCategory.type || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Category Cost:</strong>{" "}
+                      {quotation.serviceRequest.serviceCategory.cost || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Customer Name:</strong>{" "}
+                      {quotation.customer.name || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Request ID:</strong>{" "}
+                      {quotation.serviceRequest.serviceRequestId}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Description:</strong> {quotation.description}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Address:</strong>{" "}
+                      {quotation.serviceRequest.address || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Total Cost:</strong>{" "}
+                      {quotation.totalCost || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>VAT:</strong> {quotation.vat || "N/A"}
+                    </p>
+                    <td className="px-6 py-4 text-sm text-center">
+                      <button
+                        className={`px-4 py-2 rounded-lg ${
+                          quotation.confirm
+                            ? "bg-green text-white cursor-not-allowed opacity-50"
+                            : "bg-red text-white hover:bg-red-600"
+                        }`}
+                        onClick={() =>
+                          handleConfirmToggle(quotation.serviceQuotationId)
+                        }
+                        disabled={quotation.confirm}
+                      >
+                        {quotation.confirm ? "Confirmed" : "Not Confirmed"}
+                      </button>
+                    </td>
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
 
-        {visibleCount < serviceQuotation.length && (
-          <div className="flex justify-center mt-6">
-            <button
-              onClick={handleShowMore}
-              className="text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-6 py-2.5"
-            >
-              Show More
-            </button>
-          </div>
-        )}
-      </div>
-    )}
+              {visibleCount < serviceQuotation.length && (
+                <div className="flex justify-center mt-6">
+                  <button
+                    onClick={handleShowMore}
+                    className="text-white bg-red hover:opacity-50 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-6 py-2.5"
+                  >
+                    Show More
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
