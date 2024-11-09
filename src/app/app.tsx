@@ -18,10 +18,14 @@ import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
 import ConstructionInfomation from "app/user/construction-infomation.tsx";
 import ConsultForm from "app/dashboard/forms/consult.tsx";
 import Consult from "app/dashboard/tables/consult";
+
+import RequestDetailTable from "app/dashboard/tables/request-detail";
+
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 const routes = [
   { path: "/", element: <Home /> },
@@ -67,6 +71,40 @@ const routesAdmin = [
     path: "/admin/tables/table-construction-history",
     element: <ConstructionHistory />,
   },
+
+  {
+    path: "/admin/forms/quotation",
+    element: <Quotation />,
+  },
+  {
+    path: "/admin/tables/table-designProfile",
+    element: <DesignProfile />,
+  },
+  {
+    path: "/admin/forms/design-profile-form",
+    element: <DesignProfileForm />,
+  },
+  {
+    path: "/admin/tables/designProfile-manager",
+    element: <DesignProfileManager />,
+  },
+  {
+    path: "/admin/forms/form-consult",
+    element: <ConsultForm />,
+  },
+  {
+    path: "/admin/tables/table-consult",
+    element: <Consult />,
+  },
+  {
+    path: "/admin/tables/table-requestDetail",
+    element: <RequestDetailTable />,
+  },
+  {
+    path: "/admin/tables/table-quotation",
+    element: <QuotationTable />,
+  },
+
 ];
 
 function App() {
