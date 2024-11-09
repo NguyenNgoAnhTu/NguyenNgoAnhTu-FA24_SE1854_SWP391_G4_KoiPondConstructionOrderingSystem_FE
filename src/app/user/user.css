@@ -1,0 +1,16 @@
+.slide-container {
+    overflow: hidden;
+    transition: max-height 0.3s ease-out; 
+    max-height: 0;
+  }
+  .slide-container.open {
+    max-height: 200px; 
+  }
+.slide-container {
+    overflow: hidden;
+    transition: max-height 0.3s ease-out; 
+    max-height: 0;
+  }
+  .slide-container.open {
+    max-height: 200px; 
+  }

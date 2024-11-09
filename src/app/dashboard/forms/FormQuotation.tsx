@@ -113,15 +113,7 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
             />
           </div>
 
-          {/* <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Note</label>
-            <textarea
-              name="note"
-              value={formData.note}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-          </div> */}
+    
 
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Cost</label>

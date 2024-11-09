@@ -1,13 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  Button,
-  DatePicker,
-  Form,
-  Input,
-  Modal,
-  Popconfirm,
-  Table,
-} from "antd";
+import { Button, DatePicker, Form, Input, Modal, Popconfirm, Table } from "antd";
+import { toast } from "react-toastify";
 
 function ConstructionHistory() {
   const [datas, setDatas] = useState([]);
@@ -28,11 +21,11 @@ function ConstructionHistory() {
     confirmConstructorName: string;
   };
 
-  const fetchData = async () => {
+  const fetchData = async (address: any) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:8080/api/construction_history/get-design_profiles-by-constructor",
+        `http://localhost:8080/api/construction_history/get-design_profiles-by-constructor-and-address?address=${encodeURIComponent(address)}`,
         {
           method: "GET",
           headers: {
@@ -42,13 +35,14 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok.");
+        return;
       }
 
       const data = await response.json();
       setDatas(data);
-    } catch (err) {
-      alert(err);
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
@@ -63,18 +57,18 @@ function ConstructionHistory() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          cache: "no-store",
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok.");
+        return;
       }
 
       const data = await response.json();
       setDatasHistory(data);
       setShowHistoryModal(true);
-    } catch (err) {
-      alert(err);
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
@@ -89,18 +83,18 @@ function ConstructionHistory() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          cache: "no-store",
         }
       );
       if (!response.ok) {
-        throw new Error("There is no document!");
+        toast.error("There is no document!");
+        return;
       }
 
       const data = await response.json();
       setDatasDocument([data]);
       setShowDocumentModal(true);
-    } catch (err) {
-      alert(err);
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
@@ -110,7 +104,7 @@ function ConstructionHistory() {
       const requestBody = {
         step: values.step,
         description: values.description,
-        designProfileId: selectedDesignProfileId, // Include the stored ID
+        designProfileId: selectedDesignProfileId,
       };
       const response = await fetch(
         "http://localhost:8080/api/construction_history",
@@ -124,13 +118,14 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        throw new Error("This design profile is already completed!");
+        toast.error("This design profile is already completed!");
+        return;
       }
       console.log("Construction history created successfully!");
       setShowModal(false);
-      alert("Construction history created!");
-    } catch (err) {
-      alert(err);
+      toast.success("Construction history created!");
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
@@ -156,15 +151,14 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        throw new Error(
-          "This design profile is either already finished or has a document!"
-        );
+        toast.error("This design profile is either already finished or has a document!");
+        return;
       }
       console.log("Construction history created successfully!");
       setShowFormDocumentModal(false);
-      alert("Acceptance document created!");
-    } catch (err) {
-      alert(err);
+      toast.success("Acceptance document created!");
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
@@ -182,18 +176,19 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        throw new Error("This design profile has already completed!");
+        toast.error("This design profile has already completed!");
+        return;
       }
       console.log("Construction finished successfully!");
-      alert("Construction finished!");
-      fetchData();
-    } catch (err) {
-      alert(err);
+      toast.success("Construction finished!");
+      fetchData("");
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData("");
   }, []);
 
   const columnsHistory = [
@@ -329,7 +324,7 @@ function ConstructionHistory() {
           </Button>
           <Popconfirm
             title="Finish"
-            color="red"
+            color="orange"
             cancelButtonProps={{ style: { color: "white" } }}
             okButtonProps={{ style: { borderColor: "white" } }}
             description="Do you want to finish this construction?"
@@ -345,6 +340,13 @@ function ConstructionHistory() {
   ];
   return (
     <div>
+    <Input.Search
+        placeholder="Address"
+        enterButton="Search"
+        size="large"
+        onSearch={(value)=>fetchData(value)}
+        style={{ marginLeft: 18, marginTop: 10, marginBottom: 10, width: '82%', backgroundColor: 'DodgerBlue' }}
+      />
       <Table dataSource={datas} columns={columns}></Table>
       <Modal
         onCancel={() => setShowModal(false)}
