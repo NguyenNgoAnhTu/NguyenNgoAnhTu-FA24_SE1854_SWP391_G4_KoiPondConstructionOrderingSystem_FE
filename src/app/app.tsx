@@ -22,6 +22,8 @@ import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
 import ConsultForm from "app/dashboard/forms/consult.tsx";
 import Consult from "app/dashboard/tables/consult";
+import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
+import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
@@ -42,13 +44,21 @@ const routesAdmin = [
     element: <TableServiceProgress />,
   },
   {
+    path: "/admin/tables/table-service-payment",
+    element: <TableServicePayment />,
+  },
+  {
+    path: "/admin/tables/table-service-feedback",
+    element: <TableServiceFeedback />,
+  },
+  {
     path: "/admin/tables/table-service-requests",
     element: <TableServiceRequest />,
   },
   {
     path: "/admin/tables/table-service-quotation",
     element: <TableServiceQuotation />,
-  }, 
+  },
   {
     path: "/admin/tables/table-service-details",
     element: <TableServiceDetail />,

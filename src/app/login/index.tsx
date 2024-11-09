@@ -77,14 +77,19 @@ const LoginPage = () => {
           const data = await response.json();
           console.info(data)
           localStorage.setItem(
+            "customerId",
+            data.customerId
+          );
+          localStorage.setItem(
             "token",
             data.token
           );
-          console.log(data.token)
-          navigate("/admin/dashboard");
+          if (data.role != "CUSTOMER")
+            navigate("/admin/dashboard");
+          else
+            navigate("/");
           localStorage.setItem("name", data.name);
           console.log(data.name)
-          localStorage.setItem("customerId", data.customerId);
         }, 2000);
       }
 
@@ -208,7 +213,7 @@ const LoginPage = () => {
           <p className="text-black">
             Don't have an account?{" "}
             <a
-              href="#"
+              href="/register"
               className="text-black font-semibold hover:underline focus:outline-none focus:ring-2 focus:ring-blue focus:ring-opacity-50 rounded-sm"
             >
               Sign up
