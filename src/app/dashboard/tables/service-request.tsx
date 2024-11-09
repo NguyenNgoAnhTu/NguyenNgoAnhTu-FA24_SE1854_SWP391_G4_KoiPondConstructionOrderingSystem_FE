@@ -13,6 +13,7 @@ function ServiceRequestTable() {
     description: string;
     address: string;
     note: string;
+    status: string;
   }
 
   const [serviceRequestData, setServiceRequestData] = useState<
@@ -121,6 +122,7 @@ function ServiceRequestTable() {
                 "Description",
                 "Address",
                 "Note",
+                "Status",
                 "Actions",
               ].map((header) => (
                 <th
@@ -157,6 +159,9 @@ function ServiceRequestTable() {
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
                   {service.note || "N/A"}
                 </td>
+                <td className="px-6 py-4 text-sm text-black-15 text-center">
+                  {service.status || "N/A"}
+                  </td>
                 <td className="px-6 py-4 text-sm">
                   <button
                     type="button"
