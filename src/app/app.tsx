@@ -15,6 +15,7 @@ import User from "app/user/user";
 import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
+import ConstructionInfomation from "app/user/construction-infomation.tsx";
 import ConsultForm from "app/dashboard/forms/consult.tsx";
 import Consult from "app/dashboard/tables/consult";
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
@@ -28,6 +29,7 @@ const routes = [
   { path: "/pond-construction", element: <Pond_Construction /> },
   { path: "/pond-cleaning", element: <Pond_Cleaning /> },
   { path: "/user", element: <User /> },
+  { path: "/user/construction-infomation", element: <ConstructionInfomation /> },
 ];
 
 const routesAdmin = [
