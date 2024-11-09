@@ -22,6 +22,7 @@ import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
 import ConsultForm from "app/dashboard/forms/consult.tsx";
 import Consult from "app/dashboard/tables/consult";
+import RequestDetailTable from "app/dashboard/tables/request-detail";
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/contact", element: <Contact /> },
@@ -80,6 +81,10 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-consult",
     element: <Consult />,
+  },
+  {
+    path: "/admin/tables/table-requestDetail",
+    element: <RequestDetailTable />,
   },
   {
     path: "/admin/tables/table-quotation",
