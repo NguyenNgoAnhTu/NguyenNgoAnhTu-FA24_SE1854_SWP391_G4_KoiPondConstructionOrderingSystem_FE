@@ -1,0 +1,6 @@
+/* Custom button color */
+.ant-btn-primary {
+    background-color: #4096ff; /* Change to your desired color */
+    border-color: #4096ff;
+}
+
