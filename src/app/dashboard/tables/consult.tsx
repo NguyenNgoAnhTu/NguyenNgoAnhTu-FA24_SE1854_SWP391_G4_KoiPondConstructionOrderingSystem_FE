@@ -162,6 +162,7 @@ function Consult() {
       }
     }
   };
+  
 
   const consultCancel = () => {
     setShowModal(false);
