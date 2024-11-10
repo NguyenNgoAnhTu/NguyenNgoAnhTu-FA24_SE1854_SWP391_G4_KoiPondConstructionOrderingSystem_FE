@@ -15,14 +15,24 @@ import User from "app/user/user";
 import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
+
+
+
 import ConstructionInfomation from "app/user/construction-infomation.tsx";
 import ConsultForm from "app/dashboard/forms/consult.tsx";
+
 import Consult from "app/dashboard/tables/consult";
 
 import RequestDetailTable from "app/dashboard/tables/request-detail";
 
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
+import DesignProfileForm from "app/dashboard/forms/design-profile.tsx";
+// import QuotationForm from "app/dashboard/forms/quotation";
+import DesignProfileManagerTable from "app/dashboard/tables/designprofile-manager";
+import DesignProfileTable from "app/dashboard/tables/designProfile.tsx";
+import Quotation from "app/dashboard/tables/quotation";
+import ShowQuotation from "app/dashboard/tables/showQuotationCus";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -72,22 +82,38 @@ const routesAdmin = [
     element: <ConstructionHistory />,
   },
 
-  {
-    path: "/admin/forms/quotation",
-    element: <Quotation />,
-  },
-  {
-    path: "/admin/tables/table-designProfile",
-    element: <DesignProfile />,
-  },
+
+
+  
+  
+
   {
     path: "/admin/forms/design-profile-form",
     element: <DesignProfileForm />,
   },
+
+
   {
-    path: "/admin/tables/designProfile-manager",
-    element: <DesignProfileManager />,
+    path: "/admin/tables/design-profile-manager",
+    element: <DesignProfileManagerTable />,
   },
+  {
+    path: "/admin/tables/design-profile",
+    element: <DesignProfileTable />,
+  },
+  {
+    path: "/admin/tables/quotation",
+    element: < Quotation />,
+  },
+  {
+    path: "/admin/tables/show-quotation-cus",
+    element: < ShowQuotation />,
+  },
+  {
+    path: "/admin/tables/table-consult",
+    element: < Consult />,
+
+  
   {
     path: "/admin/forms/form-consult",
     element: <ConsultForm />,
@@ -103,6 +129,7 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-quotation",
     element: <QuotationTable />,
+
   },
 
 ];
