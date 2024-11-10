@@ -19,6 +19,12 @@ import ConsultForm from "app/dashboard/forms/consult.tsx";
 import Consult from "app/dashboard/tables/consult";
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
+import DesignProfileForm from "app/dashboard/forms/design-profile.tsx";
+import QuotationForm from "app/dashboard/forms/quotation";
+import DesignProfileManagerTable from "app/dashboard/tables/designprofile-manager";
+import DesignProfileTable from "app/dashboard/tables/designProfile.tsx";
+import Quotation from "app/dashboard/tables/quotation";
+import ShowQuotation from "app/dashboard/tables/showQuotationCus";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -65,6 +71,35 @@ const routesAdmin = [
     path: "/admin/tables/table-construction-history",
     element: <ConstructionHistory />,
   },
+  {
+    path: "/admin/forms/design-profile-form",
+    element: <DesignProfileForm />,
+  },
+  {
+    path: "/admin/forms/quotation-form",
+    element: < QuotationForm />,
+  },
+  {
+    path: "/admin/tables/design-profile-manager",
+    element: <DesignProfileManagerTable />,
+  },
+  {
+    path: "/admin/tables/design-profile",
+    element: <DesignProfileTable />,
+  },
+  {
+    path: "/admin/tables/quotation",
+    element: < Quotation />,
+  },
+  {
+    path: "/admin/tables/show-quotation-cus",
+    element: < ShowQuotation />,
+  },
+  {
+    path: "/admin/tables/table-consult",
+    element: < Consult />,
+  },
+
 ];
 
 function App() {
