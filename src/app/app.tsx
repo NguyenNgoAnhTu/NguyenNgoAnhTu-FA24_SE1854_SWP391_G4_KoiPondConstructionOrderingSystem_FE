@@ -15,12 +15,12 @@ import User from "app/user/user";
 import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
-import ConsultForm from "app/dashboard/forms/consult.tsx";
+
 import Consult from "app/dashboard/tables/consult";
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
 import DesignProfileForm from "app/dashboard/forms/design-profile.tsx";
-import QuotationForm from "app/dashboard/forms/quotation";
+// import QuotationForm from "app/dashboard/forms/quotation";
 import DesignProfileManagerTable from "app/dashboard/tables/designprofile-manager";
 import DesignProfileTable from "app/dashboard/tables/designProfile.tsx";
 import Quotation from "app/dashboard/tables/quotation";
@@ -75,10 +75,7 @@ const routesAdmin = [
     path: "/admin/forms/design-profile-form",
     element: <DesignProfileForm />,
   },
-  {
-    path: "/admin/forms/quotation-form",
-    element: < QuotationForm />,
-  },
+
   {
     path: "/admin/tables/design-profile-manager",
     element: <DesignProfileManagerTable />,
