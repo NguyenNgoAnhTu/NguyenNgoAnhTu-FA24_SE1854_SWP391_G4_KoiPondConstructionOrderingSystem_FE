@@ -32,6 +32,7 @@ import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
 
 import ServiceCategoryTable from "app/dashboard/tables/service-category.tsx"
+import ManagerUser from "app/dashboard/tables/managerUser.tsx"
 import DesignProfileForm from "app/dashboard/forms/design-profile.tsx";
 // import QuotationForm from "app/dashboard/forms/quotation";
 import DesignProfileManagerTable from "app/dashboard/tables/designprofile-manager";
@@ -139,6 +140,10 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-service-category",
     element: <ServiceCategoryTable />,
+  },
+  {
+    path: "/admin/tables/manager-user",
+    element: <ManagerUser />,
   },
 ];
 

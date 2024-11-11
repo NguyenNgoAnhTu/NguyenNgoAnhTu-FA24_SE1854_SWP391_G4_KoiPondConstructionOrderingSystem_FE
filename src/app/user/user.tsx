@@ -69,19 +69,14 @@ const User = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [name, setName] = useState(localStorage.getItem("name") || "John Doe");
+  const [name, setName] = useState(localStorage.getItem("name") || "N/A");
   const [email, setEmail] = useState(
-    localStorage.getItem("email") || "john@example.com"
+    localStorage.getItem("email") || "N/A"
   );
   const [phone, setPhone] = useState(
-    localStorage.getItem("phone") || "(239) 816-9029"
+    localStorage.getItem("phone") || "N/A"
   );
-  const [mobile, setMobile] = useState(
-    localStorage.getItem("mobile") || "(320) 380-4539"
-  );
-  const [address, setAddress] = useState(
-    localStorage.getItem("address") || "Bay Area, San Francisco, CA"
-  );
+ 
 
   const token = localStorage.getItem("token");
   const customerId = localStorage.getItem("customerId");
@@ -89,8 +84,8 @@ const User = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [isEditingPhone, setIsEditingPhone] = useState(false);
-  //const [isEditingMobile, setIsEditingMobile] = useState(false);
-  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  
+
   const [showServiceRequests, setShowServiceRequests] = useState(false);
   const [showServiceQuotation, setShowServiceQuotation] = useState(false);
   const [showServiceProgress, setShowServiceProgress] = useState(false);
@@ -268,35 +263,70 @@ const User = () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSave = (field: any, value: any) => {
-    switch (field) {
-      case "name":
-        setName(value);
-        localStorage.setItem("name", value);
-        setIsEditingName(false);
-        break;
-      case "email":
-        setEmail(value);
-        localStorage.setItem("email", value);
-        setIsEditingEmail(false);
-        break;
-      case "phone":
-        setPhone(value);
-        localStorage.setItem("phone", value);
-        setIsEditingPhone(false);
-        break;
-      case "mobile":
-        setMobile(value);
-        localStorage.setItem("mobile", value);
-        //setIsEditingMobile(false);
-        break;
-      case "address":
-        setAddress(value);
-        localStorage.setItem("address", value);
-        setIsEditingAddress(false);
-        break;
-      default:
-        break;
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+     // const customer = localStorage.getItem("customer");
+     if (!name.trim()) {
+      toast.error("Name cannot be empty");
+      return;
+    }
+
+    if (!email.trim() || !email.includes('@')) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!phone.trim() || phone.length < 10 || phone.length > 11) {
+      toast.error("Please enter a valid phone number");
+        return;
+      }
+      const updateData = {
+        name: name,
+        email: email,
+        phoneNumber: phone,
+      };
+
+      const response = await fetch(
+        `http://localhost:8080/api/customer`,  // Đã bỏ customerId khỏi URL
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updateData), // Gửi customer object
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      const updatedProfile = await response.json();
+      
+      // Update local storage với dữ liệu từ response
+      localStorage.setItem("name", updatedProfile.name);
+      localStorage.setItem("email", updatedProfile.email);
+      localStorage.setItem("phone", updatedProfile.phoneNumber);
+     
+
+      // Update state với dữ liệu từ response
+      setName(updatedProfile.name);
+      setEmail(updatedProfile.email);  
+      setPhone(updatedProfile.phoneNumber);
+      
+
+      // Reset editing states
+      setIsEditingName(false);
+      setIsEditingEmail(false);
+      setIsEditingPhone(false);
+      
+
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      console.error("Update profile error:", error);
+      toast.error("Failed to update profile");
     }
   };
   return (
@@ -315,7 +345,7 @@ const User = () => {
                   />
                   <div className="mt-3">
                     <h4 className="text-lg font-semibold">{name}</h4>
-                    <p className="text-gray-400 text-sm">{address}</p>
+                    <p className="text-gray-400 text-sm">{phone}</p>
                   </div>
                 </div>
                 <hr className="my-4" />
@@ -461,6 +491,7 @@ const User = () => {
               </div>
             </div>
           </div>
+          {/* edit profile */}
           <div className="lg:w-2/3 w-full p-4">
             <div className="card bg-white shadow-lg">
               <div className="card-body p-6">
@@ -533,39 +564,10 @@ const User = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-3">
-                  <div>
-                    <h6 className="mb-0">Address</h6>
-                  </div>
-                  <div className="col-span-2 text-gray-500">
-                    {isEditingAddress ? (
-                      <input
-                        type="text"
-                        className="form-input w-full"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                      />
-                    ) : (
-                      <div className="flex justify-between">
-                        <span>{address}</span>
-                        <button onClick={() => setIsEditingAddress(true)}>
-                          Edit
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 <div className="flex justify-end">
                   <button
-                    className="bg-green text-white px-4 py-2 rounded-lg"
-                    onClick={() => {
-                      handleSave("name", name);
-                      handleSave("email", email);
-                      handleSave("phone", phone);
-                      handleSave("mobile", mobile);
-                      handleSave("address", address);
-                    }}
+                    className="bg-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
+                    onClick={handleSave}
                   >
                     Save Changes
                   </button>
