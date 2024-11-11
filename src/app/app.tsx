@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "app/home";
+import About from "app/about";
 import Layout from "components/layout/layout.tsx";
 import Login from "./login";
 import Pond_Construction from "./pond-construction";
@@ -15,8 +16,8 @@ import User from "app/user/user";
 import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
-import ConsultForm from "app/dashboard/forms/consult.tsx";
-import Consult from "app/dashboard/tables/consult";
+// import ConsultForm from "app/dashboard/forms/consult.tsx";
+// import Consult from "app/dashboard/tables/consult";
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
 import { ToastContainer } from 'react-toastify';
@@ -27,6 +28,7 @@ const routes = [
   { path: "/contact", element: <Contact /> },
   { path: "/pond-construction", element: <Pond_Construction /> },
   { path: "/pond-cleaning", element: <Pond_Cleaning /> },
+  { path: "/about", element: <About /> },
   { path: "/user", element: <User /> },
 ];
 
@@ -76,7 +78,7 @@ function App() {
         ))}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+
 
         {routesAdmin.map(({ path, element }) => (
           <Route
@@ -85,8 +87,8 @@ function App() {
             element={<LayoutAdmin>{element}</LayoutAdmin>}
           />
         ))}
-        
-      
+
+
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>

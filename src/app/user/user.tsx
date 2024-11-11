@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
 import "./user.css";
+import { message } from 'antd';
 import { toast } from "react-toastify";
 const User = () => {
   interface ServiceRequest {
@@ -247,7 +248,32 @@ const User = () => {
 
   }, [showServiceRequests, showServiceQuotation, showServiceProgress]);
 
+  const handleConfirmed = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/acceptance-service-progress/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
+      if (response.ok) {
+        message.success(`Successfully confirmed service progress with ID: ${id}`); // Show success message
+        setServiceProgress((prevList) =>
+          prevList.map((service) =>
+            service.serviceProgressID === id ? { ...service, isComfirmed: true } : service
+          )
+        );
+      } else {
+        throw new Error(`Failed to confirm service progress with ID: ${id}`);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(error.message); // Show error message
+      }
+    }
+  }
 
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
@@ -323,7 +349,7 @@ const User = () => {
                   <ul className="flex flex-col gap-2">
                     <div
                       className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0"
-                      
+
                       onClick={handleOpen}>
 
                       <svg
@@ -347,13 +373,13 @@ const User = () => {
                           fill=""
                         />
                       </svg>
-                      
+
                       {/* mục lớn */}
                       <p> Service</p>
                     </div>
                     <div className={`slide-container ${modal ? "open" : ""}`}>
                       {/* mục nhỏ */}
-                     
+
                       <li>
                         <NavLink
                           to="#"
@@ -426,7 +452,6 @@ const User = () => {
                           onClick={(e) => {
                             e.preventDefault();
                             setShowServiceProgress(!showServiceProgress);
-                            setShowServiceQuotation(false);
                           }}
                         >
                           <svg
@@ -686,11 +711,10 @@ const User = () => {
                     </p>
                     <td className="px-6 py-4 text-sm text-center">
                       <button
-                        className={`px-4 py-2 rounded-lg ${
-                          quotation.confirm
-                            ? "bg-green text-white cursor-not-allowed opacity-50"
-                            : "bg-red text-white hover:bg-red-600"
-                        }`}
+                        className={`px-4 py-2 rounded-lg ${quotation.confirm
+                          ? "bg-green text-white cursor-not-allowed opacity-50"
+                          : "bg-red text-white hover:bg-red-600"
+                          }`}
                         onClick={() =>
                           handleConfirmToggle(quotation.serviceQuotationId)
                         }
@@ -717,60 +741,77 @@ const User = () => {
           )}
 
           {/*Start Service Progress*/}
-          {/* Service Quotation */}
           {showServiceProgress && (
             <div className="container mx-auto mt-8">
-              <div className="overflow-hidden rounded-lg border border-b-black-27 shadow-md">
-                <table className="min-w-full">
-                  <thead className="bg-gray-A0 border">
-                    <tr>
-                      {[
-                        "Index",
-                        "Service Progress ID",
-                        "Service Detail ID",
-                        "Start Date",
-                        "End Date",
-                        "Step",
-                        "Description",
-                        "Is Confirmed",
-                        "Actions",
-                      ].map((header) => (
-                        <th
-                          key={header}
-                          className="px-6 py-3 text-left text-xs font-medium text-black-15 uppercase tracking-wider text-center"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {serviceProgress.map((service, index) => (
-                      <tr key={service.serviceProgressID} className="hover:bg-gray-50 transition duration-200">
-                        <td className="px-2 py-4 text-sm text-black-15 text-center">{index + 1}</td>
-                        <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceProgressID}</td>
-                        <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceDetail?.serviceDetailId || "N/A"}</td>
-                        <td className="px-2 py-4 text-sm text-black-15 text-center">{new Date(service.startDate).toLocaleString()}</td>
-                        <td className="px-2 py-4 text-sm text-black-15 text-center">{service.endDate ? new Date(service.endDate).toLocaleString() : "Unfinished"}</td>
-                        <td className="px-2 py-4 text-sm text-black-15 text-center">{service.step}</td>
-                        <td className="px-2 py-4 text-sm text-black-15 text-center">{service.description || ""}</td>
-                        <td className="px-2 py-4 text-sm text-black-15 text-center">{service.isComfirmed ? "✔️" : "❌"}</td>
-                        <td className="px-2 py-4 text-sm">
-                          {!service.isComfirmed && (
-                            <button
-                              type="button"
-                              className="mx-1 text-white bg-brown focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
-                            // onClick={() => handleConfirmed(service.serviceProgressID)}
-                            >
-                              Confirm
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {serviceProgress
+                  .slice(0, visibleCount)
+                  .map((service: ServiceProgress) => (
+                    <div
+                      key={service.serviceProgressID}
+                      className={`rounded-lg shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer ${service.isComfirmed ? 'bg-[#EBF8F2]' : 'bg-red bg-opacity-50'
+                        }`}
+                    >
+                      <h3 className="text-lg font-semibold text-center mb-4">
+                        Service Progress ID:  {service.serviceProgressID}
+                      </h3>
+                      <p className="text-sm text-gray-700 mb-2">
+                        <strong>Service Detail ID:  </strong>
+                        {service.serviceDetail.serviceDetailId}
+                      </p>
+                      <p className="text-sm text-gray-700 mb-2">
+                        <strong>Start Date:  </strong>
+                        {new Date(service.startDate).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-gray-700 mb-2">
+                        <strong>End Date:  </strong>
+                        {service.endDate ? new Date(service.endDate).toLocaleString() : "Unfinished"}
+                      </p>
+                      <p className="text-sm text-gray-700 mb-2">
+                        <strong>Step:  </strong>
+                        {service.step}
+                      </p><p className="text-sm text-gray-700 mb-2">
+                        <strong>Description:  </strong>
+                        {service.description}
+                      </p>
+                      <p><strong>Is Confirmed:  </strong> {service.isComfirmed ? "✔️" : "❌"}</p>
+
+
+                      <div className="flex justify-center mt-4">
+
+                        {!service.isComfirmed && service.endDate && service.step == "Complete" && (
+                          <button
+                            type="button"
+                            className="mx-1 text-red bg-white hover:text-white  hover:bg-red focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+                            onClick={() => handleConfirmed(service.serviceProgressID)}
+                          >
+                            Confirm
+                          </button>
+                        )}
+                        {/* {service.isComfirmed && (
+                          <button
+                            type="button"
+                            className="mx-1 text-green bg-white hover:text-white  hover:bg-green focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+
+                          >
+                            Payment
+                          </button>
+                        )} */}
+                      </div>
+                    </div>
+                  ))}
               </div>
+              {visibleCount < serviceProgress.length && (
+                <div className="flex justify-center mt-6">
+                  <button
+                    onClick={handleShowMore}
+                    className="text-white bg-red hover:opacity-50 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-6 py-2.5"
+                  >
+                    Show More
+                  </button>
+                </div>
+              )}
+              <br></br>
             </div>
           )}
           {/*End Service Progress*/}

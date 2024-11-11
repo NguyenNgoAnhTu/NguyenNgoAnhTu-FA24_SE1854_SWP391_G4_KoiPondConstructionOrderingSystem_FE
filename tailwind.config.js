@@ -47,6 +47,12 @@ module.exports = {
       },
       green: "#3bca88",
       "cream-white": "#f2f0e1",
+      custom_green: {
+        DEFAULT: "#056839",
+      },
+      custom_green1: {
+        DEFAULT: "#ecf8f2",
+      },
     },
     extend: {
       maxWidth: {

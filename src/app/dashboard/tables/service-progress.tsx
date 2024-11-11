@@ -142,7 +142,11 @@ function ServiceProgressTable() {
 
       if (response.ok) {
         message.success(`Successfully confirmed service progress with ID: ${id}`); // Show success message
-        location.reload();
+        setServiceProgressData((prevList) =>
+          prevList.map((service) =>
+            service.serviceProgressID === id ? { ...service, isComfirmed: true } : service
+          )
+        );
       } else {
         throw new Error(`Failed to confirm service progress with ID: ${id}`);
       }
@@ -234,7 +238,7 @@ function ServiceProgressTable() {
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.description || ""}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.isComfirmed ? "✔️" : "❌"}</td>
                 <td className="px-2 py-4 text-sm">
-                  {!service.isComfirmed && (
+                  {!service.isComfirmed && service.endDate && service.step == "Complete" && (
                     <button
                       type="button"
                       className="mx-1 text-white bg-brown focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
@@ -243,13 +247,15 @@ function ServiceProgressTable() {
                       Confirm
                     </button>
                   )}
-                  <button
-                    type="button"
-                    className="mx-1 text-white bg-green hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
-                    onClick={() => handleEdit(service)}
-                  >
-                    Edit
-                  </button>
+                  {!service.isComfirmed && (
+                    <button
+                      type="button"
+                      className="mx-1 text-white bg-green hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
+                      onClick={() => handleEdit(service)}
+                    >
+                      Edit
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="mx-1 text-white bg-red hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
