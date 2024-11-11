@@ -161,6 +161,16 @@ function ConstructionInfomation() {
           key: "description",
         },
         {
+          title: "Start date",
+          dataIndex: "startDate",
+          key: "startDate",
+        },
+        {
+          title: "Expected end date",
+          dataIndex: "endDate",
+          key: "endDate",
+        },
+        {
           title: "Note",
           dataIndex: "note",
           key: "note",
@@ -204,6 +214,7 @@ function ConstructionInfomation() {
         <Table dataSource={datas} columns={columns}></Table>
 
         <Modal
+        width={1200}
         open={showHistoryModal}
         title="Construction histories"
         onCancel={() => setShowHistoryModal(false)}
@@ -212,10 +223,11 @@ function ConstructionInfomation() {
           style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
         }}
       >
-        <Table dataSource={datasHistory} columns={columnsHistory}></Table>
+        <Table dataSource={datasHistory} columns={columnsHistory} scroll={{ x: 600, y: 400 }}></Table>
       </Modal>
 
       <Modal
+        width={1200}
         open={showDocumentModal}
         title="Acceptance documents"
         onCancel={() => setShowDocumentModal(false)}
@@ -224,7 +236,7 @@ function ConstructionInfomation() {
           style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
         }}
       >
-        <Table dataSource={datasDocument} columns={columnsDocument}></Table>
+        <Table dataSource={datasDocument} columns={columnsDocument} scroll={{ x: 600, y: 400 }}></Table>
       </Modal>
     </div>
   )
