@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Modal, Table } from "antd";
+import { toast } from "react-toastify";
 
 type QuotationType = {
   quotationId: number;
@@ -82,13 +83,13 @@ function Quotation() {
 
       console.log("Quotation updated successfully!");
       setShowModal(false);
-      alert("Quotation updated!");
+      toast.success("Quotation updated!");
       fetchData();
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
       } else {
-        alert("An unknown error occurred");
+        toast.error("An unknown error occurred");
       }
     }
   };
@@ -117,13 +118,13 @@ function Quotation() {
       }
 
       console.log("Quotation deleted successfully!");
-      alert("Quotation deleted!");
+      toast.success("Quotation deleted!");
       fetchData();
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
       } else {
-        alert("An unknown error occurred");
+        toast.error("An unknown error occurred");
       }
     }
   };
@@ -147,13 +148,13 @@ function Quotation() {
       }
 
       console.log("Quotation confirmed successfully!");
-      alert("Quotation confirmed!");
+      toast.success("Quotation confirmed!");
       fetchData(); // Tải lại dữ liệu sau khi xác nhận
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
       } else {
-        alert("An unknown error occurred");
+        toast.error("An unknown error occurred");
       }
     }
   };
