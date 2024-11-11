@@ -112,7 +112,7 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-consult",
     element: < Consult />,
-
+  },
   
   {
     path: "/admin/forms/form-consult",
@@ -128,7 +128,7 @@ const routesAdmin = [
   },
   {
     path: "/admin/tables/table-quotation",
-    element: <QuotationTable />,
+    element: <Quotation />,
 
   },
 
