@@ -87,6 +87,7 @@ const LoginPage = () => {
           localStorage.setItem("phone", data.phoneNumber);
           localStorage.setItem("email", data.email);
           localStorage.setItem("name", data.name);
+          localStorage.setItem("role",data.role)
           if (data.role != "CUSTOMER")
             navigate("/admin/dashboard");
           else

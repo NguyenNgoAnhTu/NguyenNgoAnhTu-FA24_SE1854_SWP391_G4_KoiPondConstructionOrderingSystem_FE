@@ -3,6 +3,8 @@ import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
 import "./user.css";
 import { toast } from "react-toastify";
+import ConstructionInfomation from "./construction-infomation";
+
 const User = () => {
   interface ServiceRequest {
     serviceRequestId: string;
@@ -89,6 +91,7 @@ const User = () => {
   const [showServiceRequests, setShowServiceRequests] = useState(false);
   const [showServiceQuotation, setShowServiceQuotation] = useState(false);
   const [showServiceProgress, setShowServiceProgress] = useState(false);
+  const [showConstructionInfo, setShowConstructionInfo] = useState(false);
   //const [customerId] = useState(localStorage.getItem("customerId") || "");
   const [modal, setModal] = useState(false);
   const [visibleCount, setVisibleCount] = useState(3); // initially show 3 cards
@@ -484,7 +487,42 @@ const User = () => {
                         </NavLink>
                       </li>
                     </div>
-
+                    <li>
+  <NavLink
+    to="#"
+    className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0"
+    onClick={(e) => {
+      e.preventDefault();
+      setShowConstructionInfo(!showConstructionInfo);
+      setShowServiceQuotation(false);
+      setShowServiceRequests(false);
+      setShowServiceProgress(false);
+    }}
+  >
+    <svg
+      className="fill-current"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M16.5 9.75H1.5C1.0875 9.75 0.75 10.0875 0.75 10.5C0.75 10.9125 1.0875 11.25 1.5 11.25H16.5C16.9125 11.25 17.25 10.9125 17.25 10.5C17.25 10.0875 16.9125 9.75 16.5 9.75Z"
+        fill=""
+      />
+      <path
+        d="M16.5 13.5H1.5C1.0875 13.5 0.75 13.8375 0.75 14.25C0.75 14.6625 1.0875 15 1.5 15H16.5C16.9125 15 17.25 14.6625 17.25 14.25C17.25 13.8375 16.9125 13.5 16.5 13.5Z"
+        fill=""
+      />
+      <path
+        d="M16.5 6H1.5C1.0875 6 0.75 6.3375 0.75 6.75C0.75 7.1625 1.0875 7.5 1.5 7.5H16.5C16.9125 7.5 17.25 7.1625 17.25 6.75C17.25 6.3375 16.9125 6 16.5 6Z"
+        fill=""
+      />
+    </svg>
+    Construction Information
+  </NavLink>
+</li>
                     {/* Add more menu items as needed */}
                   </ul>
                 </nav>
@@ -776,6 +814,12 @@ const User = () => {
             </div>
           )}
           {/*End Service Progress*/}
+          {/* Construction Information */}
+          {showConstructionInfo && (
+            <div className="container mx-auto mt-8">
+              <ConstructionInfomation />
+            </div>
+          )}
         </div>
       </div>
     </div>
