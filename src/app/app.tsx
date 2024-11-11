@@ -27,6 +27,7 @@ import DesignProfileManager from "app/dashboard/tables/designprofile-manager.tsx
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
 import ServiceCategoryTable from "app/dashboard/tables/service-category.tsx"
+import ManagerUser from "app/dashboard/tables/managerUser.tsx"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -111,6 +112,10 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-service-category",
     element: <ServiceCategoryTable />,
+  },
+  {
+    path: "/admin/tables/manager-user",
+    element: <ManagerUser />,
   },
 ];
 
