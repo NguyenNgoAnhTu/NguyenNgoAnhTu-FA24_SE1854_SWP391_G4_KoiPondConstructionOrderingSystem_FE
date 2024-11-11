@@ -6,31 +6,21 @@ const Favorite_pond = () => {
       <div className="w-[50%] phone:w-full">
         <div className="flex flex-col gap-6">
           <Typography className="text-[38px] font-bold leading-12">
-            The New Favorite Gathering Place In Ann Arbor
+          Keep Your Ann Arbor Pond Clean And Clear With Pond Maintenance
           </Typography>
           <div className="w-[200px] h-[1px] bg-gray-A0"></div>
           <div className="flex flex-col gap-4">
             <Typography className="text-[#2B2825] text-[16px]">
-              A backyard pond is more than just a place to sit and relax. It’s a
-              gathering place for the people you love. Whether you’re hosting a
-              barbecue or just enjoying a quiet evening at your Ann Arbor home,
-              your pond will be the new favorite spot.
+            Ponds and water features can add a touch of beauty and tranquility to any landscape. However, they require regular maintenance in order to remain safe and functional.
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              The sounds of the water, the beauty of the plants, and the
-              welcoming environment that a garden pond brings will provide an
-              escape from the rest of the world.
+            Pond maintenance includes cleaning the sides and bottom of the pond, removing debris from the water, trimming back vegetation, and checking the pump and filtration system to make sure they are working properly. Water features, such as fountains and waterfalls, also need to be regularly cleaned and serviced.
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              At Grass Roots Pond & Garden Center, we prioritize listening to
-              your desires and requirements when starting your backyard garden
-              pond construction project. This allows us to design a pond that
-              meets all your expectations and provides you with all the benefits
-              you’re seeking.
+            By taking the time to perform these simple maintenance tasks, you can ensure that your pond or water feature stays clean and clear.
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              Turn that unused space in your yard into the space you need to
-              spend time with the people you love.
+            Let Grass Roots Pond & Garden Center in Ann Arbor take care of the maintenance and cleaning of your pond so you can spend your time enjoying it.
             </Typography>
           </div>
         </div>

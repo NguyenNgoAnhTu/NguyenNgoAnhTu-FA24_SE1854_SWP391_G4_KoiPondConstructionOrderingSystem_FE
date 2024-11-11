@@ -2,6 +2,7 @@ import Mountain from "assets/images/Moms-pond.png";
 import Typography from "components/typography";
 const Favorite_pond2 = () => {
   return (
+    <div style={{ backgroundColor: 'rgb(236, 248, 242)' }}>
     <div className="max-w-[1440px] w-[90%] flex gap-4 mx-auto mt-[150px] phone:flex-col phone:w-[95%]">
       <div className="w-[50%] phone:w-full">
         <img src={Mountain} alt="" className="w-full" />
@@ -9,36 +10,27 @@ const Favorite_pond2 = () => {
       <div className="w-[50%] phone:w-full">
         <div className="flex flex-col gap-6">
           <Typography className="text-[38px] font-bold leading-12">
-            The New Favorite Gathering Place In Ann Arbor
+          The Exploratory Drain & Clean
           </Typography>
           <div className="w-[200px] h-[1px] bg-gray-A0"></div>
           <div className="flex flex-col gap-4">
             <Typography className="text-[#2B2825] text-[16px]">
-              A backyard pond is more than just a place to sit and relax. It’s a
-              gathering place for the people you love. Whether you’re hosting a
-              barbecue or just enjoying a quiet evening at your Ann Arbor home,
-              your pond will be the new favorite spot.
+            Anyone who owns a pond in Ann Arbor knows that they require regular maintenance to stay healthy and functioning properly. One of the most important things you can do for your pond is to have an exploratory drain and clean performed regularly.
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              The sounds of the water, the beauty of the plants, and the
-              welcoming environment that a garden pond brings will provide an
-              escape from the rest of the world.
+            This pond maintenance process involves draining all the water from the pond so that it can be thoroughly cleaned. This gives you a chance to inspect the liner for any damage, remove debris and ensure that the pump is working properly.
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              At Grass Roots Pond & Garden Center, we prioritize listening to
-              your desires and requirements when starting your backyard garden
-              pond construction project. This allows us to design a pond that
-              meets all your expectations and provides you with all the benefits
-              you’re seeking.
+            Although it may seem like a lot of work, an exploratory drain and clean is essential for keeping your pond healthy and looking its best. Furthermore, it can help to prevent serious problems from developing in the future.
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              Turn that unused space in your yard into the space you need to
-              spend time with the people you love.
+            We’re here and happy to do the hard work and diagnose any issues that we find, that way you can love your pond for years to come.
             </Typography>
           </div>
         </div>
       </div>
     </div>
+      </div>
   );
 };
 export default Favorite_pond2;
