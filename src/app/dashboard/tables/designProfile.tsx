@@ -1,194 +1,6 @@
-// import { useEffect, useState } from "react";
-// import { Button, Form, Input, Modal, Table } from "antd";
-
-
-
-// function designProfile() {
-//     const [datas, setDatas] = useState([]);
-//     const [showModal, setShowModal] = useState(false);
-//     const [form] = Form.useForm();
-//     const [selectedDesignProfileId, setSelectedDesignProfileId] = useState(null);
-//     const [showHistoryModal, setShowHistoryModal] = useState(false);
-
-//   const fetchData = async () => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       const response = await fetch(
-//         "http://localhost:8080/api/designProfile",
-//         {
-//           method: "GET",
-//           headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${token}`,
-//           },
-//         }
-//       );
-//       if (!response.ok) {
-//         throw new Error("Network response was not ok");
-//       }
-
-//       const data = await response.json();
-//       setDatas(data);
-//     } catch (err) {
-//       alert(err);
-//     }
-//   };
-//   const handleFormCreate = async (values: any) => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       const requestBody = {
-//         design:values.design,
-//         description: values.description,
-//         designProfileId: selectedDesignProfileId,
-//       };
-//       const response = await fetch(
-//         "http://localhost:8080/api/design",
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${token}`,
-//           },
-//           body: JSON.stringify(requestBody),
-//         }
-//       );
-//       if (!response.ok) {
-//         throw new Error("Network response was not ok");
-//       }
-//       console.log("Design created successfully!");
-//       setShowModal(false);
-//       alert("Design created!");
-//     } catch (err) {
-//       alert(err);
-//     }
-//   };
-//   useEffect(() => {
-//     fetchData();
-//   }, []);
-//   const columns = [
-//     {
-//       title: "DesignProfileID",
-//       dataIndex: "designProfileId",
-//       key: "designProfileId",
-//     },
-//     {
-//       title: "QuotationId",
-//       dataIndex: "quotationId",
-//       key: "quotationId",
-//     },
-//     {
-//       title: "Address",
-//       dataIndex: "address",
-//       key: "address",
-//     },
-//     {
-//       title: "ConstructionStatus",
-//       dataIndex: "constructionStatus",
-//       key: "constructionStatus",
-//     },
-    
-//     {
-//       title: "Description",
-//       dataIndex: "description",
-//       key: "description",
-//     },
-//     {
-//       title: "Created",
-//       dataIndex: "createDate",
-//       key: "createDate",
-//     },
-//     {
-//         title: "Action",
-//         dataIndex: "designProfileId",
-//         key: "designProfileId",
-//         render: (designProfileId: any) => (
-//           <>
-//             <Button
-//               type="primary"
-//               danger
-//               style={{ marginRight: "3px" }}
-//               onClick={() => {
-//                 setSelectedDesignProfileId(designProfileId);
-//                 setShowModal(true);
-//               }}
-//             >
-//               Create design
-//             </Button>
-           
-//           </>
-//         ),
-//       },
-// ];
-// const columnsDesign = [
-//     {
-//       title: "DesignProfileID",
-//       dataIndex: "designProfileId",
-//       key: "designProfileId",
-//     },
-//     {
-//       title: "Design",
-//       dataIndex: "design",
-//       key: "design",
-//     },
-//     {
-//       title: "DesignStatus",
-//       dataIndex: "designStatus",
-//       key: "designStatus",
-//     },
-//     {
-//       title: "Description",
-//       dataIndex: "description",
-//       key: "description",
-//     },
-   
-    
-//   ];
-
-//   return (
-//     <div>
-//     <Table dataSource={datas} columns={columns}></Table>
-//       <Modal
-//         onCancel={() => setShowModal(false)}
-//         onOk={() => form.submit()}
-//         open={showModal}
-//         title="Design"
-//       >
-//         <Form onFinish={handleFormCreate} form={form} labelCol={{ span: 24 }}>
-//           <Form.Item
-//             label="Design"
-//             name="design"
-//             rules={[{ required: true, message: "Cannot be blank!" }]}
-//           >
-//             <Input />
-//           </Form.Item>
-//           {/* <Form.Item
-//             label="DesignStatus"
-//             name="designStatus"
-//             rules={[{ required: true, message: "Cannot be blank!" }]}
-//           >
-//             <Input />
-//           </Form.Item> */}
-//           <Form.Item
-//             label="Description"
-//             name="description"
-//             rules={[{ required: true, message: "Cannot be blank!" }]}
-//           >
-//             <Input.TextArea />
-//           </Form.Item>
-//         </Form>
-//       </Modal>
-      
-//     </div>
-//   )
-// }
-
-// export default designProfile
-
-
-
 import { useEffect, useState } from "react";
 import { Button, Form, Input, Modal, Table, Popconfirm } from "antd";
-
+import { toast } from "react-toastify";
 function DesignProfile() {
   const [datas, setDatas] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -257,7 +69,7 @@ function DesignProfile() {
       }
       console.log("Design created successfully!");
       setShowModal(false);
-      alert("Design created!");
+      toast.success("Design created!");
     } catch (err) {
       alert(err);
     }
@@ -309,7 +121,7 @@ function DesignProfile() {
           design.designId === designId ? updatedDesign : design
         )
       );
-      alert("Design finished successfully!");
+      toast.success("Design finished successfully!");
     } catch (err) {
       alert(err);
     }
