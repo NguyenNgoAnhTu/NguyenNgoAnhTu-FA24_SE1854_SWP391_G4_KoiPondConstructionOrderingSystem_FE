@@ -2,6 +2,7 @@ import Mountain from "assets/images/Moms-pond.png";
 import Typography from "components/typography";
 const Favorite_pond2 = () => {
   return (
+  <div style={{ backgroundColor: 'rgb(236, 248, 242)' }}>
     <div className="max-w-[1440px] w-[90%] flex gap-4 mx-auto mt-[150px] phone:flex-col phone:w-[95%]">
          <div className="w-[50%] phone:w-full">
         <img src={Mountain} alt="" className="w-full" />
@@ -9,36 +10,27 @@ const Favorite_pond2 = () => {
       <div className="w-[50%] phone:w-full">
         <div className="flex flex-col gap-6">
           <Typography className="text-[38px] font-bold leading-12">
-            The New Favorite Gathering Place In Ann Arbor
+          Connect with Ann Arbor Wildlife
           </Typography>
           <div className="w-[200px] h-[1px] bg-gray-A0"></div>
           <div className="flex flex-col gap-4">
             <Typography className="text-[#2B2825] text-[16px]">
-              A backyard pond is more than just a place to sit and relax. It’s a
-              gathering place for the people you love. Whether you’re hosting a
-              barbecue or just enjoying a quiet evening at your Ann Arbor home,
-              your pond will be the new favorite spot.
+            In addition to the focal feature that a pond will add to your yard, there are many other benefits to backyard koi pond construction.
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              The sounds of the water, the beauty of the plants, and the
-              welcoming environment that a garden pond brings will provide an
-              escape from the rest of the world.
+            Ponds provide a perfect place for wildlife like frogs, turtles, and fish to live. They can also help to attract other animals, such as birds and butterflies – which can add a touch of beauty to your backyard.
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              At Grass Roots Pond & Garden Center, we prioritize listening to
-              your desires and requirements when starting your backyard garden
-              pond construction project. This allows us to design a pond that
-              meets all your expectations and provides you with all the benefits
-              you’re seeking.
+            This offers you a unique opportunity to connect with nature. Watching the wildlife in your koi pond can be a relaxing and enjoyable experience, and it can also be a great way to learn about the different animals in Ann Arbor. Any kids will love being around a backyard pond – it’s the perfect place to explore and imagine. 
             </Typography>
             <Typography className="text-[#2B2825] text-[16px]">
-              Turn that unused space in your yard into the space you need to
-              spend time with the people you love.
+            Your koi pond construction project can help you connect with nature (and your inner child).
             </Typography>
           </div>
         </div>
       </div>
      
+    </div>
     </div>
   );
 };

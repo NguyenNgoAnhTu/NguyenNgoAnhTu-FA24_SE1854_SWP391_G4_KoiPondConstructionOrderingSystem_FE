@@ -18,11 +18,15 @@ import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
 import ConstructionInfomation from "app/user/construction-infomation.tsx";
 import ConsultForm from "app/dashboard/forms/consult.tsx";
 import Consult from "app/dashboard/tables/consult";
-
+import Quotation from "./dashboard/forms/quotation";
+import QuotationTable from "app/dashboard/tables/quotation"
 import RequestDetailTable from "app/dashboard/tables/request-detail";
-
+import DesignProfile from "./dashboard/tables/designProfile";
+import DesignProfileForm from "app/dashboard/forms/design-profile.tsx"
+import DesignProfileManager from "app/dashboard/tables/designprofile-manager.tsx"
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
+import ServiceCategoryTable from "app/dashboard/tables/service-category.tsx"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -104,7 +108,10 @@ const routesAdmin = [
     path: "/admin/tables/table-quotation",
     element: <QuotationTable />,
   },
-
+  {
+    path: "/admin/tables/table-service-category",
+    element: <ServiceCategoryTable />,
+  },
 ];
 
 function App() {
