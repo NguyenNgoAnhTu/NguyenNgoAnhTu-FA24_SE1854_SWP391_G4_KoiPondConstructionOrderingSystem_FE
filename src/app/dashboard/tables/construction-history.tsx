@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, DatePicker, Form, Input, Modal, Popconfirm, Table } from "antd";
+import { Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Table } from "antd";
 import { toast } from "react-toastify";
 
 function ConstructionHistory() {
@@ -12,6 +12,7 @@ function ConstructionHistory() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [form] = Form.useForm();
   const [selectedDesignProfileId, setSelectedDesignProfileId] = useState(null);
+  const [constructors, setConstructors] = useState<StaffType[]>([]);
 
   type DocumentType = {
     acceptanceDocumentId: number;
@@ -20,14 +21,15 @@ function ConstructionHistory() {
     confirmCustomerName: string;
     confirmConstructorName: string;
   };
+  type StaffType = {
+    name: string;
+  };
 
   const fetchData = async (address: any) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/construction_history/get-design_profiles-by-constructor-and-address?address=${encodeURIComponent(
-          address
-        )}`,
+        `http://localhost:8080/api/construction_history/get-design_profiles-by-constructor-and-address?address=${encodeURIComponent(address)}`,
         {
           method: "GET",
           headers: {
@@ -95,6 +97,31 @@ function ConstructionHistory() {
       const data = await response.json();
       setDatasDocument([data]);
       setShowDocumentModal(true);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  const fetchDataStaffs = async (designProfileId: any) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/customer/getStaffsByDesignProfileId/${designProfileId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        toast.error("No staffs found");
+        return;
+      }
+
+      const data = await response.json();
+      setConstructors(data);
     } catch (err: any) {
       toast.error(err.message);
     }
@@ -470,7 +497,17 @@ function ConstructionHistory() {
             name="confirmConstructorName"
             rules={[{ required: true, message: "Cannot be blank!" }]}
           >
-            <Input />
+            <Select
+              showSearch
+              placeholder="Select a constructor"
+              onFocus={() => fetchDataStaffs(selectedDesignProfileId)}
+            >
+              {constructors.map((constructor) => (
+                <Select.Option key={constructor.name} value={constructor.name}>
+                  {constructor.name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
