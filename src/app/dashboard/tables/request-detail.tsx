@@ -1,6 +1,7 @@
 import { Table, Button, Modal } from "antd";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { toast } from "react-toastify";
 
 function RequestDetailTable() {
   const [requestDetails, setRequestDetails] = useState([]);
@@ -52,7 +53,7 @@ function RequestDetailTable() {
         },
       });
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok");
       }
 
       const data = await response.json();
@@ -76,7 +77,7 @@ function RequestDetailTable() {
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok");
       }
 
       const data = await response.json();
@@ -101,7 +102,7 @@ function RequestDetailTable() {
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok");
       }
 
       const data = await response.json();
