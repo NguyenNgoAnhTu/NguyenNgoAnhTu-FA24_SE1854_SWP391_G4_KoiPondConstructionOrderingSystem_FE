@@ -1,7 +1,7 @@
 import { Button, Form, Input, Modal, Table, Popconfirm } from "antd";
 import { useState, useEffect } from "react";
-
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 type ConsultType = {
   id: number;
@@ -34,7 +34,7 @@ function Consult() {
         },
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch consult data");
+        toast.error("Failed to fetch consult data");
       }
 
       const data = await response.json();
@@ -79,13 +79,13 @@ function Consult() {
         try {
           const errorData = JSON.parse(text); // Parse JSON nếu có thể
           console.error("Error response:", errorData);
-          throw new Error(`Network response was not ok: ${errorData.message || "Unknown error"}`);
+          toast.error(`Network response was not ok: ${errorData.message || "Unknown error"}`);
         } catch (e) {
           console.error("Non-JSON error response:", text); // Log nếu không phải JSON
-          throw new Error(`Network response was not ok: ${text}`);
+          toast.error(`Network response was not ok: ${text}`);
         }
       }
-      console.log("Quotation created successfully!");
+      toast.success("Quotation created successfully!");
       setShowQuotationModal(false);
       alert("Quotation created!");
     } catch (err) {
@@ -117,7 +117,7 @@ function Consult() {
     try {
       const token = localStorage.getItem("token");
       if (!selectedConsult) {
-        alert("The consult not exist!");
+        toast.error("The consult not exist!");
         return;
       }
 
@@ -147,18 +147,18 @@ function Consult() {
       if (!response.ok) {
         const errorText = await response.text(); // Nhận phản hồi dưới dạng văn bản
         console.error("Server Error:", errorText);
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok");
       }
 
       console.log("Consult updated successfully!");
       setShowModal(false);
-      alert("Consult updated!");
+      toast.success("Consult updated!");
       fetchConsultData();
     } catch (err) {
       if (err instanceof Error) {
-        alert(err.message);
+        toast.error(err.message);
       } else {
-        alert("Error Update!");
+        toast.error("Error Update!");
       }
     }
   };
@@ -188,13 +188,13 @@ function Consult() {
       }
 
       console.log("Consult deleted successfully!");
-      alert("Consult deleted!");
+      toast.error("Consult deleted!");
       fetchConsultData();
     } catch (err) {
       if (err instanceof Error) {
-        alert(err.message);
+        toast.error(err.message);
       } else {
-        alert("Error Deleted!");
+        toast.error("Error Deleted!");
       }
     }
   };
@@ -218,14 +218,14 @@ function Consult() {
       }
 
       console.log("Consult confirmed successfully!");
-      alert("Consult confirmed!");
+      toast.success("Consult confirmed!");
       fetchConsultData(); // Tải lại dữ liệu sau khi xác nhận
       
     } catch (err) {
       if (err instanceof Error) {
-        alert(err.message);
+        toast.error(err.message);
       } else {
-        alert("Error Confirm");
+        toast.error("Error Confirm");
       }
     }
   };
