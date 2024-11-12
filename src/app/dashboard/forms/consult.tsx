@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ConsultForm = () => {
   const [formData, setFormData] = useState({
@@ -120,14 +121,14 @@ const ConsultForm = () => {
         if (!response.ok) {
           const errorText = await response.text(); // Lấy chi tiết lỗi từ phản hồi của server
           console.error("Error details:", errorText);
-          alert(`Create consult failed: ${errorText}`);
-          throw new Error(errorText); // Ném lỗi để ngắt quá trình
+          toast.error(`Create consult failed: ${errorText}`);
+          toast.error(errorText); // Ném lỗi để ngắt quá trình
         }
 
-        alert("Consult created successfully!");
+        toast.success("Consult created successfully!");
         navigate("/admin/tables/table-consult"); // Redirect to a list of consultations or another page
       } catch (error) {
-        alert("Create consult failed!");
+        toast.error("Create consult failed!");
       } finally {
         setLoading(false);
       }

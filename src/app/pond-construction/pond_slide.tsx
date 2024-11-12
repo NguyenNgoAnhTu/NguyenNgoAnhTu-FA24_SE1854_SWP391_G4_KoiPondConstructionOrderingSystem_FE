@@ -1,5 +1,6 @@
 import { Table, Button, Modal, Form, Input, Card, Row, Col } from "antd";
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 function Pond_slide() {
   const [datas, setDatas] = useState<PondDesignTemplateType[]>([]);
@@ -24,7 +25,7 @@ function Pond_slide() {
     pondBottom: string;
     decoration: string;
     minEstimatedCost: number;
-    maxSizmaxEstimatedCoste: number;
+    maxEstimatedCost: number;
     imageUrl: string;
     description: string;
   };
@@ -43,7 +44,7 @@ function Pond_slide() {
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok");
       }
 
       const data = await response.json();
@@ -56,11 +57,11 @@ function Pond_slide() {
   const handleFormCreate = async (values: any) => {
     try {
       if (!selectedId) {
-        throw new Error("Please select a pond design template");
+        toast.error("Please select a pond design template");
       }
 
       if (!customerId) {
-        throw new Error("No customer ID found. Please login again.");
+        toast.error("No customer ID found. Please login again.");
       }
 
       const token = localStorage.getItem("token");
@@ -83,7 +84,7 @@ function Pond_slide() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create service request");
+        toast.error(errorData.message || "Failed to create service request");
       }
 
       const requestData = await response.json();
@@ -111,14 +112,14 @@ function Pond_slide() {
 
       if (!responseRequestDetail.ok) {
         const errorData = await responseRequestDetail.json();
-        throw new Error(errorData.message || "Failed to create request detail");
+        toast.error(errorData.message || "Failed to create request detail");
       }
 
       const requestDetailData = await responseRequestDetail.json();
       console.log("Request detail created:", requestDetailData);
 
       setShowModal(false);
-      alert("Request sent successfully!");
+      toast.success("Request sent successfully!");
     } catch (err) {
       console.error("Error:", err);
       alert(err instanceof Error ? err.message : "An error occurred");
@@ -147,7 +148,7 @@ function Pond_slide() {
               style={{ textAlign: "center" }}
             >
               <h2 style={{ margin: 0 }}>
-                ${data.minEstimatedCost} - ${data.maxSizmaxEstimatedCoste}
+                ${data.minEstimatedCost} - ${data.maxEstimatedCost}
               </h2>
               <h3>{data.description || "Pond Design"}</h3>
               <p>Min Size: {data.minSize} | Max Size: {data.maxSize}</p>
@@ -166,7 +167,7 @@ function Pond_slide() {
                 danger
                 onClick={() => {
                   if (!customerId) {
-                    alert("Please login first");
+                    toast.error("Please login first");
                     return;
                   }
                   setSelectedId(data.pondDesignTemplateId);
