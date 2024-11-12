@@ -480,11 +480,21 @@ function ServiceCategoryTable() {
                   }`}
                   value={formData.cost}
                   onChange={(e) => {
-                    setFormData({...formData, cost: Number(e.target.value)});
-                    if (errors.cost) {
-                      setErrors({...errors, cost: undefined});
+                    const value = e.target.value;
+                    // Cho phép nhập số âm nhưng hiển thị lỗi
+                    setFormData({...formData, cost: Number(value)});
+                    
+                    // Validate ngay khi nhập
+                    if (Number(value) <= 0) {
+                      setErrors(prev => ({...prev, cost: "Cost must be greater than 0"}));
+                    } else if (Number(value) > 1000000000) {
+                      setErrors(prev => ({...prev, cost: "Cost is too high"}));
+                    } else {
+                      setErrors(prev => ({...prev, cost: undefined}));
                     }
                   }}
+                  min="0"
+                  step="100"
                   required
                 />
                 {errors.cost && (
