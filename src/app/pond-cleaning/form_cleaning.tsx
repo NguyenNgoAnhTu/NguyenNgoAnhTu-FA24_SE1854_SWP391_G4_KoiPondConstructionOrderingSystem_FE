@@ -71,8 +71,18 @@ const FormCleaning: React.FC<FormCleaningProps> = ({
     let isValid = true;
     const newErrors = { ...errors };
 
-    if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
+    if (!formData.description.trim() || formData.description.length < 10 || formData.description.length > 200) {
+      newErrors.description = "Description is required and must be between 10 and 200 characters";
+      isValid = false;
+    }
+
+    if (!formData.address.trim() || formData.address.length < 10 || formData.address.length > 100) {
+      newErrors.address = "Address is required and must be between 10 and 100 characters";
+      isValid = false;
+    }
+
+    if (!formData.note.trim() || formData.note.length < 10 || formData.note.length > 200) {
+      newErrors.note = "Note is required and must be between 10 and 200 characters";
       isValid = false;
     }
 

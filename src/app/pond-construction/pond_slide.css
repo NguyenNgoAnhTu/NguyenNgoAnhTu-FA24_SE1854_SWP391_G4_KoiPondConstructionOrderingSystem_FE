@@ -5,3 +5,77 @@
 .slick-list {
  height: 600px;
 }
+.custom-modal .ant-modal-content {
+    border-radius: 20px; /* More rounded corners */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Deeper shadow */
+    background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient background */
+    padding: 25px;
+    border: 1px solid #e0e0e0; /* Light border */
+  }
+  
+  .custom-modal .ant-modal-header {
+    border-bottom: none; /* Remove header border */
+    background: linear-gradient(to right, #4CAF50, #2E8B57); /* Gradient header */
+    color: #fff; /* White text */
+    border-radius: 20px 20px 0 0; /* Rounded top corners */
+  }
+  
+  .custom-modal .ant-modal-title {
+    color: #fff; /* Ensure title is visible */
+    font-family: 'Poppins', sans-serif; /* Modern font */
+    font-size: 24px;
+    animation: fadeInDown 0.5s ease-out; /* Entrance animation */
+  }
+  
+  .custom-modal .ant-modal-footer {
+    border-top: none; /* Remove footer border */
+    background-color: #fafafa; /* Light footer */
+    border-radius: 0 0 20px 20px; /* Rounded bottom corners */
+  }
+  
+  .custom-modal .ant-btn-primary {
+    background-color: #4CAF50; /* Custom green color */
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out; /* Smooth transition */
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); /* Button shadow */
+  }
+  
+  .custom-modal .ant-btn-primary:hover {
+    background-color: #45a049;
+    box-shadow: 0 6px 15px rgba(69, 160, 73, 0.4); /* Elevated shadow on hover */
+    transform: translateY(-2px); /* Lift effect */
+  }
+  
+  .ant-form-item-label > label {
+    font-weight: 600; /* Bold label text */
+    color: #444; /* Darker color */
+    font-family: 'Roboto', sans-serif; /* Modern font */
+  }
+  
+  .ant-input-textarea {
+    border-radius: 12px; /* More rounded input */
+    background-color: #fdfdfd; /* Light background */
+    border: 1px solid #ddd; /* Light border */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth border animation */
+  }
+  
+  .ant-input-textarea:hover,
+  .ant-input-textarea:focus {
+    border-color: #4CAF50; /* Highlight border color */
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); /* Enhanced focus shadow */
+  }
+  
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
