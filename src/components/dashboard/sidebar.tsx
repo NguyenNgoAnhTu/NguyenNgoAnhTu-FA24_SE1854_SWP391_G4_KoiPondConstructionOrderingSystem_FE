@@ -260,6 +260,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Form Layout
                             </NavLink>
                           </li>
+                          <li>
+                            <NavLink
+                              to="/admin/forms/pondDesignTemplate"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Form pondDesignTemplate
+                            </NavLink>
+                          </li>
                           {/* <!-- hết --> */}
                         </ul>
                       </div>

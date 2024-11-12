@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Form, Modal, Select, Table } from "antd";
+import { toast } from "react-toastify";
 
 interface Staff {
   customerId: number; // Thay đổi từ id sang customerId
@@ -43,6 +44,7 @@ function DesignProfile() {
       alert(err);
     }
   };
+  
 
   // Fetch staffs by role
   const fetchStaffsByRole = async (role: string) => {
@@ -64,9 +66,9 @@ function DesignProfile() {
       }
 
       const data: Staff[] = await response.json();
-      if (role === "design staff") {
+      if (role === "DESIGNER") {
         setDesignStaff(data); // Lưu danh sách nhân viên thiết kế
-      } else if (role === "construction staff") {
+      } else if (role === "CONSTRUCTOR") {
         setConstructionStaff(data); // Lưu danh sách nhân viên thi công
       }
     } catch (err) {
@@ -77,8 +79,8 @@ function DesignProfile() {
   // Open assign staff modal
   const handleOpenAssignModal = (designProfileId: number) => {
     setSelectedDesignProfileId(designProfileId);
-    fetchStaffsByRole("design staff"); // Lấy danh sách nhân viên thiết kế
-    fetchStaffsByRole("construction staff"); // Lấy danh sách nhân viên thi công
+    fetchStaffsByRole("DESIGNER"); // Lấy danh sách nhân viên thiết kế
+    fetchStaffsByRole("CONSTRUCTOR"); // Lấy danh sách nhân viên thi công
     setShowAssignModal(true); // Mở modal
   };
 
@@ -99,13 +101,12 @@ const response = await fetch(
   }
 );
 
-
       if (!response.ok) {
         const errorMessage = await response.text(); // Lấy nội dung phản hồi
         throw new Error(`Network response was not ok: ${errorMessage}`);
       }
 
-      alert("Assign Staff Successfully!");
+      toast.success("Assign Staff Successfully!");
       setShowAssignModal(false);
     } catch (err) {
       alert(err);
@@ -174,6 +175,7 @@ const response = await fetch(
       title: "Created",
       dataIndex: "createDate",
       key: "createDate",
+      render: (date: string) => new Intl.DateTimeFormat('vi-VN').format(new Date(date)),
     },
     {
       title: "Action",
@@ -235,11 +237,11 @@ const response = await fetch(
         onOk={handleAssignStaff}
         onCancel={() => setShowAssignModal(false)}
       >
-        <h3>Nhân Viên Thiết Kế</h3>
+        <h3>DESIGNER</h3>
         <Select
           mode="multiple"
           style={{ width: '100%', marginBottom: '20px' }}
-          placeholder="Select design staff"
+          placeholder="Select designer"
           onChange={setSelectedDesignStaff}
           options={designStaff.map(staff => ({
             label: staff.name,
@@ -247,11 +249,11 @@ const response = await fetch(
           }))}
         />
 
-        <h3>Nhân Viên Thi Công</h3>
+        <h3>CONSTRUCTOR</h3>
         <Select
           mode="multiple"
           style={{ width: '100%' }}
-          placeholder="Select contruction staff"
+          placeholder="Select constructor "
           onChange={setSelectedConstructionStaff}
           options={constructionStaff.map(staff => ({
             label: staff.name,

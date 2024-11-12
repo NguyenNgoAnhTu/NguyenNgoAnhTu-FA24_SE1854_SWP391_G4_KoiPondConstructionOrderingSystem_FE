@@ -15,8 +15,7 @@ import User from "app/user/user";
 import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
-
-
+import PondDesignTemplateForm from "app/dashboard/forms/pondDesignTemplate";
 
 import ConstructionInfomation from "app/user/construction-infomation.tsx";
 import ConsultForm from "app/dashboard/forms/consult.tsx";
@@ -90,6 +89,10 @@ const routesAdmin = [
     path: "/admin/forms/design-profile-form",
     element: <DesignProfileForm />,
   },
+  {
+    path: "/admin/forms/pondDesignTemplate",
+    element: <PondDesignTemplateForm />,
+  },
 
 
   {
@@ -100,10 +103,10 @@ const routesAdmin = [
     path: "/admin/tables/design-profile",
     element: <DesignProfileTable />,
   },
-  {
-    path: "/admin/tables/quotation",
-    element: < Quotation />,
-  },
+  // {
+  //   path: "/admin/tables/quotation",
+  //   element: < Quotation />,
+  // },
   {
     path: "/admin/tables/show-quotation-cus",
     element: < ShowQuotation />,

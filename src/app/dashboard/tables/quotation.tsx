@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Modal, Table } from "antd";
 import { toast } from "react-toastify";
-import { EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useNavigate } from "react-router-dom";
 type QuotationType = {
   quotationId: number;
   customerId: number;
@@ -15,10 +15,14 @@ type QuotationType = {
 };
 
 function Quotation() {
+  const navigate = useNavigate();
   const [datas, setDatas] = useState<QuotationType[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [form] = Form.useForm();
   const [selectedQuotation, setSelectedQuotation] = useState<QuotationType | null>(null);
+  const [showCreateProfileModal, setShowCreateProfileModal] = useState(false);
+  
+  const [profileForm] = Form.useForm();
 
   const fetchData = async () => {
     try {
@@ -159,6 +163,39 @@ function Quotation() {
     }
   };
 
+  const handleCreateDesignProfile = (quotationId: number) => {
+    profileForm.setFieldsValue({ quotationId });
+    setShowCreateProfileModal(true);
+  };
+
+  const handleCreateProfileSubmit = async (values: any) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8080/api/designProfile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || "Failed to create design profile");
+      }
+
+      toast.success("Design profile created successfully!");
+
+      
+      setShowCreateProfileModal(false);
+      navigate('/admin/tables/design-profile-manager');
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create design profile");
+    }
+  };
+
   const columnsQuotation = [
     {
       title: "QuotationID",
@@ -204,11 +241,13 @@ function Quotation() {
       title: "Created",
       dataIndex: "createDate",
       key: "createDate",
+      render: (date: string) => new Intl.DateTimeFormat('vi-VN').format(new Date(date)),
     },
     {
       title: "Updated",
       dataIndex: "updateDate",
       key: "updateDate",
+      render: (date: string) => new Intl.DateTimeFormat('vi-VN').format(new Date(date)),
     },
     {
       title: "Is Confirmed",
@@ -217,23 +256,26 @@ function Quotation() {
       render: (text: boolean) => (text ? "Yes" : "No"), // Hiển thị Yes/No
     },
     {
-      title: "Actions",
-      dataIndex: "actions",
-      render: (text : any, record: QuotationType) => (
-        <>
-          <Button type="link" onClick={() => handleUpdate(record)}>
-            Update
-          </Button> 
-        
-        <Button type="link" onClick={() => handleDelete(record.quotationId)}>
-            Delete
-          </Button>
-          {!record.isConfirm && ( // Hiển thị nút Confirm nếu chưa xác nhận
-            <Button type="link" onClick={() => handleConfirm(record.quotationId)}>
-              Confirm
+      
+        title: "Actions",
+        dataIndex: "actions",
+        render: (text: any, record: QuotationType) => (
+          <>
+            <Button onClick={() => handleUpdate(record)}>
+              Update
             </Button>
-          )}
-        </>
+            <Button onClick={() => handleDelete(record.quotationId)}>
+              Delete
+            </Button>
+            {!record.isConfirm && (
+              <Button onClick={() => handleConfirm(record.quotationId)}>
+                Confirm
+              </Button>
+            )}
+            <Button onClick={() => handleCreateDesignProfile(record.quotationId)}>
+              Create Design Profile
+            </Button>
+          </>
       ),
     },
   ];
@@ -299,8 +341,60 @@ function Quotation() {
           </Form.Item>
         </Form>
       </Modal>
+      <Modal
+        title="Create Design Profile"
+        visible={showCreateProfileModal}
+        onCancel={() => setShowCreateProfileModal(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setShowCreateProfileModal(false)}>
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={() => {
+              profileForm
+                .validateFields()
+                .then((values) => {
+                  handleCreateProfileSubmit(values);
+                })
+                .catch((info) => {
+                  console.log("Validate Failed:", info);
+                });
+            }}
+          >
+            Create
+          </Button>,
+        ]}
+      >
+        <Form form={profileForm} layout="vertical" name="createProfileForm">
+          <Form.Item
+            name="quotationId"
+            label="Quotation ID"
+            rules={[{ required: true, message: "Quotation ID is required!" }]}
+          >
+            <Input readOnly />
+          </Form.Item>
+          <Form.Item
+            name="address"
+            label="Address"
+            rules={[{ required: true, message: "Please input the address!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true, message: "Please input the description!" }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }
 
 export default Quotation;
+
+

@@ -39,7 +39,6 @@ function DesignProfile() {
  
   
 
-
   
   
   
@@ -162,6 +161,7 @@ function DesignProfile() {
       title: "Created",
       dataIndex: "createDate",
       key: "createDate",
+      render: (date: string) => new Intl.DateTimeFormat('vi-VN').format(new Date(date)),
     },
     {
       title: "Action",
@@ -284,6 +284,5 @@ function DesignProfile() {
 }
 
 export default DesignProfile;
-
 
 
