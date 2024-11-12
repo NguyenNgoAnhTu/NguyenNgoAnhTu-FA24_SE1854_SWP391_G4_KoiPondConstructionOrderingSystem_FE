@@ -5,6 +5,8 @@ import "./user.css";
 import { message } from 'antd';
 import { toast } from "react-toastify";
 import ConstructionInfomation from "./construction-infomation";
+import PaymentModal from './paymentModal';
+import FeedbackModal from './feedbackModal';
 
 const User = () => {
   interface ServiceRequest {
@@ -14,6 +16,9 @@ const User = () => {
       type: string;
       cost: number;
       note: string;
+    };
+    customer: {
+      name: string;
     };
     description: string;
     address: string;
@@ -56,6 +61,12 @@ const User = () => {
     serviceProgressID: string;
     serviceDetail: {
       serviceDetailId: string;
+      staff: {
+        customerId: string;
+      };
+      serviceQuotation: {
+        serviceQuotationId: string;
+      };
     };
     startDate: string;
     endDate?: string;
@@ -79,7 +90,7 @@ const User = () => {
   const [phone, setPhone] = useState(
     localStorage.getItem("phone") || "N/A"
   );
- 
+
 
   const token = localStorage.getItem("token");
   const customerId = localStorage.getItem("customerId");
@@ -87,7 +98,7 @@ const User = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [isEditingPhone, setIsEditingPhone] = useState(false);
-  
+
 
   const [showServiceRequests, setShowServiceRequests] = useState(false);
   const [showServiceQuotation, setShowServiceQuotation] = useState(false);
@@ -96,6 +107,12 @@ const User = () => {
   //const [customerId] = useState(localStorage.getItem("customerId") || "");
   const [modal, setModal] = useState(false);
   const [visibleCount, setVisibleCount] = useState(3); // initially show 3 cards
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [selectedServiceRequest, setSelectedServiceRequest] = useState<string | null>(null);
+  const [selectedServiceCategory, setSelectedServiceCategory] = useState<string | null>(null);
+
   const handleConfirmToggle = async (quotationId: string) => {
     // Only show confirmation dialog if not already confirmed
     const quotation = serviceQuotation.find(
@@ -174,7 +191,6 @@ const User = () => {
         }
         const data = await response.json();
         setServiceRequests(data);
-        console.log(data);
       } catch (error: unknown) {
         if (error instanceof Error) {
           setError(error.message);
@@ -231,6 +247,7 @@ const User = () => {
 
         const data = await response.json();
         setServiceProgress(data);
+        console.log(data);
       } catch (error: unknown) {
         if (error instanceof Error) {
           setError(error.message);
@@ -246,9 +263,9 @@ const User = () => {
 
   }, [showServiceRequests, showServiceQuotation, showServiceProgress]);
 
-  const handleConfirmed = async (id: string) => {
+  const handleConfirmed = async (service: ServiceProgress) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/acceptance-service-progress/${id}`, {
+      const response = await fetch(`http://localhost:8080/api/acceptance-service-progress/${service.serviceProgressID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -257,14 +274,30 @@ const User = () => {
       });
 
       if (response.ok) {
-        message.success(`Successfully confirmed service progress with ID: ${id}`); // Show success message
+        message.success(`Successfully confirmed service progress with ID: ${service.serviceProgressID}`); // Show success message
         setServiceProgress((prevList) =>
           prevList.map((service) =>
-            service.serviceProgressID === id ? { ...service, isComfirmed: true } : service
+            service.serviceProgressID === service.serviceProgressID ? { ...service, isComfirmed: true } : service
           )
         );
+        const resPayment = await fetch(`http://localhost:8080/api/service-payment`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            "serviceQuotationID": service.serviceDetail.serviceQuotation.serviceQuotationId,
+            "paymentMethod": "Cash",
+            "maintenanceStaffID": service.serviceDetail.staff.customerId,
+            "status": "Pending"
+          }),
+        });
+        if (!resPayment.ok) {
+          throw new Error(`Failed to create service payment`);
+        }
       } else {
-        throw new Error(`Failed to confirm service progress with ID: ${id}`);
+        throw new Error(`Failed to confirm service progress with ID: ${service.serviceProgressID}`);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -272,6 +305,25 @@ const User = () => {
       }
     }
   }
+
+  const handlePaymentClick = (quotation: ServiceQuotation) => {
+    setSelectedPayment({
+      serviceQuotation: {
+        serviceQuotationId: quotation.serviceQuotationId,
+        customer: quotation.customer,
+        cost: quotation.cost,
+        vat: quotation.vat,
+        totalCost: quotation.totalCost
+      }
+    });
+    setIsPaymentModalOpen(true);
+  };
+
+  const handleFeedbackClick = (service: any) => {
+    console.log("Service Category ID:", service.serviceCategory.serviceCategoryId); // Debug log
+    setSelectedServiceCategory(service.serviceCategory.serviceCategoryId);
+    setIsFeedbackModalOpen(true);
+  };
 
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
@@ -295,19 +347,19 @@ const User = () => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
-     // const customer = localStorage.getItem("customer");
-     if (!name.trim()) {
-      toast.error("Name cannot be empty");
-      return;
-    }
+      // const customer = localStorage.getItem("customer");
+      if (!name.trim()) {
+        toast.error("Name cannot be empty");
+        return;
+      }
 
-    if (!email.trim() || !email.includes('@')) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
+      if (!email.trim() || !email.includes('@')) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
 
-    if (!phone.trim() || phone.length < 10 || phone.length > 11) {
-      toast.error("Please enter a valid phone number");
+      if (!phone.trim() || phone.length < 10 || phone.length > 11) {
+        toast.error("Please enter a valid phone number");
         return;
       }
       const updateData = {
@@ -333,24 +385,24 @@ const User = () => {
       }
 
       const updatedProfile = await response.json();
-      
+
       // Update local storage với dữ liệu từ response
       localStorage.setItem("name", updatedProfile.name);
       localStorage.setItem("email", updatedProfile.email);
       localStorage.setItem("phone", updatedProfile.phoneNumber);
-     
+
 
       // Update state với dữ liệu từ response
       setName(updatedProfile.name);
-      setEmail(updatedProfile.email);  
+      setEmail(updatedProfile.email);
       setPhone(updatedProfile.phoneNumber);
-      
+
 
       // Reset editing states
       setIsEditingName(false);
       setIsEditingEmail(false);
       setIsEditingPhone(false);
-      
+
 
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -513,41 +565,41 @@ const User = () => {
                       </li>
                     </div>
                     <li>
-  <NavLink
-    to="#"
-    className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0"
-    onClick={(e) => {
-      e.preventDefault();
-      setShowConstructionInfo(!showConstructionInfo);
-      setShowServiceQuotation(false);
-      setShowServiceRequests(false);
-      setShowServiceProgress(false);
-    }}
-  >
-    <svg
-      className="fill-current"
-      width="18"
-      height="18"
-      viewBox="0 0 18 18"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M16.5 9.75H1.5C1.0875 9.75 0.75 10.0875 0.75 10.5C0.75 10.9125 1.0875 11.25 1.5 11.25H16.5C16.9125 11.25 17.25 10.9125 17.25 10.5C17.25 10.0875 16.9125 9.75 16.5 9.75Z"
-        fill=""
-      />
-      <path
-        d="M16.5 13.5H1.5C1.0875 13.5 0.75 13.8375 0.75 14.25C0.75 14.6625 1.0875 15 1.5 15H16.5C16.9125 15 17.25 14.6625 17.25 14.25C17.25 13.8375 16.9125 13.5 16.5 13.5Z"
-        fill=""
-      />
-      <path
-        d="M16.5 6H1.5C1.0875 6 0.75 6.3375 0.75 6.75C0.75 7.1625 1.0875 7.5 1.5 7.5H16.5C16.9125 7.5 17.25 7.1625 17.25 6.75C17.25 6.3375 16.9125 6 16.5 6Z"
-        fill=""
-      />
-    </svg>
-    Construction Information
-  </NavLink>
-</li>
+                      <NavLink
+                        to="#"
+                        className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowConstructionInfo(!showConstructionInfo);
+                          setShowServiceQuotation(false);
+                          setShowServiceRequests(false);
+                          setShowServiceProgress(false);
+                        }}
+                      >
+                        <svg
+                          className="fill-current"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M16.5 9.75H1.5C1.0875 9.75 0.75 10.0875 0.75 10.5C0.75 10.9125 1.0875 11.25 1.5 11.25H16.5C16.9125 11.25 17.25 10.9125 17.25 10.5C17.25 10.0875 16.9125 9.75 16.5 9.75Z"
+                            fill=""
+                          />
+                          <path
+                            d="M16.5 13.5H1.5C1.0875 13.5 0.75 13.8375 0.75 14.25C0.75 14.6625 1.0875 15 1.5 15H16.5C16.9125 15 17.25 14.6625 17.25 14.25C17.25 13.8375 16.9125 13.5 16.5 13.5Z"
+                            fill=""
+                          />
+                          <path
+                            d="M16.5 6H1.5C1.0875 6 0.75 6.3375 0.75 6.75C0.75 7.1625 1.0875 7.5 1.5 7.5H16.5C16.9125 7.5 17.25 7.1625 17.25 6.75C17.25 6.3375 16.9125 6 16.5 6Z"
+                            fill=""
+                          />
+                        </svg>
+                        Construction Information
+                      </NavLink>
+                    </li>
                     {/* Add more menu items as needed */}
                   </ul>
                 </nav>
@@ -643,56 +695,66 @@ const User = () => {
           {showServiceRequests && (
             <div className="container mx-auto mt-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {serviceRequests
-                  .slice(0, visibleCount)
-                  .map((service: ServiceRequest) => (
-                    <div
-                      key={service.serviceRequestId}
-                      className=" rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                    >
-                      <h3 className="text-lg font-semibold text-center mb-4">
-                        Service Request ID: {service.serviceRequestId}
-                      </h3>
+                {serviceRequests.slice(0, visibleCount).map((service: ServiceRequest) => (
+                  <div
+                    key={service.serviceRequestId}
+                    className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+                  >
+                    <h3 className="text-lg font-semibold text-center mb-4">
+                      Service Request ID: {service.serviceRequestId}
+                    </h3>
 
-                      <p className="text-sm text-gray-700 mb-2">
-                        <strong>Category Type:</strong>{" "}
-                        {service.serviceCategory.type || "N/A"}
-                      </p>
-                      <p className="text-sm text-gray-700 mb-2">
-                        <strong>Cost:</strong>{" "}
-                        {service.serviceCategory.cost || "N/A"}
-                      </p>
-                      <p className="text-sm text-gray-700 mb-2">
-                        <strong>Description:</strong> {service.description}
-                      </p>
-                      <p className="text-sm text-gray-700 mb-2">
-                        <strong>Address:</strong> {service.address || "N/A"}
-                      </p>
-                      <p className="text-sm text-gray-700 mb-2">
-                        <strong>Note:</strong> {service.note || "N/A"}
-                      </p>
-                      <p className="text-sm text-gray-700 mb-2">
-                        <strong>Status:</strong> {service.status || "N/A"}
-                      </p>
-
-                      <div className="flex justify-center mt-4">
-                        {/* Optional 'Create Quotation' button */}
-                        {/* <button
-              type="button"
-              className="mx-1 text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-4 py-2"
-            >
-              Create Quotation
-            </button> */}
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Category Type:</strong>{" "}
+                      {service.serviceCategory.type || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Cost:</strong>{" "}
+                      {service.serviceCategory.cost || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Description:</strong> {service.description}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Address:</strong> {service.address || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Note:</strong> {service.note || "N/A"}
+                    </p>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Status:</strong> {service.status || "N/A"}
+                    </p>
+                    <div className="flex justify-center mt-4">
+                      {service.status === "Finish" && (
                         <button
                           type="button"
-                          className="mx-1 text-red bg-white hover:text-white  hover:bg-red focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+                          className="mx-1 text-green bg-white hover:text-white hover:bg-green focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-4 py-2"
+                          onClick={() => handleFeedbackClick(service)}
                         >
-                          Delete
+                          Feedback
                         </button>
-                      </div>
+                      )}
+                      <button
+                        type="button"
+                        className="mx-1 text-red bg-white hover:text-white  hover:bg-red focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+                      >
+                        Delete
+                      </button>
                     </div>
-                  ))}
+                  </div>
+                ))}
               </div>
+
+              {/* Add FeedbackModal */}
+              <FeedbackModal
+                isOpen={isFeedbackModalOpen}
+                onClose={() => {
+                  setIsFeedbackModalOpen(false);
+                  setSelectedServiceCategory(null);
+                }}
+                serviceCategoryId={selectedServiceCategory}
+              />
+
               {visibleCount < serviceRequests.length && (
                 <div className="flex justify-center mt-6">
                   <button
@@ -719,29 +781,29 @@ const User = () => {
                       Quotation ID: {quotation.serviceQuotationId}
                     </h3>
 
-                    <p className="text-sm text-gray-700 mb-2">
+                    {/* <p className="text-sm text-gray-700 mb-2">
                       <strong>Category Type:</strong>{" "}
                       {quotation.serviceRequest.serviceCategory.type || "N/A"}
-                    </p>
-                    <p className="text-sm text-gray-700 mb-2">
+                    </p> */}
+                    {/* <p className="text-sm text-gray-700 mb-2">
                       <strong>Category Cost:</strong>{" "}
                       {quotation.serviceRequest.serviceCategory.cost || "N/A"}
-                    </p>
+                    </p> */}
                     <p className="text-sm text-gray-700 mb-2">
                       <strong>Customer Name:</strong>{" "}
                       {quotation.customer.name || "N/A"}
                     </p>
-                    <p className="text-sm text-gray-700 mb-2">
+                    {/* <p className="text-sm text-gray-700 mb-2">
                       <strong>Request ID:</strong>{" "}
                       {quotation.serviceRequest.serviceRequestId}
-                    </p>
+                    </p> */}
                     <p className="text-sm text-gray-700 mb-2">
                       <strong>Description:</strong> {quotation.description}
                     </p>
-                    <p className="text-sm text-gray-700 mb-2">
+                    {/* <p className="text-sm text-gray-700 mb-2">
                       <strong>Address:</strong>{" "}
                       {quotation.serviceRequest.address || "N/A"}
-                    </p>
+                    </p> */}
                     <p className="text-sm text-gray-700 mb-2">
                       <strong>Total Cost:</strong>{" "}
                       {quotation.totalCost || "N/A"}
@@ -763,9 +825,25 @@ const User = () => {
                         {quotation.confirm ? "Confirmed" : "Not Confirmed"}
                       </button>
                     </td>
+                    {quotation.confirm && (
+                      <td className="px-6 py-4 text-sm text-center">
+                        <button
+                          className="px-4 py-2 rounded-lg bg-[#4A6CF7] text-white"
+                          onClick={() => handlePaymentClick(quotation)}
+                        >
+                          Payment
+                        </button>
+                      </td>
+                    )}
                   </div>
                 ))}
               </div>
+
+              <PaymentModal
+                isOpen={isPaymentModalOpen}
+                onClose={() => setIsPaymentModalOpen(false)}
+                servicePayment={selectedPayment}
+              />
 
               {visibleCount < serviceQuotation.length && (
                 <div className="flex justify-center mt-6">
@@ -823,20 +901,11 @@ const User = () => {
                           <button
                             type="button"
                             className="mx-1 text-red bg-white hover:text-white  hover:bg-red focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
-                            onClick={() => handleConfirmed(service.serviceProgressID)}
+                            onClick={() => handleConfirmed(service)}
                           >
                             Confirm
                           </button>
                         )}
-                        {/* {service.isComfirmed && (
-                          <button
-                            type="button"
-                            className="mx-1 text-green bg-white hover:text-white  hover:bg-green focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
-
-                          >
-                            Payment
-                          </button>
-                        )} */}
                       </div>
                     </div>
                   ))}

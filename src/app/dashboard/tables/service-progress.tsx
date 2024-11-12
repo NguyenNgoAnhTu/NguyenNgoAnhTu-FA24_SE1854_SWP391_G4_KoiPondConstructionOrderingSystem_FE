@@ -86,11 +86,7 @@ function ServiceProgressTable() {
         throw new Error("Failed to update service progress");
       }
       message.success("Service progress updated successfully");
-      setServiceProgressData((prevData) =>
-        prevData.map((service) =>
-          service.serviceProgressID === selectedService.serviceProgressID ? selectedService : service
-        )
-      );
+      location.reload();
     } catch (error: unknown) {
       if (error instanceof Error) {
         message.error(error.message);
