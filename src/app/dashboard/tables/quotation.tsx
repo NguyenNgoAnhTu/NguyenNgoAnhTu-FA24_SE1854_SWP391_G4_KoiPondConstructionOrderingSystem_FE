@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Modal, Table } from "antd";
 import { toast } from "react-toastify";
-
+import { EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
 type QuotationType = {
   quotationId: number;
   customerId: number;
