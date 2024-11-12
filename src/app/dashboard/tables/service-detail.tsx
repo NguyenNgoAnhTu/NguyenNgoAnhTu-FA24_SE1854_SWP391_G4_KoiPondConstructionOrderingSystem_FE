@@ -107,7 +107,8 @@ function ServiceRequestTable() {
                 "Staff Name",
                 "Quotation ID",
                 "Customer Name",
-                "Is Active",
+                "Description",
+                "Address",
                 "Actions",
               ].map((header) => (
                 <th
@@ -138,22 +139,10 @@ function ServiceRequestTable() {
                   {serviceDetail.serviceQuotation.customer.name}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.serviceRequest.serviceRequestId}
+                  {serviceDetail.description}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.serviceRequest.serviceCategory.type}
-                </td>
-                <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.cost}
-                </td>
-                <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.totalCost}
-                </td>
-                <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.vat}
-                </td>
-                <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.isActive ? "Active" : "Inactive"}
+                  {serviceDetail.serviceQuotation.serviceRequest.address}
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <button
