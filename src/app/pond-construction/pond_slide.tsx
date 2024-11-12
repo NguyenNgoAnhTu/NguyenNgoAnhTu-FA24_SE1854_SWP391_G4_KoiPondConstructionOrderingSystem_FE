@@ -1,5 +1,7 @@
-import { Table, Button, Modal, Form, Input, Card, Row, Col } from "antd";
+import {  Modal, Form, Input } from "antd";
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import Typography from "components/typography";
 
 function Pond_slide() {
   const [datas, setDatas] = useState<PondDesignTemplateType[]>([]);
@@ -24,7 +26,7 @@ function Pond_slide() {
     pondBottom: string;
     decoration: string;
     minEstimatedCost: number;
-    maxSizmaxEstimatedCoste: number;
+    maxEstimatedCost: number;
     imageUrl: string;
     description: string;
   };
@@ -43,7 +45,7 @@ function Pond_slide() {
         }
       );
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok");
       }
 
       const data = await response.json();
@@ -56,11 +58,11 @@ function Pond_slide() {
   const handleFormCreate = async (values: any) => {
     try {
       if (!selectedId) {
-        throw new Error("Please select a pond design template");
+        toast.error("Please select a pond design template");
       }
 
       if (!customerId) {
-        throw new Error("No customer ID found. Please login again.");
+        toast.error("No customer ID found. Please login again.");
       }
 
       const token = localStorage.getItem("token");
@@ -83,7 +85,7 @@ function Pond_slide() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create service request");
+        toast.error(errorData.message || "Failed to create service request");
       }
 
       const requestData = await response.json();
@@ -111,14 +113,14 @@ function Pond_slide() {
 
       if (!responseRequestDetail.ok) {
         const errorData = await responseRequestDetail.json();
-        throw new Error(errorData.message || "Failed to create request detail");
+        toast.error(errorData.message || "Failed to create request detail");
       }
 
       const requestDetailData = await responseRequestDetail.json();
       console.log("Request detail created:", requestDetailData);
 
       setShowModal(false);
-      alert("Request sent successfully!");
+      toast.success("Request sent successfully!");
     } catch (err) {
       console.error("Error:", err);
       alert(err instanceof Error ? err.message : "An error occurred");
@@ -130,83 +132,112 @@ function Pond_slide() {
   }, []);
 
   return (
-    <div>
-      <h1>Pond design templates:</h1>
-      <Row gutter={[16, 16]}>
+    <div className="max-w-[1440px] w-[90%] mx-auto mt-[50px] phone:w-[95%]">
+      <div className="flex flex-col gap-6 mb-10">
+        <Typography className="text-[38px] font-bold leading-12">
+          Pond Design Templates
+        </Typography>
+        <div className="w-[200px] h-[1px] bg-gray-A0"></div>
+        <Typography className="text-[#2B2825] text-[16px]">
+          Choose from our carefully crafted pond design templates to create your perfect water feature
+        </Typography>
+      </div>
+
+      <div className="grid grid-cols-3 gap-8 phone:grid-cols-1 tablet:grid-cols-2">
         {datas.map((data) => (
-          <Col span={8} key={data.pondDesignTemplateId}>
-            <Card
-              hoverable
-              cover={
-                <img
-                  alt="Pond Design"
-                  src={data.imageUrl}                  
-                  style={{ height: 200, objectFit: "cover" }}
-                />
-              }
-              style={{ textAlign: "center" }}
-            >
-              <h2 style={{ margin: 0 }}>
-                ${data.minEstimatedCost} - ${data.maxSizmaxEstimatedCoste}
-              </h2>
-              <h3>{data.description || "Pond Design"}</h3>
-              <p>Min Size: {data.minSize} | Max Size: {data.maxSize}</p>
-              <p>Water Volume: {data.waterVolume}</p>
-              <p>Min Depth: {data.minDepth}</p>
-              <p>Max Depth: {data.maxDepth}</p>
-              <p>Shape: {data.shape}</p>
-              <p>Filtration System: {data.filtrationSystem}</p>
-              <p>pH Level: {data.phLevel}</p>
-              <p>Water Temperature: {data.waterTemperature}°C</p>
-              <p>Pond Liner: {data.pondLiner}</p>
-              <p>Pond Bottom: {data.pondBottom}</p>
-              <p>Decoration: {data.decoration}</p>
-              <Button
-                type="primary"
-                danger
-                onClick={() => {
-                  if (!customerId) {
-                    alert("Please login first");
-                    return;
-                  }
-                  setSelectedId(data.pondDesignTemplateId);
-                  setShowModal(true);
-                  console.log("Selected template ID:", data.pondDesignTemplateId);
-                  console.log("Customer ID:", customerId);
-                }}
-              >
-                Consult
-              </Button>
-            </Card>
-          </Col>
+          <div 
+            key={data.pondDesignTemplateId}
+            className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+          >
+            <div className="relative h-[250px] overflow-hidden">
+              <img
+                src={data.imageUrl}
+                alt="Pond Design"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            <div className="p-6">
+              <Typography className="text-[24px] font-bold mb-4 text-center">
+                ${data.minEstimatedCost.toLocaleString()} - ${data.maxEstimatedCost.toLocaleString()}
+              </Typography>
+              
+              <Typography className="text-[18px] font-semibold mb-4 text-center">
+                {data.description || "Pond Design"}
+              </Typography>
+
+              <div className="space-y-2 text-[#2B2825] text-[16px]">
+                <p>Size: {data.minSize} - {data.maxSize} m²</p>
+                <p>Water Volume: {data.waterVolume} L</p>
+                <p>Depth: {data.minDepth} - {data.maxDepth} m</p>
+                <p>Shape: {data.shape}</p>
+                <p>Filtration: {data.filtrationSystem}</p>
+                <p>pH Level: {data.phLevel}</p>
+                <p>Temperature: {data.waterTemperature}°C</p>
+                <p>Liner: {data.pondLiner}</p>
+                <p>Bottom: {data.pondBottom}</p>
+                <p>Decoration: {data.decoration}</p>
+              </div>
+
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => {
+                    if (!customerId) {
+                      toast.error("Please login first");
+                      return;
+                    }
+                    setSelectedId(data.pondDesignTemplateId);
+                    setShowModal(true);
+                  }}
+                  className="bg-green text-white px-8 py-3 rounded-full hover:bg-red-700 transition-colors duration-300"
+                >
+                  Consult Now
+                </button>
+              </div>
+            </div>
+          </div>
         ))}
-      </Row>
+      </div>
+
       <Modal
         onCancel={() => setShowModal(false)}
         onOk={() => form.submit()}
         open={showModal}
-        title="Request"
+        title={
+          <Typography className="text-[24px] font-bold">
+            Request Consultation
+          </Typography>
+        }
+        width={600}
+        className="custom-modal"
       >
-        <Form onFinish={handleFormCreate} form={form} labelCol={{ span: 24 }}>
+        <Form 
+          onFinish={handleFormCreate} 
+          form={form} 
+          layout="vertical"
+          className="mt-4"
+        >
           <Form.Item
             label="Description"
             name="description"
-            rules={[{ required: true, message: "Cannot be blank!" }]}
+            rules={[{ required: true, message: "Please enter a description" }]}
           >
-            <Input />
+            <Input.TextArea rows={4} className="rounded-lg" />
           </Form.Item>
+          
           <Form.Item
             label="Address"
             name="address"
-            rules={[{ required: true, message: "Cannot be blank!" }]}
+            rules={[{ required: true, message: "Please enter your address" }]}
           >
-            <Input.TextArea />
+            <Input.TextArea rows={3} className="rounded-lg" />
           </Form.Item>
+          
           <Form.Item
-            label="Note"
+            label="Additional Notes"
             name="note"
           >
-            <Input />
+            <Input.TextArea rows={2} className="rounded-lg" />
           </Form.Item>
         </Form>
       </Modal>

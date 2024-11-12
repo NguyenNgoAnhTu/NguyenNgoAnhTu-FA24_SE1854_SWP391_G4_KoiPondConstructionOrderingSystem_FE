@@ -30,7 +30,7 @@ function CustomerTable() {
     email: "",
     phoneNumber: "",
     password: "",
-    role: "STAFF",
+    role: "STAFF" || "CONSTRUCTOR" || "DESIGNER" || "CONSULTANT" || "MAINTENANCE STAFF",
   });
   const [newCustomer, setNewCustomer] = useState({
     name: "",
@@ -40,13 +40,14 @@ function CustomerTable() {
     
   });
 
-  const roles = ["CUSTOMER", "STAFF"];
+  const roles = ["CUSTOMER", "STAFF","CONSTRUCTOR", "DESIGNER", "CONSULTANT", "MAINTENANCE STAFF"];
+  const staffRoles = ["STAFF", "CONSTRUCTOR", "DESIGNER", "CONSULTANT", "MAINTENANCE STAFF"];
 
   const fetchCustomers = async (role: string) => {
     try {
       const token = localStorage.getItem("token");
-      console.log("Fetching customers with role:", role);
-      console.log("Token:", token);
+    //  console.log("Fetching customers with role:", role);
+    //  console.log("Token:", token);
 
       const response = await fetch(
         `http://localhost:8080/api/customer/${role}`,
@@ -163,7 +164,7 @@ function CustomerTable() {
       const addedStaff = await response.json();
       setCustomers(prev => [...prev, addedStaff]);
       setShowAddForm(false);
-      setNewStaff({ name: "", email: "", phoneNumber: "", password: "", role: "STAFF" });
+      setNewStaff({ name: "", email: "", phoneNumber: "", password: "", role: "STAFF" || "CONSTRUCTOR" || "DESIGNER" || "CONSULTANT" || "MAINTENANCE" });
       toast.success("Staff added successfully");
       
       fetchCustomers(selectedRole);
@@ -265,15 +266,13 @@ function CustomerTable() {
       />
 
       <div className="flex justify-between items-center mb-4">
-        {(selectedRole === "STAFF" || selectedRole === "CUSTOMER") && (
-          <button
-            type="button"
-            className="text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2"
-            onClick={() => setShowAddForm(true)}
-          >
-            Add New {selectedRole === "STAFF" ? "Staff" : "Customer"}
-          </button>
-        )}
+        <button
+          type="button"
+          className="text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2"
+          onClick={() => setShowAddForm(true)}
+        >
+          Add New {selectedRole}  
+        </button>
         
         <div className="flex items-center">
           <label className="text-sm font-medium text-gray-700 mr-2">Select Role:</label>
@@ -296,8 +295,8 @@ function CustomerTable() {
           <div className="flex min-h-screen items-center justify-center p-4">
             <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md">
               <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 rounded-t-lg">
-                <h3 className="text-lg font-bold text-white">
-                  Add New {selectedRole === "STAFF" ? "Staff" : "Customer"}
+                <h3 className="text-lg font-bold text-black">
+                  Add New {selectedRole}
                 </h3>
               </div>
               
@@ -306,45 +305,51 @@ function CustomerTable() {
                   <input
                     type="text"
                     placeholder="Name"
-                    value={selectedRole === "STAFF" ? newStaff.name : newCustomer.name}
-                    onChange={(e) => selectedRole === "STAFF" 
-                      ? setNewStaff({...newStaff, name: e.target.value})
-                      : setNewCustomer({...newCustomer, name: e.target.value})
-                    }
+                    value={newStaff.name}
+                    onChange={(e) => setNewStaff({...newStaff, name: e.target.value})}
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="email"
                     placeholder="Email"
-                    value={selectedRole === "STAFF" ? newStaff.email : newCustomer.email}
-                    onChange={(e) => selectedRole === "STAFF"
-                      ? setNewStaff({...newStaff, email: e.target.value})
-                      : setNewCustomer({...newCustomer, email: e.target.value})
-                    }
+                    value={newStaff.email}
+                    onChange={(e) => setNewStaff({...newStaff, email: e.target.value})}
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="tel"
                     placeholder="Phone Number"
-                    value={selectedRole === "STAFF" ? newStaff.phoneNumber : newCustomer.phoneNumber}
-                    onChange={(e) => selectedRole === "STAFF"
-                      ? setNewStaff({...newStaff, phoneNumber: e.target.value})
-                      : setNewCustomer({...newCustomer, phoneNumber: e.target.value})
-                    }
+                    value={newStaff.phoneNumber}
+                    onChange={(e) => setNewStaff({...newStaff, phoneNumber: e.target.value})}
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="password"
                     placeholder="Password"
-                    value={selectedRole === "STAFF" ? newStaff.password : newCustomer.password}
-                    onChange={(e) => selectedRole === "STAFF"
-                      ? setNewStaff({...newStaff, password: e.target.value})
-                      : setNewCustomer({...newCustomer, password: e.target.value})
-                    }
+                    value={newStaff.password}
+                    onChange={(e) => setNewStaff({...newStaff, password: e.target.value})}
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
                   />
+                  {selectedRole !== "CUSTOMER" && (
+                    <select
+                      value={newStaff.role}
+                      onChange={(e) => setNewStaff({...newStaff, role: e.target.value})}
+                      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                    >
+                      {staffRoles.map((role) => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
-                
+                  
+
+
+
+
+
                 <div className="mt-6 flex justify-end space-x-3">
                   <button
                     onClick={() => setShowAddForm(false)}
@@ -353,10 +358,10 @@ function CustomerTable() {
                     Cancel
                   </button>
                   <button
-                    onClick={selectedRole === "STAFF" ? handleAddStaff : handleAddCustomer}
+                    onClick={selectedRole === "CUSTOMER" ? handleAddCustomer : handleAddStaff}
                     className="px-4 py-2 text-sm font-medium text-white bg-green rounded-md hover:bg-blue-600"
                   >
-                    Add {selectedRole === "STAFF" ? "Staff" : "Customer"}
+                    Add {selectedRole}
                   </button>
                 </div>
               </div>
@@ -366,122 +371,142 @@ function CustomerTable() {
       )}
 
       <div className="overflow-x-auto bg-white rounded-lg shadow-xl">
-        <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-A0 border">
-            <tr>
-              {["ID",
-                "Name",
-                "Email",
-                "Phone Number",
-                "Role",
-                "Actions"
-              ].map((header) => (
-                <th
-                  key={header}
-                  className="px-6 py-3 text-left text-xs font-medium text-black-15 uppercase tracking-wider text-center"
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {customers.map((customer) => (
-              <tr key={customer.customerId} className="hover:bg-gray-50 transition-colors duration-200">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.customerId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {editingCustomer?.customerId === customer.customerId ? (
-                    <input
-                      type="text"
-                      value={editingCustomer.name}
-                      onChange={(e) => setEditingCustomer({
-                        ...editingCustomer,
-                        name: e.target.value
-                      })}
-                      className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-                    />
-                  ) : (
-                    customer.name
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {editingCustomer?.customerId === customer.customerId ? (
-                    <input
-                      type="email"
-                      value={editingCustomer.email}
-                      onChange={(e) => setEditingCustomer({
-                        ...editingCustomer,
-                        email: e.target.value
-                      })}
-                      className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-                    />
-                  ) : (
-                    customer.email
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {editingCustomer?.customerId === customer.customerId ? (
-                    <input
-                      type="tel"
-                      value={editingCustomer.phoneNumber}
-                      onChange={(e) => setEditingCustomer({
-                        ...editingCustomer,
-                        phoneNumber: e.target.value
-                      })}
-                      className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-                    />
-                  ) : (
-                    customer.phoneNumber
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {customer.role}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {editingCustomer?.customerId === customer.customerId ? (
-                    <div className="space-x-2">
-                      <button
-                        onClick={() => handleUpdateProfile(editingCustomer)}
-                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105 shadow-sm"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditingCustomer(null)}
-                        className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-sm"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-x-2">
-                      <button
-                        onClick={() => setEditingCustomer({
-                          customerId: customer.customerId,
-                          name: customer.name,
-                          email: customer.email,
-                          phoneNumber: customer.phoneNumber 
-                        })}
-                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-sm"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setCustomerToDelete(customer);
-                          setShowDeleteModal(true);
-                        }}
-                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 transform hover:scale-105 shadow-sm"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {customers.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            <svg 
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+              />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No {selectedRole} Found</h3>
+            <p className="mt-1 text-sm text-gray-500">Click "Add New {selectedRole}" button above to create one.</p>
+          </div>
+        ) : (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-A0 border">
+                <tr>
+                  {["ID",
+                    "Name",
+                    "Email",
+                    "Phone Number",
+                    "Role",
+                    "Actions"
+                  ].map((header) => (
+                    <th
+                      key={header}
+                      className="px-6 py-3 text-left text-xs font-medium text-black-15 uppercase tracking-wider text-center"
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {customers.map((customer) => (
+                  <tr key={customer.customerId} className="hover:bg-gray-50 transition-colors duration-200">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.customerId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {editingCustomer?.customerId === customer.customerId ? (
+                        <input
+                          type="text"
+                          value={editingCustomer.name}
+                          onChange={(e) => setEditingCustomer({
+                            ...editingCustomer,
+                            name: e.target.value
+                          })}
+                          className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                        />
+                      ) : (
+                        customer.name
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {editingCustomer?.customerId === customer.customerId ? (
+                        <input
+                          type="email"
+                          value={editingCustomer.email}
+                          onChange={(e) => setEditingCustomer({
+                            ...editingCustomer,
+                            email: e.target.value
+                          })}
+                          className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                        />
+                      ) : (
+                        customer.email
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {editingCustomer?.customerId === customer.customerId ? (
+                        <input
+                          type="tel"
+                          value={editingCustomer.phoneNumber}
+                          onChange={(e) => setEditingCustomer({
+                            ...editingCustomer,
+                            phoneNumber: e.target.value
+                          })}
+                          className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                        />
+                      ) : (
+                        customer.phoneNumber
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {customer.role}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      {editingCustomer?.customerId === customer.customerId ? (
+                        <div className="space-x-2">
+                          <button
+                            onClick={() => handleUpdateProfile(editingCustomer)}
+                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105 shadow-sm"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditingCustomer(null)}
+                            className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-x-2">
+                          <button
+                            onClick={() => setEditingCustomer({
+                              customerId: customer.customerId,
+                              name: customer.name,
+                              email: customer.email,
+                              phoneNumber: customer.phoneNumber 
+                            })}
+                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setCustomerToDelete(customer);
+                              setShowDeleteModal(true);
+                            }}
+                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 transform hover:scale-105 shadow-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
       </div>
 
       {showDeleteModal && customerToDelete && (

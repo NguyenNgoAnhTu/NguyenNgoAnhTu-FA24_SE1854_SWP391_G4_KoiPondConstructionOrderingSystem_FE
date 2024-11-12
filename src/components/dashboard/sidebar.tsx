@@ -144,7 +144,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 }}
               </SidebarLinkGroup>
               {/* <!-- Menu Item Dashboard --> */}
-
+                
               {/* <!-- Menu Item Forms --> */}
               <SidebarLinkGroup
                 activeCondition={
@@ -260,6 +260,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Form Layout
                             </NavLink>
                           </li>
+                          <li>
+                            <NavLink
+                              to="/admin/forms/pondDesignTemplate"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Form pondDesignTemplate
+                            </NavLink>
+                          </li>
                           {/* <!-- hết --> */}
                         </ul>
                       </div>
@@ -339,6 +347,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                        <li>
+                            <NavLink
+                              to="/admin/tables/table-service-category"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                              Table Service Category
+                            </NavLink>
+                          </li>
+                          
                           <li>
                             <NavLink
                               to="/admin/tables/table-service-requests"

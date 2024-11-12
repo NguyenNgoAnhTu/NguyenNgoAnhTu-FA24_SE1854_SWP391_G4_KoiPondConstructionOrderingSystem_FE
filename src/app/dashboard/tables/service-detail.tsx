@@ -1,66 +1,75 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Modal, Select, message } from 'antd';
+import { toast } from "react-toastify";
 
-interface ServiceDetail {
-  serviceDetailId: string;
-  staff: {
-    customerId: string;
-    name: string;
-  };
-  serviceQuotation: {
-    serviceQuotationId: string;
-    customer: {
+
+function ServiceRequestTable() {
+  interface ServiceDetail {
+    serviceDetailId: string;
+    staff: {
+      customerId: string;
       name: string;
-      email: string;
-      role: string;
     };
-    serviceRequest: {
-      serviceRequestId: string;
+    serviceQuotation: {
+      serviceQuotationId: string;
       customer: {
         name: string;
         email: string;
         role: string;
       };
-      serviceCategory: {
-        serviceCategoryId: number;
-        type: string;
-        cost: number;
-        note: string;
+      serviceRequest: {
+        serviceRequestId: string;
+        customer: {
+          name: string;
+          email: string;
+          role: string;
+        };
+        serviceCategory: {
+          serviceCategoryId: number;
+          type: string;
+          cost: number;
+          note: string;
+        };
+        address: string;
       };
-      address: string;
+      description: string;
+      note: string;
+      cost: number;
+      totalCost: number;
+      vat: number;
+      isActive: boolean;
     };
     description: string;
-    note: string;
-    cost: number;
-    totalCost: number;
-    vat: number;
     isActive: boolean;
-  };
-  description: string;
-  isActive: boolean;
-  isCreatedProgress: boolean;
-}
+  }
 
-interface ServiceProgress {
-  serviceDetailID: string;
-  step: string;
-  description: string;
-}
+  interface Staff {
+    customerId: string;
+    name: string;
+    role: string;
+  }
 
-function ServiceRequestTable() {
+  interface ServiceProgress {
+    serviceProgressId?: string;
+    serviceDetailId: string;
+    step: string;
+    description: string;
+  }
+
   const [serviceDetailsData, setServiceDetailsData] = useState<ServiceDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const token = localStorage.getItem("token");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<ServiceProgress | null>(null);
-  const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const navigate = useNavigate();
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editingDetail, setEditingDetail] = useState<ServiceDetail | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [detailToDelete, setDetailToDelete] = useState<ServiceDetail | null>(null);
+  const [staffList, setStaffList] = useState<Staff[]>([]);
+  const [showProgressForm, setShowProgressForm] = useState(false);
+  const [progressDetail, setProgressDetail] = useState<ServiceProgress | null>(null);
 
   useEffect(() => {
     const fetchServiceDetails = async () => {
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch("http://localhost:8080/api/service-details", {
           method: "GET",
           headers: {
@@ -87,40 +96,74 @@ function ServiceRequestTable() {
     fetchServiceDetails();
   }, []);
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setSelectedService(null);
+  useEffect(() => {
+    const fetchStaffList = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:8080/api/customer/STAFF", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch staff list");
+
+        const data = await response.json();
+        const filteredStaff = data.filter((staff: Staff) => staff.role !== "CUSTOMER");
+        setStaffList(filteredStaff);
+      } catch (error) {
+        console.error("Error fetching staff list:", error);
+        toast.error("Failed to load staff list");
+      }
+    };
+
+    fetchStaffList();
+  }, []);
+
+  const handleEdit = async (serviceDetail: ServiceDetail) => {
+    setEditingDetail(serviceDetail);
+    setShowEditForm(true);
   };
 
-  const handleInputChange = (
-    eOrName: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string,
-    value?: string
-  ) => {
-    if (selectedService) {
-      if (typeof eOrName === "string") {
-        // Handle Select change
-        setSelectedService({
-          ...selectedService,
-          [eOrName]: value,
-        });
-      } else {
-        // Handle input/textarea change
-        const { name, value } = eOrName.target;
-        setSelectedService({
-          ...selectedService,
-          [name]: value,
-        });
+  const handleDelete = async (serviceDetailId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/service-details/${serviceDetailId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete service detail");
       }
+
+      setServiceDetailsData(prevData =>
+        prevData.filter(detail => detail.serviceDetailId !== serviceDetailId)
+      );
+      setShowDeleteModal(false);
+      setDetailToDelete(null);
+      toast.success("Service detail deleted successfully!");
+
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete service detail!");
     }
   };
 
-  const options = [
-    { value: "Not started", label: "Not started" },
-    { value: "On hold", label: "On hold" },
-    { value: "In progress", label: "In progress" },
-    { value: "Complete", label: "Complete" },
-    { value: "Canceled", label: "Canceled" }
-  ];
+  const handleCreateProgress = async (serviceDetail: ServiceDetail) => {
+    setProgressDetail({
+      serviceDetailId: serviceDetail.serviceDetailId,
+      description: '',
+      step: 'Pending'
+    });
+    setShowProgressForm(true);
+  };
 
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
@@ -144,71 +187,21 @@ function ServiceRequestTable() {
     return <div className="text-center py-4">No data available.</div>;
   }
 
-  const handleCreateProgress = (serviceDetailId: string) => {
-    setSelectedService({
-      serviceDetailID: serviceDetailId,
-      step: "Not started",
-      description: "",
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleOk = async () => {
-    if (!selectedService) return;
-
-    setLoadingUpdate(true);
-    try {
-      const response = await fetch(
-        "http://localhost:8080/api/service-progress",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ ...selectedService }),
-        });
-
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || "Failed to create service progress");
-      }
-      const service = serviceDetailsData.find(service => service.serviceDetailId === selectedService.serviceDetailID);
-      if (service) {
-        service.isCreatedProgress = true;
-      }
-      navigate("/admin/tables/table-service-progress");
-      message.success("Service progress create successfully");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        message.error(error.message);
-      }
-    } finally {
-      setLoadingUpdate(false);
-      setIsModalOpen(false);
-      setSelectedService(null);
-    }
-  };
-
-  const tableHeaders = [
-    "Service Detail ID",
-    "Staff Name",
-    "Quotation ID",
-    "Customer Name",
-    "Cost",
-    "Total Cost",
-    "VAT",
-    "Is Active",
-    "Actions"
-  ];
-
   return (
     <div className="container mx-auto mt-8">
       <div className="overflow-hidden rounded-lg border border-b-black-27 shadow-md">
         <table className="min-w-full">
           <thead className="bg-gray-A0 border">
             <tr>
-              {tableHeaders.map((header) => (
+              {[
+                "Service Detail ID",
+                "Staff Name",
+                "Quotation ID",
+                "Customer Name",
+                "Description",
+                "Address",
+                "Actions",
+              ].map((header) => (
                 <th
                   key={header}
                   className="px-6 py-3 text-left text-xs font-medium text-black-15 uppercase tracking-wider text-center"
@@ -237,34 +230,33 @@ function ServiceRequestTable() {
                   {serviceDetail.serviceQuotation.customer.name}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.cost}
+                  {serviceDetail.description}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.totalCost}
-                </td>
-                <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.vat}
-                </td>
-                <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {serviceDetail.serviceQuotation.isActive ? "Active" : "Inactive"}
+                  {serviceDetail.serviceQuotation.serviceRequest.address}
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <button
                     type="button"
-                    className="mx-1 text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    onClick={() => handleEdit(serviceDetail)}
+                    className="mx-1 text-white bg-green hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
                   >
-                    Create Quotation
+                    Edit
                   </button>
                   <button
                     type="button"
-                    className="mx-1 text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    onClick={() => handleCreateProgress(serviceDetail.serviceDetailId)}
+                    onClick={() => handleCreateProgress(serviceDetail)}
+                    className="mx-1 text-white bg-green hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
                   >
                     Create Progress
                   </button>
                   <button
                     type="button"
-                    className="mx-1 text-white bg-red hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    onClick={() => {
+                      setDetailToDelete(serviceDetail);
+                      setShowDeleteModal(true);
+                    }}
+                    className="mx-1 text-white bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
                   >
                     Delete
                   </button>
@@ -274,33 +266,244 @@ function ServiceRequestTable() {
           </tbody>
         </table>
       </div>
-      <Modal title="Create Service Progress" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} confirmLoading={loadingUpdate}>
-        {selectedService && (
-          <div>
-            <p><strong>Service Detail ID:</strong> {selectedService.serviceDetailID || "N/A"}</p>
-            <div className="mt-1">
-              <label>
-                <strong>Step:</strong>
-                <Select
-                  defaultValue={selectedService.step}
-                  style={{ width: '100%' }}
-                  onChange={(value) => handleInputChange("step", value)}
-                  options={options}
-                />
-              </label>
-              <label className="mt-1">
-                <strong>Description:</strong>
-                <textarea
-                  name="description"
-                  value={selectedService.description || ""}
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded px-2 py-1 w-full"
-                />
-              </label>
+      {showDeleteModal && detailToDelete && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-70 backdrop-blur-sm"></div>
+          <div className="flex min-h-screen items-center justify-center">
+            <div className="relative bg-white rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-lg font-bold mb-4">Confirm Delete</h3>
+              <p>Are you sure you want to delete this service detail?</p>
+              <div className="mt-6 flex justify-end gap-4">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDetailToDelete(null);
+                  }}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(detailToDelete.serviceDetailId)}
+                  className="px-4 py-2 bg-red text-white rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-        )}
-      </Modal>
+        </div>
+      )}
+      {showEditForm && editingDetail && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-70 backdrop-blur-sm"></div>
+          <div className="flex min-h-screen items-center justify-center">
+            <div className="relative bg-white rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-lg font-bold mb-4 text-white">Edit Service Detail</h3>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const token = localStorage.getItem("token");
+                  const response = await fetch(
+                    `http://localhost:8080/api/service-details/${editingDetail.serviceDetailId}`,
+                    {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
+                        staffId: editingDetail.staff.customerId,
+                        description: editingDetail.description,
+                      }),
+                    }
+                  );
+
+                  if (!response.ok) {
+                    throw new Error("Failed to update service detail");
+                  }
+
+                  const updatedDetail = await response.json();
+                  setServiceDetailsData(prevData =>
+                    prevData.map(detail =>
+                      detail.serviceDetailId === updatedDetail.serviceDetailId
+                        ? updatedDetail
+                        : detail
+                    )
+                  );
+                  setShowEditForm(false);
+                  setEditingDetail(null);
+                  toast.success("Service detail updated successfully!");
+
+                } catch (error) {
+                  console.error("Update error:", error);
+                  toast.error("Failed to update service detail!");
+                }
+              }}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-white">Staff</label>
+                  <select
+                    value={editingDetail.staff.customerId}
+                    onChange={(e) => {
+                      const selectedStaff = staffList.find(staff => staff.customerId === e.target.value);
+                      setEditingDetail({
+                        ...editingDetail,
+                        staff: {
+                          customerId: e.target.value,
+                          name: selectedStaff?.name || ''
+                        }
+                      });
+                    }}
+                    className="w-full p-2 border rounded bg-white text-gray-800"
+                    required
+                  >
+                    <option value="">Select Staff</option>
+                    {staffList.map(staff => (
+                      <option
+                        key={staff.customerId}
+                        value={staff.customerId}
+                      >
+                        {staff.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-white">Description</label>
+                  <textarea
+                    value={editingDetail.description}
+                    onChange={(e) => setEditingDetail({
+                      ...editingDetail,
+                      description: e.target.value
+                    })}
+                    className="w-full p-2 border rounded"
+                    rows={4}
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end gap-4">
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditForm(false);
+                      setEditingDetail(null);
+                    }}
+                    className="px-4 py-2 bg-red text-white rounded hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-green text-white rounded hover:bg-green-600"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {showProgressForm && progressDetail && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-70 backdrop-blur-sm"></div>
+          <div className="flex min-h-screen items-center justify-center">
+            <div className="relative bg-white rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-lg font-bold mb-4 text-gray-800">Create Service Progress</h3>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const token = localStorage.getItem("token");
+                  const response = await fetch(
+                    "http://localhost:8080/api/service-progress",
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
+                        serviceDetailID: progressDetail.serviceDetailId,
+                        step: progressDetail.step,
+                        description: progressDetail.description,
+                      }),
+                    }
+                  );
+
+                  if (!response.ok) {
+                    throw new Error("Failed to create service progress");
+                  }
+
+                  setShowProgressForm(false);
+                  setProgressDetail(null);
+                  toast.success("Service progress created successfully!");
+
+                } catch (error) {
+                  console.error("Create progress error:", error);
+                  toast.error("Failed to create service progress!");
+                }
+              }}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">Step</label>
+                  <select
+                    value={progressDetail.step}
+                    onChange={(e) => setProgressDetail({
+                      ...progressDetail,
+                      step: e.target.value
+                    })}
+                    className="w-full p-2 border rounded bg-white text-gray-800"
+                    required
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">Description</label>
+                  <textarea
+                    value={progressDetail.description}
+                    onChange={(e) => setProgressDetail({
+                      ...progressDetail,
+                      description: e.target.value
+                    })}
+                    className="w-full p-2 border rounded"
+                    rows={4}
+                    placeholder="Enter progress description"
+                    required
+                  />
+                </div>
+
+
+
+                <div className="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowProgressForm(false);
+                      setProgressDetail(null);
+                    }}
+                    className="px-4 py-2 bg-red text-white rounded hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-green text-white rounded hover:bg-green-600"
+                  >
+                    Create Progress
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { Button, Form, Input, Modal, Table, Popconfirm } from "antd";
 import { useState, useEffect } from "react";
-
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 type ConsultType = {
@@ -11,18 +11,21 @@ type ConsultType = {
   requestDetailId: number;
   createDate: string; // Có thể đổi thành Date nếu cần
   isCustomerConfirm: boolean; // Thêm trường isCustomerConfirm
-  customers: number;
+ // customers: number;
+ customers: { customerId: number }[];
 };
 
 function Consult() {
   const [consultData, setConsultData] = useState<ConsultType[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [form] = Form.useForm();
+  const [quotationForm] = Form.useForm();
   const [selectedConsult, setSelectedConsult] = useState<ConsultType | null>(null);
   const [selectedConsultId, setSelectedConsultId] = useState<number | null>(null);
   
   const [showQuotationModal, setShowQuotationModal] = useState(false);
-
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+  const navigate = useNavigate();
   const fetchConsultData = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -48,19 +51,49 @@ function Consult() {
   useEffect(() => {
     fetchConsultData();
   }, []);
-  const handleFormCreate = async (values: any) => {
+  // const handleFormCreate = async (values: any) => {
     
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     console.log("Selected Customer ID:", selectedCustomerId);
+  //     console.log("Selected Consult ID:", selectedConsultId);
+      
+  //     // Đảm bảo customerId được set khi click vào nút Create quotation
+  //     if (!selectedCustomerId) {
+  //       toast.error("Customer ID is missing!");
+  //       return;
+  //     }
+  //     if (!selectedConsult) {
+  //       toast.error("No consult selected!");
+  //       return;
+  //     }
+  //     const requestBody = {
+  //       customerId:  selectedConsult.customers[0].customerId,
+  //       consultId: selectedConsultId,
+  //       isConfirm: false, // Đặt giá trị mặc định là false
+  //       description: values.description,
+  //       mainCost: values.mainCost,
+  //       subCost: values.subCost,
+  //       vat: values.vat
+        
+  //     };
+  const handleFormCreate = async (values: any) => {
     try {
       const token = localStorage.getItem("token");
+      
+      if (!selectedConsult) {
+        toast.error("No consult selected!");
+        return;
+      }
+  
       const requestBody = {
-        customerId: values.customerId,
+        customerId: selectedCustomerId, // Sử dụng selectedCustomerId đã lưu
         consultId: selectedConsultId,
-        isConfirm: false, // Đặt giá trị mặc định là false
+        isConfirm: false,
         description: values.description,
         mainCost: values.mainCost,
         subCost: values.subCost,
         vat: values.vat
-        
       };
       
         const response = await fetch("http://localhost:8080/api/quotation", {
@@ -87,13 +120,12 @@ function Consult() {
       }
       console.log("Quotation created successfully!");
       setShowQuotationModal(false);
-      alert("Quotation created!");
+      toast.success("Quotation created!");
+      navigate('/admin/tables/table-quotation');
     } catch (err) {
       alert(err);
     }
   };
-
-
 
   const consultUpdate = (record: ConsultType) => {
     console.log("Selected Consult Record:", record);
@@ -127,7 +159,6 @@ function Consult() {
         requestDetailId: values.requestDetailId,
         consultDate: values.consultDate,
       };
-
 
       // Thêm dòng log ở đây để kiểm tra requestBody
       console.log("Request Body:", requestBody);
@@ -275,16 +306,33 @@ function Consult() {
           
             
           <Button
-            type="primary"
-            style={{ backgroundColor: "orange", color: "white", marginRight: "3px" }}
-            onClick={() => {
-              setSelectedConsultId(record.id);
-              
-              setShowQuotationModal(true);
-            }}
-          >
-            Create quotation
-          </Button>
+  type="primary"
+  style={{ backgroundColor: "orange", color: "white", marginRight: "3px" }}
+  onClick={() => {
+    console.log("Selected record:", record);
+    
+    const consultId = record.id;
+    // Lấy customerId từ phần tử thứ hai của mảng customers
+    const customerId = record.customers[1].customerId;
+    
+    setSelectedConsult(record);
+    setSelectedConsultId(consultId);
+    setSelectedCustomerId(customerId);
+    
+    quotationForm.setFieldsValue({
+      customerId: customerId,
+      description: '',
+      mainCost: 0,
+      subCost: 0,
+      vat: 0
+    });
+
+    console.log("Setting customerId:", customerId); // Debug log
+    setShowQuotationModal(true);
+  }}
+>
+  Create quotation
+</Button>
         
 
           {!record.isCustomerConfirm && ( // Hiển thị nút Confirm nếu chưa xác nhận
@@ -372,12 +420,12 @@ function Consult() {
      
       <Modal
   onCancel={() => setShowQuotationModal(false)} // Đóng modal khi hủy
-  onOk={() => form.submit()} // Gửi form khi nhấn OK
+  onOk={() => quotationForm.submit()}// Gửi form khi nhấn OK
   open={showQuotationModal} // Mở/đóng modal
   title="Create Quotation" // Tiêu đề modal
 >
   <Form
-    form={form}
+    form={quotationForm}
     onFinish={handleFormCreate} // Xử lý khi form được submit
     labelCol={{ span: 24 }} // Cài đặt chiều rộng label
   >
@@ -421,9 +469,9 @@ function Consult() {
 <Form.Item
   name="customerId"
   label="CustomerId"
-  rules={[{ required: true, message: "Please input the CustomerId!" }]}
+  // rules={[{ required: true, message: "Please input the CustomerId!" }]}
 >
-  <Input />
+  <Input disabled/>
 </Form.Item>
 
 <Form.Item
@@ -495,3 +543,7 @@ function Consult() {
 }
 
 export default Consult;
+
+
+
+

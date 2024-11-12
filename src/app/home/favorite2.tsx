@@ -1,4 +1,4 @@
-import Mountain from "assets/images/Moms-pond.png";
+import Mountain from "assets/images/2DONE.webp";
 import Typography from "components/typography";
 const Favorite2 = () => {
   return (
