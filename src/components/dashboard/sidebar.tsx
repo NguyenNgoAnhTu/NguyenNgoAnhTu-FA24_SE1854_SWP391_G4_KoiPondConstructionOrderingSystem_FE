@@ -226,14 +226,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Form Service Progress
                             </NavLink>
                           </li>
-                          <li>
+                          {/* <li>
                             <NavLink
                               to="/admin/forms/design-profile-form"
                               className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
                             >
                               Form Design Profile
                             </NavLink>
-                          </li>
+                          </li> */}
                           {/* <li>
                             <NavLink
                               to="/admin/forms/quotation-form"
