@@ -1,4 +1,5 @@
 import { Table, Button, Modal } from "antd";
+import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { toast } from "react-toastify";
@@ -37,8 +38,9 @@ function RequestDetailTable() {
     maxSizmaxEstimatedCoste: number;
     imageUrl: string;
     description: string;
-    note: string;   
+    note: string;
   };
+
 
   const navigate = useNavigate();
 
@@ -114,8 +116,14 @@ function RequestDetailTable() {
   };
 
 
-  const handleConsult = () => {
-    navigate("/admin/forms/form-consult");
+  const handleConsult = (record: any) => {
+    // Get the customer ID from the request
+    const customerId = record.request.customer.customerId;
+    const requestDetailId = record.requestDetailId;
+    // Navigate with state containing the customer ID
+    navigate("/admin/forms/form-consult", {
+      state: { customerId, requestDetailId }
+    });
   };
 
   const requestDetailColumns = [
@@ -124,49 +132,108 @@ function RequestDetailTable() {
       title: "Request ID", dataIndex: ["request", "id"], key: "requestId",
       render: (requestId: any) => (
         <>
-        <span>{requestId}</span>
+          <span>{requestId}</span>
           <Button
+            icon={<EyeOutlined />}
             style={{
-              marginLeft: "20px",
-              backgroundColor: "LightGray",
-              color: "Black",
-              border: "1px solid black"
+              marginLeft: "10px",
+              backgroundColor: "white",
+              color: "#1890ff",
+              border: "1px solid #1890ff",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              padding: 0,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.3s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = "#1890ff";
+              e.currentTarget.style.color = "white";
+              e.currentTarget.style.transform = "scale(1.1)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = "white";
+              e.currentTarget.style.color = "#1890ff";
+              e.currentTarget.style.transform = "scale(1)";
             }}
             onClick={() => fetchRequestId(requestId)}
           >
-            View Detail
           </Button>
         </>
       ),
     },
-    { title: "Pond Design Template ID", dataIndex: ["pondDesignTemplate", "pondDesignTemplateId"], key: "pondDesignTemplateId",
+    {
+      title: "Pond Design Template ID", dataIndex: ["pondDesignTemplate", "pondDesignTemplateId"], key: "pondDesignTemplateId",
       render: (pondDesignTemplateId: any) => (
-      <>
-      <span>{pondDesignTemplateId}</span>
-        <Button
-          style={{
-            marginLeft: "20px",
-            backgroundColor: "LightGray",
-            color: "Black",
-            border: "1px solid black"
-          }}
-          onClick={() => fetchPondDesignTemplate(pondDesignTemplateId)}
-        >
-          View Detail
-        </Button>
-      </>
-    ), },
+        <>
+          <span>{pondDesignTemplateId}</span>
+          <Button
+            icon={<EyeOutlined />}
+            style={{
+              marginLeft: "10px",
+              backgroundColor: "white",
+              color: "#1890ff",
+              border: "1px solid #1890ff",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              padding: 0,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.3s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = "#1890ff";
+              e.currentTarget.style.color = "white";
+              e.currentTarget.style.transform = "scale(1.1)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = "white";
+              e.currentTarget.style.color = "#1890ff";
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+            onClick={() => fetchPondDesignTemplate(pondDesignTemplateId)}
+          >
+          </Button>
+        </>
+      ),
+    },
     { title: "Note", dataIndex: "note", key: "note", render: (text: any) => text || "null" }, // Nếu `note` không có giá trị, hiển thị "null"}, 
     {
       title: "Actions",
       key: "actions",
-      render: (text: any) => (
+      render: (record: any) => (
         <Button
-          type="primary"
-          style={{ backgroundColor: "LimeGreen", color: "white" }}
-          onClick={handleConsult}
+          icon={<EditOutlined />}
+          style={{
+            backgroundColor: "white",
+            color: "#52c41a", // Màu xanh lá cây nhạt
+            border: "1px solid #52c41a",
+            borderRadius: "50%",
+            width: "32px",
+            height: "32px",
+            padding: 0,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.3s ease"
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = "#52c41a";
+            e.currentTarget.style.color = "white";
+            e.currentTarget.style.transform = "scale(1.1)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = "white";
+            e.currentTarget.style.color = "#52c41a";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+          onClick={() => handleConsult(record)}
         >
-          Consult
         </Button>
       ),
     },
@@ -329,16 +396,14 @@ function RequestDetailTable() {
         title="View Pond Design Template"
         onCancel={() => setShowPondDesignTemplateModal(false)}
         onOk={() => setShowPondDesignTemplateModal(false)}
-        width={2000} // Tăng chiều rộng modal lên 2000px (có thể điều chỉnh theo nhu cầu)
+        width="90%" // Tăng chiều rộng modal lên 2000px (có thể điều chỉnh theo nhu cầu)
         style={{
-          maxWidth: "90%", // Đảm bảo modal không quá lớn so với màn hình
+          maxWidth: "1200px", // Đảm bảo modal không quá lớn so với màn hình
           top: 20, // Điều chỉnh vị trí dọc nếu cần
         }}
-        okButtonProps={{
-          style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
-        }}
+        bodyStyle={{ overflowX: "auto" }} // Thêm thanh cuộn ngang nếu cần
       >
-        <Table dataSource={pondDesignTemplate} columns={columnsPondDesignTemplate}></Table>
+        <Table dataSource={pondDesignTemplate} columns={columnsPondDesignTemplate} scroll={{ x: true }}></Table>
       </Modal>
     </div>
   );

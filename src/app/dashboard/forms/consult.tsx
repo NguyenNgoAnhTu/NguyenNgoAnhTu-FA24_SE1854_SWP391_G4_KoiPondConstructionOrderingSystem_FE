@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ConsultForm = () => {
+  const location = useLocation();
+  const { customerId, requestDetailId } = location.state || {};
+
   const [formData, setFormData] = useState({
-    customerId: "",
+    customerId: customerId || "",
     description: "",
-    consultDate: new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16), // Điều chỉnh thời gian theo múi giờ địa phương
+    consultDate: new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
     isCustomerConfirm: false,
-    requestDetailId: "",
+    requestDetailId: requestDetailId || "",
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
@@ -70,7 +73,7 @@ const ConsultForm = () => {
     let isValid = true;
     const newErrors = { ...errors };
 
-    if (!formData.customerId.trim()) {
+    if (!formData.customerId) {
       newErrors.customerId = "Customer ID is required";
       isValid = false;
     }
@@ -80,7 +83,7 @@ const ConsultForm = () => {
       isValid = false;
     }
 
-    if (!formData.requestDetailId.trim()) {
+    if (!formData.requestDetailId) {
       newErrors.requestDetailId = "Request Detail ID is required";
       isValid = false;
     }
@@ -108,11 +111,11 @@ const ConsultForm = () => {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-              customerId: formData.customerId,
+              customerId: parseInt(formData.customerId), // Chuyển đổi sang số
               description: formData.description,
               consultDate: formData.consultDate || new Date().toISOString(),
-              isCustomerConfirm: false,
-              requestDetailId: formData.requestDetailId,
+              isCustomerConfirm: formData.isCustomerConfirm,
+              requestDetailId: parseInt(formData.requestDetailId), // Chuyển đổi sang số
             }),
           }
         );
@@ -125,13 +128,17 @@ const ConsultForm = () => {
           toast.error(errorText); // Ném lỗi để ngắt quá trình
         }
 
-        toast.success("Consult created successfully!");
-        navigate("/admin/tables/table-consult"); // Redirect to a list of consultations or another page
-      } catch (error) {
-        toast.error("Create consult failed!");
-      } finally {
-        setLoading(false);
-      }
+        const data = await response.json();
+      console.log("Response data:", data);
+
+      toast.success("Consult created successfully!");
+      navigate("/admin/tables/table-consult");
+    } catch (error) {
+      console.error("Error creating consult:", error);
+      toast.error(error instanceof Error ? error.message : "Create consult failed!");
+    } finally {
+      setLoading(false);
+    }
     }
   };
 
