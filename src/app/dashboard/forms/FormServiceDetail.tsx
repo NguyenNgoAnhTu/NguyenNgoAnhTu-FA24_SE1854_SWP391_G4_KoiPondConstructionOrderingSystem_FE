@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 interface FormServiceDetailProps {
   onClose: () => void;
@@ -74,7 +76,7 @@ const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotatio
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -92,15 +94,23 @@ const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotatio
           }),
         }
       );
-
+  
       if (!response.ok) {
         throw new Error("Failed to create service detail");
       }
-
-      alert("Service detail created successfully!");
+  
+      // Show success notification with SweetAlert2
+      await Swal.fire({
+        title: 'Success!',
+        text: 'Service detail created successfully!',
+        icon: 'success',
+        confirmButtonColor: '#3085d6',
+      });
+  
       navigate("/admin/tables/table-service-details");
     } catch (error) {
-      alert("Failed to create service detail!");
+      toast.error("Failed to create service detail!");
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -165,7 +175,7 @@ const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotatio
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+              className="flex-1 bg-red hover:bg-black text-white py-2 px-4 rounded"
             >
               Cancel
             </button>

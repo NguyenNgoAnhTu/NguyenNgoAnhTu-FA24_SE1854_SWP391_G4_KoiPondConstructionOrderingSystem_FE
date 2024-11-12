@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import FormQuotation from "../forms/FormQuotation";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 function ServiceRequestTable() {
   interface ServiceRequest {
@@ -24,33 +26,43 @@ function ServiceRequestTable() {
   const [selectedService, setSelectedService] = useState<ServiceRequest | null>(null);
   const [showQuotationForm, setShowQuotationForm] = useState(false);
   const handleDelete = async (serviceRequestId: string) => {
-    if (window.confirm("Are you sure you want to delete this service request?")) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this service request? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    });
+  
+    if (result.isConfirmed) {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('token');
         const response = await fetch(
           `http://localhost:8080/api/service-requests/${serviceRequestId}`,
           {
-            method: "DELETE",
+            method: 'DELETE',
             headers: {
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        
+  
         if (!response.ok) {
-          throw new Error("Failed to delete service request");
+          throw new Error('Failed to delete service request');
         }
   
         // Remove the deleted item from the state
-        setServiceRequestData(prevData => 
-          prevData.filter(request => request.serviceRequestId !== serviceRequestId)
+        setServiceRequestData((prevData) =>
+          prevData.filter((request) => request.serviceRequestId !== serviceRequestId)
         );
-        
-        alert("Service request deleted successfully!");
+  
+        toast.success('Service request deleted successfully!');
       } catch (error) {
-        alert("Failed to delete service request!");
-        console.error("Error:", error);
+        console.error('Error:', error);
+        toast.error('Failed to delete service request!');
       }
     }
   };
@@ -86,6 +98,15 @@ function ServiceRequestTable() {
 
     fetchServiceRequest();
   }, []);
+
+  const handleCreateQuotation = (service: ServiceRequest) => {
+    if (service.status !== "PROCESSING") {
+      toast.error("Can only create quotation for requests with PROCESSING status");
+      return;
+    }
+    setSelectedService(service);
+    setShowQuotationForm(true);
+  };
 
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
@@ -165,22 +186,23 @@ function ServiceRequestTable() {
                 <td className="px-6 py-4 text-sm">
                   <button
                     type="button"
-                    className="mx-1 text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    onClick={() => {
-                      setSelectedService(service);
-                      setShowQuotationForm(true);
-                    }}
+                    className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
+                      ${service.status === "PROCESSING"
+                        ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
+                        : "bg-[#d3d3d3] cursor-not-allowed" 
+                      }`}
+                    onClick={() => handleCreateQuotation(service)}
                   >
                     Create Quotation
                   </button>
 
                   <button
-          type="button"
-          className="mx-1 text-white bg-red hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          onClick={() => handleDelete(service.serviceRequestId)}
-        >
-          Delete
-        </button>
+                    type="button"
+                    className="mx-1 text-white bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2"
+                    onClick={() => handleDelete(service.serviceRequestId)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

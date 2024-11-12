@@ -1,4 +1,4 @@
-import { Table, Button, Modal, Form, Input, Card, Row, Col } from "antd";
+import { Button, Modal, Form, Input, Card, Row, Col } from "antd";
 import { useState, useEffect } from "react";
 
 function Pond_slide() {

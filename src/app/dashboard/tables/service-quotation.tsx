@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import FormServiceDetail from "../forms/FormServiceDetail";
-import FormEditQuotation from "../forms/FormQuotation";
+import FormEditQuotation from "../forms/FormEditQuotation";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 function ServiceQuotationTable() {
   interface ServiceQuotation {
@@ -77,58 +79,79 @@ function ServiceQuotationTable() {
     fetchServiceQuotations();
   }, []);
   const handleDelete = async (serviceQuotationId: string) => {
-    if (
-      window.confirm("Are you sure you want to delete this service quotation?")
-    ) {
-      try {
-        const id = serviceQuotationId;
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8080/api/service-quotations/${id}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this service quotation? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e74c3c', // Matches your delete button color
+      cancelButtonColor: '#6c757d', // Neutral gray for cancel button
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(
+            `http://localhost:8080/api/service-quotations/${serviceQuotationId}`,
+            {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+  
+          if (!response.ok) {
+            throw new Error('Failed to delete service quotation');
           }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to delete service request");
+  
+          // Remove the deleted item from the state
+          setServiceQuotationData((prevData) =>
+            prevData.filter(
+              (quotation) => quotation.serviceQuotationId !== serviceQuotationId
+            )
+          );
+  
+          toast.success('Service quotation deleted successfully!');
+        } catch (error) {
+          toast.error('Failed to delete service quotation!');
+          console.error('Error:', error);
         }
-
-        // Remove the deleted item from the state
-        setServiceQuotationData((prevData) =>
-          prevData.filter(
-            (request) => request.serviceQuotationId !== serviceQuotationId
-          )
-        );
-
-        alert("Service request deleted successfully!");
-      } catch (error) {
-        alert("Failed to delete service request!");
-        console.error("Error:", error);
       }
+    });
+  };
+
+  const handleEditClick =    (quotation: ServiceQuotation) => {
+    if (quotation.confirm) {
+      toast.error("Cannot edit confirmed quotations");
+      return;
     }
+    setEditingQuotation(quotation);
+    setShowEditForm(true);
   };
 
   const handleEdit = async (
-    quotationId: string,
+    serviceQuotationId: string,
     updatedData: Partial<ServiceQuotation>
   ) => {
     try {
+      const editableData = {
+        description: updatedData.description,
+        vat: updatedData.vat,
+        
+      };
+
       const token = localStorage.getItem("token");
-      const id = quotationId;
       const response = await fetch(
-        `http://localhost:8080/api/service-quotations/${id}`,
+        `http://localhost:8080/api/service-quotations/${serviceQuotationId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(updatedData),
+          body: JSON.stringify(editableData),
         }
       );
 
@@ -138,21 +161,20 @@ function ServiceQuotationTable() {
 
       const updatedQuotation = await response.json();
 
-      // Update the local state with the edited quotation
       setServiceQuotationData((prevData) =>
         prevData.map((quotation) =>
-          quotation.serviceQuotationId === quotationId
-            ? updatedQuotation
+          quotation.serviceQuotationId === serviceQuotationId
+            ? {...quotation, ...updatedQuotation}
             : quotation
         )
       );
 
       setShowEditForm(false);
       setEditingQuotation(null);
-      alert("Quotation updated successfully!");
+      toast.success("Quotation updated successfully!");
     } catch (error) {
       console.error("Error updating quotation:", error);
-      alert("Failed to update quotation!");
+      toast.error("Failed to update quotation!");
     }
   };
 
@@ -245,30 +267,36 @@ function ServiceQuotationTable() {
                 <td className="px-6 py-4 text-sm">
                   <button
                     type="button"
-                    className={`mx-1 text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${
-                      !quotation.confirm ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
+                      ${quotation.confirm
+                        ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
+                        : "bg-[#d3d3d3] cursor-not-allowed"
+                      }`}
                     onClick={() => {
+                      if (!quotation.confirm) {
+                        toast.error("Can only create detail for confirmed quotations");
+                        return;
+                      }
                       setSelectedQuotation(quotation);
                       setShowDetailForm(true);
                     }}
-                    disabled={!quotation.confirm}
                   >
                     Create Detail
                   </button>
                   <button
                     type="button"
-                    className="mx-1 text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    onClick={() => {
-                      setEditingQuotation(quotation);
-                      setShowEditForm(true);
-                    }}
+                    className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
+                      ${!quotation.confirm
+                        ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
+                        : "bg-[#d3d3d3] cursor-not-allowed"
+                      }`}
+                    onClick={() => handleEditClick(quotation)}
                   >
                     Edit
                   </button>
                   <button
                     type="button"
-                    className="mx-1 text-white bg-red hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    className="mx-1 text-white bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2"
                     onClick={() => handleDelete(quotation.serviceQuotationId)}
                   >
                     Delete
@@ -287,9 +315,10 @@ function ServiceQuotationTable() {
       )}
       {showEditForm && editingQuotation && (
         <FormEditQuotation
-          quotation={editingQuotation}
+        
           onClose={() => setShowEditForm(false)}
-          onSubmit={handleEdit}
+          onSubmit={handleEdit} 
+          quotation={editingQuotation}
         />
       )}
     </div>

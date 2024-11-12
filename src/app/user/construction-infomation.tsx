@@ -8,6 +8,7 @@ function ConstructionInfomation() {
     const [datasDocument, setDatasDocument] = useState<DocumentType[]>([]);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [showDocumentModal, setShowDocumentModal] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(6);
 
     const fetchData = async () => {
         try {
@@ -84,6 +85,10 @@ function ConstructionInfomation() {
         } catch (err: any) {
           toast.error(err.message);
         }
+      };
+
+      const handleShowMore = () => {
+        setVisibleCount(prev => prev + 6);
       };
 
       useEffect(() => {
@@ -209,37 +214,115 @@ function ConstructionInfomation() {
           key: "confirmConstructorName",
         },
       ];
-  return (
-    <div>
-        <Table dataSource={datas} columns={columns}></Table>
 
-        <Modal
-        width={1200}
-        open={showHistoryModal}
-        title="Construction histories"
-        onCancel={() => setShowHistoryModal(false)}
-        onOk={() => setShowHistoryModal(false)}
-        okButtonProps={{
-          style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
-        }}
-      >
-        <Table dataSource={datasHistory} columns={columnsHistory} scroll={{ x: 600, y: 400 }}></Table>
-      </Modal>
+      return (
+        <div className="container mx-auto mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {datas.slice(0, visibleCount).map((data: any) => (
+              <div
+                key={data.designProfileId}
+                className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+              >
+                <h3 className="text-lg font-semibold text-center mb-4">
+                  Design Profile ID: {data.designProfileId}
+                </h3>
 
-      <Modal
-        width={1200}
-        open={showDocumentModal}
-        title="Acceptance documents"
-        onCancel={() => setShowDocumentModal(false)}
-        onOk={() => setShowDocumentModal(false)}
-        okButtonProps={{
-          style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
-        }}
-      >
-        <Table dataSource={datasDocument} columns={columnsDocument} scroll={{ x: 600, y: 400 }}></Table>
-      </Modal>
-    </div>
-  )
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>Address:</strong> {data.address}
+                </p>
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>Construction Status:</strong>{" "}
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold
+                    ${data.contructionStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 
+                      data.contructionStatus === 'COMPLETED' ? 'bg-green-100 text-green-800' : 
+                      'bg-gray-100 text-gray-800'}`}
+                  >
+                    {data.contructionStatus}
+                  </span>
+                </p>
+
+                <div className="flex justify-center gap-2 mt-4">
+                  <button
+                    onClick={() => fetchDataHistory(data.designProfileId)}
+                    className="text-white bg-green hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2"
+                  >
+                    View History
+                  </button>
+                  <button
+                    onClick={() => fetchDataDocument(data.designProfileId)}
+                    className="text-white bg-green hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-4 py-2"
+                  >
+                    View Document
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Show More Button */}
+          {visibleCount < datas.length && (
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={handleShowMore}
+                className="mx-1 text-white bg-red hover:bg-red-32 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+              >
+                Show More
+              </button>
+            </div>
+          )}
+
+          {/* Modals */}
+          <Modal
+            width={1200}
+            open={showHistoryModal}
+            title={
+              <h3 className="text-lg font-semibold">
+                Construction Histories
+              </h3>
+            }
+            onCancel={() => setShowHistoryModal(false)}
+            onOk={() => setShowHistoryModal(false)}
+            okButtonProps={{
+              className: "bg-blue-600 hover:bg-blue-700"
+            }}
+          >
+            <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md">
+              <Table 
+                dataSource={datasHistory} 
+                columns={columnsHistory} 
+                scroll={{ x: 600, y: 400 }}
+                className="min-w-full"
+                rowClassName="hover:bg-gray-50 transition duration-200"
+              />
+            </div>
+          </Modal>
+
+          <Modal
+            width={1200}
+            open={showDocumentModal}
+            title={
+              <h3 className="text-lg font-semibold">
+                Acceptance Documents
+              </h3>
+            }
+            onCancel={() => setShowDocumentModal(false)}
+            onOk={() => setShowDocumentModal(false)}
+            okButtonProps={{
+              className: "bg-blue-600 hover:bg-blue-700"
+            }}
+          >
+            <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md">
+              <Table 
+                dataSource={datasDocument} 
+                columns={columnsDocument} 
+                scroll={{ x: 600, y: 400 }}
+                className="min-w-full"
+                rowClassName="hover:bg-gray-50 transition duration-200"
+              />
+            </div>
+          </Modal>
+        </div>
+      );
 }
 
 export default ConstructionInfomation;

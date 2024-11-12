@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import close_circle from "assets/icons/close-circle.svg";
+import Swal from "sweetalert2";
 
 interface FormCleaningProps {
   onClose: () => void;
@@ -81,11 +82,11 @@ const FormCleaning: React.FC<FormCleaningProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     if (validateForm()) {
       setLoading(true);
       const token = localStorage.getItem("token");
-
+  
       try {
         const response = await fetch(
           "http://localhost:8080/api/service-requests",
@@ -103,16 +104,29 @@ const FormCleaning: React.FC<FormCleaningProps> = ({
             }),
           }
         );
-
+  
         if (!response.ok) {
           const errorMessage = await response.text();
           throw new Error(errorMessage || "Failed to create service request");
         }
-
-        alert("Service request saved!");
+  
+        // Success popup
+        await Swal.fire({
+          title: 'Success!',
+          text: 'Service request saved!',
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+        });
+  
         navigate("/user");
       } catch (error) {
-        alert("Create service request failed!");
+        // Error popup
+        Swal.fire({
+          title: 'Error!',
+          text: 'Create service request failed!',
+          icon: 'error',
+          confirmButtonColor: '#d33',
+        });
       } finally {
         setLoading(false);
       }
