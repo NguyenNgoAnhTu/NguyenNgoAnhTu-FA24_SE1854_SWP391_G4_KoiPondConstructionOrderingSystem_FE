@@ -134,15 +134,13 @@ const Header = () => {
 
           </div>
         ))}
-        <div>
-        </div>
-        <div>
+        {/* <div>
           <a href="/contact">
             <button className="bg-[#1C6839] p-3 rounded-lg text-white font-bold">
               Get A Quote
-            </button>
+               </button>
           </a>
-        </div>
+        </div> */}
       </div>
       {token ? (
         <div className="relative">
