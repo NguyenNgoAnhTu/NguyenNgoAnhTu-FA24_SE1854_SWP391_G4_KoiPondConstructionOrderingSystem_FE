@@ -175,7 +175,7 @@ const LoginPage = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray focus:outline-none"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black focus:outline-none"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -206,10 +206,10 @@ const LoginPage = () => {
           </div>
           <div className="text-center">
             <a
-              href="#"
+              href="/"
               className="text-black hover:underline focus:outline-none focus:ring-2 focus:ring-blue focus:ring-opacity-50 rounded-sm"
             >
-              Forgot password?
+              Go to home page
             </a>
           </div>
         </form>

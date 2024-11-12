@@ -145,6 +145,13 @@ const User = () => {
   const [showConstructionQuotation, setShowConstructionQuotation] = useState(false);
   const [showConstructionInformation, setShowConstructionInformation] = useState(false);
 
+  const [role, setRole] = useState(localStorage.getItem("role") || "");
+
+  useEffect(() => {
+    const userRole = localStorage.getItem("role");
+    setRole(userRole || "");
+  }, []);
+
   const handleConfirmToggle = async (quotationId: string) => {
     // Only show confirmation dialog if not already confirmed
     if (!serviceQuotation || serviceQuotation.length === 0) {
@@ -417,7 +424,7 @@ const User = () => {
       <div className="main-body">
         <div className="flex flex-wrap">
           <div className="lg:w-1/3 w-full p-4">
-            <div className="card bg-white shadow-lg">
+            <div className="card bg-white shadow-lg h-[400px]">
               <div className="card-body p-6">
                 <div className="flex flex-col items-center text-center">
                   <img
@@ -431,261 +438,182 @@ const User = () => {
                     <p className="text-gray-400 text-sm">{phone}</p>
                   </div>
                 </div>
+
                 <hr className="my-4" />
                 <nav className="mt-5">
                   <ul className="flex flex-col gap-2">
-                    {/* Service Menu */}
-                    <div
-                      className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0 cursor-pointer"
-                      onClick={() => {
-                        setShowServiceMenu(!showServiceMenu);
-                        setShowConstructionInfoMenu(false);
-                        setActiveConstructionTab(null);
-                      }}
-                    >
-                      <svg
-                        className="fill-current"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M16.5 9.75H1.5C1.0875 9.75 0.75 10.0875 0.75 10.5C0.75 10.9125 1.0875 11.25 1.5 11.25H16.5C16.9125 11.25 17.25 10.9125 17.25 10.5C17.25 10.0875 16.9125 9.75 16.5 9.75Z"
-                          fill=""
-                        />
-                        <path
-                          d="M16.5 13.5H1.5C1.0875 13.5 0.75 13.8375 0.75 14.25C0.75 14.6625 1.0875 15 1.5 15H16.5C16.9125 15 17.25 14.6625 17.25 14.25C17.25 13.8375 16.9125 13.5 16.5 13.5Z"
-                          fill=""
-                        />
-                        <path
-                          d="M16.5 6H1.5C1.0875 6 0.75 6.3375 0.75 6.75C0.75 7.1625 1.0875 7.5 1.5 7.5H16.5C16.9125 7.5 17.25 7.1625 17.25 6.75C17.25 6.3375 16.9125 6 16.5 6Z"
-                          fill=""
-                        />
-                      </svg>
-                      <p>Service</p>
-                    </div>
+                    {role === "CUSTOMER" && (
+                      <>
+                        {/* Service Menu */}
+                        <div
+                          className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0 cursor-pointer"
+                          onClick={() => {
+                            setShowServiceMenu(!showServiceMenu);
+                            setShowConstructionInfoMenu(false);
+                            setActiveConstructionTab(null);
+                          }}
+                        >
+                          <svg
+                            className="fill-current"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 18 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M16.5 9.75H1.5C1.0875 9.75 0.75 10.0875 0.75 10.5C0.75 10.9125 1.0875 11.25 1.5 11.25H16.5C16.9125 11.25 17.25 10.9125 17.25 10.5C17.25 10.0875 16.9125 9.75 16.5 9.75Z"
+                              fill=""
+                            />
+                            <path
+                              d="M16.5 13.5H1.5C1.0875 13.5 0.75 13.8375 0.75 14.25C0.75 14.6625 1.0875 15 1.5 15H16.5C16.9125 15 17.25 14.6625 17.25 14.25C17.25 13.8375 16.9125 13.5 16.5 13.5Z"
+                              fill=""
+                            />
+                            <path
+                              d="M16.5 6H1.5C1.0875 6 0.75 6.3375 0.75 6.75C0.75 7.1625 1.0875 7.5 1.5 7.5H16.5C16.9125 7.5 17.25 7.1625 17.25 6.75C17.25 6.3375 16.9125 6 16.5 6Z"
+                              fill=""
+                            />
+                          </svg>
+                          <p>Service</p>
+                        </div>
 
-                    {/* Service Submenu */}
-                    {showServiceMenu && (
-                      <div className="pl-8">
-                        <ul className="flex flex-col gap-2">
-                          <li>
-                            <div
-                              className={`cursor-pointer py-2 px-4 ${activeServiceTab === 'requests' ? 'bg-gray-A0' : ''}`}
-                              onClick={() => {
-                                setActiveServiceTab('requests');
-                                setShowServiceRequests(true);
-                                setShowServiceQuotation(false);
-                                setShowServiceProgress(false);
-                              }}
-                            >
-                              Service Requests
-                            </div>
-                          </li>
-                          <li>
-                            <div
-                              className={`cursor-pointer py-2 px-4 ${activeServiceTab === 'quotation' ? 'bg-gray-A0' : ''}`}
-                              onClick={() => {
-                                setActiveServiceTab('quotation');
-                                setShowServiceRequests(false);
-                                setShowServiceQuotation(true);
-                                setShowServiceProgress(false);
-                              }}
-                            >
-                              Service Quotation
-                            </div>
-                          </li>
-                          <li>
-                            <div
-                              className={`cursor-pointer py-2 px-4 ${activeServiceTab === 'progress' ? 'bg-gray-A0' : ''}`}
-                              onClick={() => {
-                                setActiveServiceTab('progress');
-                                setShowServiceRequests(false);
-                                setShowServiceQuotation(false);
-                                setShowServiceProgress(true);
-                              }}
-                            >
-                              Service Progress
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
+                        {/* Service Submenu */}
+                        {showServiceMenu && (
+                          <div className="pl-8">
+                            <ul className="flex flex-col gap-2">
+                              <li>
+                                <div
+                                  className={`cursor-pointer py-2 px-4 ${activeServiceTab === 'requests' ? 'bg-gray-A0' : ''}`}
+                                  onClick={() => {
+                                    setActiveServiceTab('requests');
+                                    setShowServiceRequests(true);
+                                    setShowServiceQuotation(false);
+                                    setShowServiceProgress(false);
+                                  }}
+                                >
+                                  Service Requests
+                                </div>
+                              </li>
+                              <li>
+                                <div
+                                  className={`cursor-pointer py-2 px-4 ${activeServiceTab === 'quotation' ? 'bg-gray-A0' : ''}`}
+                                  onClick={() => {
+                                    setActiveServiceTab('quotation');
+                                    setShowServiceRequests(false);
+                                    setShowServiceQuotation(true);
+                                    setShowServiceProgress(false);
+                                  }}
+                                >
+                                  Service Quotation
+                                </div>
+                              </li>
+                              <li>
+                                <div
+                                  className={`cursor-pointer py-2 px-4 ${activeServiceTab === 'progress' ? 'bg-gray-A0' : ''}`}
+                                  onClick={() => {
+                                    setActiveServiceTab('progress');
+                                    setShowServiceRequests(false);
+                                    setShowServiceQuotation(false);
+                                    setShowServiceProgress(true);
+                                  }}
+                                >
+                                  Service Progress
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        )}
 
-                    {/* Construction Info Menu */}
-                    <div
-                      className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0 cursor-pointer"
-                      onClick={() => {
-                        setShowConstructionInfoMenu(!showConstructionInfoMenu);
-                        setShowServiceMenu(false);
-                        setActiveServiceTab(null);
-                      }}
-                    >
-                      <svg
-                        className="fill-current"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M16.5 9.75H1.5C1.0875 9.75 0.75 10.0875 0.75 10.5C0.75 10.9125 1.0875 11.25 1.5 11.25H16.5C16.9125 11.25 17.25 10.9125 17.25 10.5C17.25 10.0875 16.9125 9.75 16.5 9.75Z"
-                          fill=""
-                        />
-                        <path
-                          d="M16.5 13.5H1.5C1.0875 13.5 0.75 13.8375 0.75 14.25C0.75 14.6625 1.0875 15 1.5 15H16.5C16.9125 15 17.25 14.6625 17.25 14.25C17.25 13.8375 16.9125 13.5 16.5 13.5Z"
-                          fill=""
-                        />
-                        <path
-                          d="M16.5 6H1.5C1.0875 6 0.75 6.3375 0.75 6.75C0.75 7.1625 1.0875 7.5 1.5 7.5H16.5C16.9125 7.5 17.25 7.1625 17.25 6.75C17.25 6.3375 16.9125 6 16.5 6Z"
-                          fill=""
-                        />
-                      </svg>
-                      <p>Construction Information</p>
-                    </div>
+                        {/* Construction Info Menu */}
+                        <div
+                          className="flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-gray-A0 cursor-pointer"
+                          onClick={() => {
+                            setShowConstructionInfoMenu(!showConstructionInfoMenu);
+                            setShowServiceMenu(false);
+                            setActiveServiceTab(null);
+                          }}
+                        >
+                          <svg
+                            className="fill-current"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 18 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M16.5 9.75H1.5C1.0875 9.75 0.75 10.0875 0.75 10.5C0.75 10.9125 1.0875 11.25 1.5 11.25H16.5C16.9125 11.25 17.25 10.9125 17.25 10.5C17.25 10.0875 16.9125 9.75 16.5 9.75Z"
+                              fill=""
+                            />
+                            <path
+                              d="M16.5 13.5H1.5C1.0875 13.5 0.75 13.8375 0.75 14.25C0.75 14.6625 1.0875 15 1.5 15H16.5C16.9125 15 17.25 14.6625 17.25 14.25C17.25 13.8375 16.9125 13.5 16.5 13.5Z"
+                              fill=""
+                            />
+                            <path
+                              d="M16.5 6H1.5C1.0875 6 0.75 6.3375 0.75 6.75C0.75 7.1625 1.0875 7.5 1.5 7.5H16.5C16.9125 7.5 17.25 7.1625 17.25 6.75C17.25 6.3375 16.9125 6 16.5 6Z"
+                              fill=""
+                            />
+                          </svg>
+                          <p>Construction Information</p>
+                        </div>
 
-
-                    {/* Construction Info Submenu */}
-                    {showConstructionInfoMenu && (
-                      <div className="pl-8">
-                        <ul className="flex flex-col gap-2">
-                          <li>
-                            <div
-                              className={`cursor-pointer py-2 px-4 ${activeConstructionTab === 'requests' ? 'bg-gray-A0' : ''}`}
-                              onClick={() => {
-                                setActiveConstructionTab('requests');
-                                setShowConstructionRequest(true);
-                                setShowConstructionQuotation(false);
-                                setShowConstructionInformation(false);
-                              }}
-                            >
-                              Construction Requests
-                            </div>
-                          </li>
-                          <li>
-                            <div
-                              className={`cursor-pointer py-2 px-4 ${activeConstructionTab === 'quotations' ? 'bg-gray-A0' : ''}`}
-                              onClick={() => {
-                                setActiveConstructionTab('quotations');
-                                setShowConstructionRequest(false);
-                                setShowConstructionQuotation(true);
-                                setShowConstructionInformation(false);
-                              }}
-                            >
-                              Construction Quotations
-                            </div>
-                          </li>
-                          <li>
-                            <div
-                              className={`cursor-pointer py-2 px-4 ${activeConstructionTab === 'information' ? 'bg-gray-A0' : ''}`}
-                              onClick={() => {
-                                setActiveConstructionTab('information');
-                                setShowConstructionRequest(false);
-                                setShowConstructionQuotation(false);
-                                setShowConstructionInformation(true);
-                              }}
-                            >
-                              Construction History
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
+                        {/* Construction Info Submenu */}
+                        {showConstructionInfoMenu && (
+                          <div className="pl-8">
+                            <ul className="flex flex-col gap-2">
+                              <li>
+                                <div
+                                  className={`cursor-pointer py-2 px-4 ${activeConstructionTab === 'requests' ? 'bg-gray-A0' : ''}`}
+                                  onClick={() => {
+                                    setActiveConstructionTab('requests');
+                                    setShowConstructionRequest(true);
+                                    setShowConstructionQuotation(false);
+                                    setShowConstructionInformation(false);
+                                  }}
+                                >
+                                  Construction Requests
+                                </div>
+                              </li>
+                              <li>
+                                <div
+                                  className={`cursor-pointer py-2 px-4 ${activeConstructionTab === 'quotations' ? 'bg-gray-A0' : ''}`}
+                                  onClick={() => {
+                                    setActiveConstructionTab('quotations');
+                                    setShowConstructionRequest(false);
+                                    setShowConstructionQuotation(true);
+                                    setShowConstructionInformation(false);
+                                  }}
+                                >
+                                  Construction Quotations
+                                </div>
+                              </li>
+                              <li>
+                                <div
+                                  className={`cursor-pointer py-2 px-4 ${activeConstructionTab === 'information' ? 'bg-gray-A0' : ''}`}
+                                  onClick={() => {
+                                    setActiveConstructionTab('information');
+                                    setShowConstructionRequest(false);
+                                    setShowConstructionQuotation(false);
+                                    setShowConstructionInformation(true);
+                                  }}
+                                >
+                                  Construction History
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                      </>
                     )}
                   </ul>
                 </nav>
               </div>
             </div>
           </div>
-          {/* edit profile */}
-          <div className="lg:w-2/3 w-full p-4">
-            <div className="card bg-white shadow-lg">
-              <div className="card-body p-6">
-                <div className="grid grid-cols-3 gap-4 mb-3">
-                  <div>
-                    <h6 className="mb-0">Full Name</h6>
-                  </div>
-                  <div className="col-span-2 text-gray-500">
-                    {isEditingName ? (
-                      <input
-                        type="text"
-                        className="form-input w-full"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    ) : (
-                      <div className="flex justify-between">
-                        <span>{name}</span>
-                        <button onClick={() => setIsEditingName(true)}>
-                          Edit
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 mb-3">
-                  <div>
-                    <h6 className="mb-0">Email</h6>
-                  </div>
-                  <div className="col-span-2 text-gray-500">
-                    {isEditingEmail ? (
-                      <input
-                        type="text"
-                        className="form-input w-full"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    ) : (
-                      <div className="flex justify-between">
-                        <span>{email}</span>
-                        <button onClick={() => setIsEditingEmail(true)}>
-                          Edit
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 mb-3">
-                  <div>
-                    <h6 className="mb-0">Phone</h6>
-                  </div>
-                  <div className="col-span-2 text-gray-500">
-                    {isEditingPhone ? (
-                      <input
-                        type="text"
-                        className="form-input w-full"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                      />
-                    ) : (
-                      <div className="flex justify-between">
-                        <span>{phone}</span>
-                        <button onClick={() => setIsEditingPhone(true)}>
-                          Edit
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    className="bg-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
-                    onClick={handleSave}
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+         
 
           {/* Service Content */}
-          {showServiceMenu && (
+          {role === "CUSTOMER" && showServiceMenu && (
             <>
               {showServiceRequests && (
                 <div className="container mx-auto mt-8">
@@ -886,7 +814,7 @@ const User = () => {
           )}
 
           {/* Construction Info Content */}
-          {showConstructionInfoMenu && (
+          {role === "CUSTOMER" && showConstructionInfoMenu && (
             <>
               {/* Construction Requests */}
               {showConstructionRequest && (
@@ -1022,6 +950,90 @@ const User = () => {
             </>
           )}
 
+         {/* edit profile */}
+         <div className="lg:w-2/3 w-full p-4">
+            <div className="card bg-white shadow-lg">
+              <div className="card-body p-6">
+                <div className="grid grid-cols-3 gap-4 mb-3">
+                  <div>
+                    <h6 className="mb-0">Full Name</h6>
+                  </div>
+                  <div className="col-span-2 text-gray-500">
+                    {isEditingName ? (
+                      <input
+                        type="text"
+                        className="form-input w-full"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    ) : (
+                      <div className="flex justify-between">
+                        <span>{name}</span>
+                        <button onClick={() => setIsEditingName(true)}>
+                          Edit
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 mb-3">
+                  <div>
+                    <h6 className="mb-0">Email</h6>
+                  </div>
+                  <div className="col-span-2 text-gray-500">
+                    {isEditingEmail ? (
+                      <input
+                        type="text"
+                        className="form-input w-full"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    ) : (
+                      <div className="flex justify-between">
+                        <span>{email}</span>
+                        <button onClick={() => setIsEditingEmail(true)}>
+                          Edit
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 mb-3">
+                  <div>
+                    <h6 className="mb-0">Phone</h6>
+                  </div>
+                  <div className="col-span-2 text-gray-500">
+                    {isEditingPhone ? (
+                      <input
+                        type="text"
+                        className="form-input w-full"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                    ) : (
+                      <div className="flex justify-between">
+                        <span>{phone}</span>
+                        <button onClick={() => setIsEditingPhone(true)}>
+                          Edit
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    className="bg-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
+                    onClick={handleSave}
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
