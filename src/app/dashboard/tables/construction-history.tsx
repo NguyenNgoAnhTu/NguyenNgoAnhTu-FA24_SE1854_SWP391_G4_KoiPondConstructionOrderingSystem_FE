@@ -25,7 +25,9 @@ function ConstructionHistory() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/construction_history/get-design_profiles-by-constructor-and-address?address=${encodeURIComponent(address)}`,
+        `http://localhost:8080/api/construction_history/get-design_profiles-by-constructor-and-address?address=${encodeURIComponent(
+          address
+        )}`,
         {
           method: "GET",
           headers: {
@@ -104,6 +106,9 @@ function ConstructionHistory() {
       const requestBody = {
         step: values.step,
         description: values.description,
+        startDate: values.startDate,
+        endDate: values.endDate,
+        note: values.note,
         designProfileId: selectedDesignProfileId,
       };
       const response = await fetch(
@@ -151,7 +156,9 @@ function ConstructionHistory() {
         }
       );
       if (!response.ok) {
-        toast.error("This design profile is either already finished or has a document!");
+        toast.error(
+          "This design profile is either already finished or has a document!"
+        );
         return;
       }
       console.log("Construction history created successfully!");
@@ -206,6 +213,16 @@ function ConstructionHistory() {
       title: "Description",
       dataIndex: "description",
       key: "description",
+    },
+    {
+      title: "Start date",
+      dataIndex: "startDate",
+      key: "startDate",
+    },
+    {
+      title: "Expected end date",
+      dataIndex: "endDate",
+      key: "endDate",
     },
     {
       title: "Note",
@@ -340,12 +357,18 @@ function ConstructionHistory() {
   ];
   return (
     <div>
-    <Input.Search
+      <Input.Search
         placeholder="Address"
         enterButton="Search"
         size="large"
-        onSearch={(value)=>fetchData(value)}
-        style={{ marginLeft: 18, marginTop: 10, marginBottom: 10, width: '82%', backgroundColor: 'DodgerBlue' }}
+        onSearch={(value) => fetchData(value)}
+        style={{
+          marginLeft: 18,
+          marginTop: 10,
+          marginBottom: 10,
+          width: "82%",
+          backgroundColor: "DodgerBlue",
+        }}
       />
       <Table dataSource={datas} columns={columns}></Table>
       <Modal
@@ -371,6 +394,37 @@ function ConstructionHistory() {
             rules={[{ required: true, message: "Cannot be blank!" }]}
           >
             <Input.TextArea />
+          </Form.Item>
+          <Form.Item
+            label="Start date"
+            name="startDate"
+            rules={[{ required: true, message: "Please select a date!" }]}
+          >
+            <DatePicker showTime/>
+          </Form.Item>
+          <Form.Item
+            label="Expected end date"
+            name="endDate"
+            dependencies={["startDate"]}
+            rules={[
+              { required: true, message: "Please select a date!" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const startDate = getFieldValue("startDate");
+                  if (!value || !startDate || value.isAfter(startDate)) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("End date must be later than start date!")
+                  );
+                },
+              }),
+            ]}
+          >
+            <DatePicker showTime/>
+          </Form.Item>
+          <Form.Item label="Note" name="note">
+            <Input />
           </Form.Item>
         </Form>
       </Modal>
@@ -400,7 +454,9 @@ function ConstructionHistory() {
             name="confirmDate"
             rules={[{ required: true, message: "Please select a date!" }]}
           >
-            <DatePicker />
+            <DatePicker
+              disabledDate={(current) => current && current.isAfter(new Date())}
+            />
           </Form.Item>
           <Form.Item
             label="Customer"
@@ -419,6 +475,7 @@ function ConstructionHistory() {
         </Form>
       </Modal>
       <Modal
+        width={1200}
         open={showHistoryModal}
         title="Construction histories"
         onCancel={() => setShowHistoryModal(false)}
@@ -427,9 +484,14 @@ function ConstructionHistory() {
           style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
         }}
       >
-        <Table dataSource={datasHistory} columns={columnsHistory}></Table>
+        <Table
+          dataSource={datasHistory}
+          columns={columnsHistory}
+          scroll={{ x: 600, y: 400 }}
+        ></Table>
       </Modal>
       <Modal
+        width={1200}
         open={showDocumentModal}
         title="Acceptance documents"
         onCancel={() => setShowDocumentModal(false)}
@@ -438,7 +500,11 @@ function ConstructionHistory() {
           style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
         }}
       >
-        <Table dataSource={datasDocument} columns={columnsDocument}></Table>
+        <Table
+          dataSource={datasDocument}
+          columns={columnsDocument}
+          scroll={{ x: 600, y: 400 }}
+        ></Table>
       </Modal>
     </div>
   );
