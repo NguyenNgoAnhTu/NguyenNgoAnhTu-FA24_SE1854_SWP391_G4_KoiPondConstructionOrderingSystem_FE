@@ -3,7 +3,7 @@ import { menus, Menu } from "components/layout/menus";
 import Typography from "components/typography/index";
 import Logo from "assets/images/Logo.png";
 import menu from "assets/icons/Menu.svg";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -37,8 +37,8 @@ const Header = () => {
     if (typeof window !== "undefined" && window.localStorage) {
       const token = localStorage.getItem("token");
       setToken(token);
-     // const name = localStorage.getItem("name");
-     // setName(name);
+      // const name = localStorage.getItem("name");
+      // setName(name);
     }
   }, []);
   console.log(token);
@@ -99,7 +99,7 @@ const Header = () => {
               className="cursor-pointer font-bold hover:text-pink-second_02 text-[24px]"
               onClick={() => handleMenuClick(item.slug)}
             >
-              {item.title}
+              {/* {item.title} */}
             </Typography>
             {item.slug === "/services" && isServicesDropdownOpen && (
               <div className="absolute w-[200px] bg-[#EBF8F2] shadow-lg rounded-md p-2 z-50">
@@ -117,6 +117,21 @@ const Header = () => {
                 </div>
               </div>
             )}
+            {item.slug === "/about" ? (
+              <Link to={item.slug}>
+                <Typography className="cursor-pointer font-bold hover:text-pink-second_02 text-[24px]">
+                  {item.title}
+                </Typography>
+              </Link>
+            ) : (
+              <Typography
+                className="cursor-pointer font-bold hover:text-pink-second_02 text-[24px]"
+                onClick={() => handleMenuClick(item.slug)}
+              >
+                {item.title}
+              </Typography>
+            )}
+
           </div>
         ))}
         {/* <div>
@@ -133,13 +148,13 @@ const Header = () => {
             onClick={toggleUserDropdown}
             className="cursor-pointer"
           >
-             <img
-                    src="https://i.pinimg.com/564x/72/32/98/72329823360e56269897813a3dbd99b6.jpg"
-                    alt="Admin"
-                    className="rounded-full p-1 bg-blue-500"
-                    width="110"
-                    
-                  />
+            <img
+              src="https://i.pinimg.com/564x/72/32/98/72329823360e56269897813a3dbd99b6.jpg"
+              alt="Admin"
+              className="rounded-full p-1 bg-blue-500"
+              width="110"
+
+            />
           </Typography>
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50">

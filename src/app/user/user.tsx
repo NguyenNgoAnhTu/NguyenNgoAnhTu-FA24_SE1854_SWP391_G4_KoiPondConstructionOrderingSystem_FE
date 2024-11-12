@@ -2,10 +2,12 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
 import "./user.css";
+import { message } from 'antd';
 import { toast } from "react-toastify";
-import ConstructionInfomation from './construction-infomation';
-import Swal from "sweetalert2";
-
+import ConstructionInfomation from "./construction-infomation";
+import PaymentModal from './paymentModal';
+import FeedbackModal from './feedbackModal';
+import Swal from 'sweetalert2';
 
 const User = () => {
   interface ServiceRequest {
@@ -16,10 +18,15 @@ const User = () => {
       cost: number;
       note: string;
     };
+    customer: {
+      name: string;
+      email: string;
+      role: string;
+    };
     description: string;
     address: string;
-    note: string;
     status: string;
+    note: string;
   }
 
   interface ServiceQuotation {
@@ -28,6 +35,10 @@ const User = () => {
       name: string;
       email: string;
       role: string;
+    };
+    serviceProgress: {
+      serviceProgressID?: string;
+      isConfirmed?: boolean;
     };
     serviceRequest: {
       serviceRequestId: string;
@@ -52,11 +63,17 @@ const User = () => {
     vat: number;
     confirm: boolean;
   }
-  
+
   interface ServiceProgress {
     serviceProgressID: string;
     serviceDetail: {
       serviceDetailId: string;
+      staff: {
+        customerId: string;
+      };
+      serviceQuotation: {
+        serviceQuotationId: string;
+      };
     };
     startDate: string;
     endDate?: string;
@@ -76,14 +93,49 @@ const User = () => {
 
   interface GetAllQuotationResponse {
     quotationId: string;
-    consult:{
+    consult: {
       Id: string;
       consultDate: string;
-     
+
       requestDetail: {
         requestDetailId: string;
         note: string;
-        request:{
+        request: {
+          id: string;
+          address: string;
+          status: string;
+        }
+      };
+    };
+    isConfirm: boolean;
+    description: string;
+    totalCost: number;
+    vat: number;
+    subCost: number;
+    mainCost: number;
+    createdAt: string;
+    updatedAt: string;
+  }
+  interface Request {
+    id: string;
+    description: string;
+    address: string;
+    note: string;
+    status: string;
+    createDate: string;
+    updatedAt: string;
+  }
+
+  interface GetAllQuotationResponse {
+    quotationId: string;
+    consult: {
+      Id: string;
+      consultDate: string;
+
+      requestDetail: {
+        requestDetailId: string;
+        note: string;
+        request: {
           id: string;
           address: string;
           status: string;
@@ -114,7 +166,7 @@ const User = () => {
   const [phone, setPhone] = useState(
     localStorage.getItem("phone") || "N/A"
   );
-  
+
 
   const token = localStorage.getItem("token");
   const customerId = localStorage.getItem("customerId");
@@ -122,7 +174,7 @@ const User = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [isEditingPhone, setIsEditingPhone] = useState(false);
-  
+
 
   const [showServiceRequests, setShowServiceRequests] = useState(false);
   const [showServiceQuotation, setShowServiceQuotation] = useState(false);
@@ -131,10 +183,15 @@ const User = () => {
   //const [customerId] = useState(localStorage.getItem("customerId") || "");
   const [modal, setModal] = useState(false);
   const [visibleCount, setVisibleCount] = useState(3); // initially show 3 cards
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+
   const [constructionRequests, setConstructionRequests] = useState<Request[]>([]);
 
   const [quotationConstructions, setQuotationConstructions] = useState<GetAllQuotationResponse[]>([]);
-  const [showQuotations, setShowQuotations] = useState(false);
+  const [showQuotations, setShowQuotations] = useState(false)
 
   const [showServiceMenu, setShowServiceMenu] = useState(false);
   const [activeServiceTab, setActiveServiceTab] = useState<string | null>(null);
@@ -162,7 +219,7 @@ const User = () => {
     const quotation = serviceQuotation.find(
       (q) => q.serviceQuotationId === quotationId
     );
-  
+
     if (!quotation?.confirm) {
       const result = await Swal.fire({
         title: 'Are you sure?',
@@ -173,7 +230,7 @@ const User = () => {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, confirm it!',
       });
-  
+
       if (result.isConfirmed) {
         try {
           const token = localStorage.getItem('token');
@@ -187,11 +244,11 @@ const User = () => {
               },
             }
           );
-  
+
           if (!response.ok) {
             throw new Error('Failed to toggle confirmation status');
           }
-  
+
           const updatedQuotation = await response.json();
           setServiceQuotation((prevData) =>
             prevData.map((quotation) =>
@@ -200,7 +257,7 @@ const User = () => {
                 : quotation
             )
           );
-  
+
           toast.success('Quotation confirmed successfully!');
         } catch (error) {
           console.error('Error toggling confirmation status:', error);
@@ -229,12 +286,13 @@ const User = () => {
 
       try {
         setLoading(true);
-        
+
         // Fetch service requests
         if (showServiceRequests) {
           const serviceRequestsResponse = await fetch(
             `http://localhost:8080/api/service-requests/customer/${customerId}`,
             {
+              method: "GET",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -272,6 +330,7 @@ const User = () => {
           const progressResponse = await fetch(
             `http://localhost:8080/api/service-progress/customer/${customerId}`,
             {
+              method: "GET",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -290,6 +349,7 @@ const User = () => {
           const constructionResponse = await fetch(
             `http://localhost:8080/api/request/customer/${customerId}`,
             {
+              method: "GET",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -352,23 +412,108 @@ const User = () => {
     );
   }
 
+  const handleConfirmed = async (service: ServiceProgress) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/acceptance-service-progress/${service.serviceProgressID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        message.success(`Successfully confirmed service progress with ID: ${service.serviceProgressID}`); // Show success message
+        setServiceProgress((prevList) =>
+          prevList.map((service) =>
+            service.serviceProgressID === service.serviceProgressID ? { ...service, isComfirmed: true } : service
+          )
+        );
+        const resPayment = await fetch(`http://localhost:8080/api/service-payment`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            "serviceQuotationID": service.serviceDetail.serviceQuotation.serviceQuotationId,
+            "paymentMethod": "Cash",
+            "maintenanceStaffID": service.serviceDetail.staff.customerId,
+            "status": "Pending"
+          }),
+        });
+        if (!resPayment.ok) {
+          throw new Error(`Failed to create service payment`);
+        }
+      } else {
+        throw new Error(`Failed to confirm service progress with ID: ${service.serviceProgressID}`);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(error.message); // Show error message
+      }
+    }
+  }
+
+  const handlePaymentClick = (quotation: ServiceQuotation) => {
+    setSelectedPayment({
+      serviceQuotation: {
+        serviceQuotationId: quotation.serviceQuotationId,
+        customer: quotation.customer,
+        cost: quotation.cost,
+        vat: quotation.vat,
+        totalCost: quotation.totalCost
+      }
+    });
+    setIsPaymentModalOpen(true);
+  };
+
+  const handleFeedbackClick = (requestId: string) => {
+    console.log('Opening feedback modal for request:', requestId);
+    setSelectedRequestId(requestId);
+    setIsFeedbackModalOpen(true);
+  };
+
+  const handleCloseFeedbackModal = () => {
+    setIsFeedbackModalOpen(false);
+    setSelectedRequestId(null);
+  };
+
+  if (loading) {
+    return <div className="text-center py-4">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red py-4">
+        Error: {error}
+        <button
+          onClick={() => window.location.reload()}
+          className="ml-4 text-blue-500 underline"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
-     // const customer = localStorage.getItem("customer");
-     if (!name.trim()) {
-      toast.error("Name cannot be empty");
-      return;
-    }
+      // const customer = localStorage.getItem("customer");
+      if (!name.trim()) {
+        toast.error("Name cannot be empty");
+        return;
+      }
 
-    if (!email.trim() || !email.includes('@')) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
+      if (!email.trim() || !email.includes('@')) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
 
-    if (!phone.trim() || phone.length < 10 || phone.length > 11) {
-      toast.error("Please enter a valid phone number");
+      if (!phone.trim() || phone.length < 10 || phone.length > 11) {
+        toast.error("Please enter a valid phone number");
         return;
       }
       const updateData = {
@@ -394,24 +539,24 @@ const User = () => {
       }
 
       const updatedProfile = await response.json();
-      
+
       // Update local storage với dữ liệu từ response
       localStorage.setItem("name", updatedProfile.name);
       localStorage.setItem("email", updatedProfile.email);
       localStorage.setItem("phone", updatedProfile.phoneNumber);
-     
+
 
       // Update state với dữ liệu từ response
       setName(updatedProfile.name);
-      setEmail(updatedProfile.email);  
+      setEmail(updatedProfile.email);
       setPhone(updatedProfile.phoneNumber);
-      
+
 
       // Reset editing states
       setIsEditingName(false);
       setIsEditingEmail(false);
       setIsEditingPhone(false);
-      
+
 
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -610,349 +755,11 @@ const User = () => {
               </div>
             </div>
           </div>
-         
 
-          {/* Service Content */}
-          {role === "CUSTOMER" && showServiceMenu && (
-            <>
-              {showServiceRequests && (
-                <div className="container mx-auto mt-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {serviceRequests
-                      .slice(0, visibleCount)
-                      .map((service: ServiceRequest) => (
-                        <div
-                          key={service.serviceRequestId}
-                          className=" rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                        >
-                          <h3 className="text-lg font-semibold text-center mb-4">
-                            Service Request ID: {service.serviceRequestId}
-                          </h3>
-
-                          <p className="text-sm text-gray-700 mb-2">
-                            <strong>Category Type:</strong>{" "}
-                            {service.serviceCategory.type || "N/A"}
-                          </p>
-                          <p className="text-sm text-gray-700 mb-2">
-                            <strong>Cost:</strong>{" "}
-                            {service.serviceCategory.cost || "N/A"}
-                          </p>
-                          <p className="text-sm text-gray-700 mb-2">
-                            <strong>Description:</strong> {service.description}
-                          </p>
-                          <p className="text-sm text-gray-700 mb-2">
-                            <strong>Address:</strong> {service.address || "N/A"}
-                          </p>
-                          <p className="text-sm text-gray-700 mb-2">
-                            <strong>Note:</strong> {service.note || "N/A"}
-                          </p>
-                          <p className="text-sm text-gray-700 mb-2">
-                            <strong>Status:</strong> {service.status || "N/A"}
-                          </p>
-
-                          <div className="flex justify-center mt-4">
-                            {/* Optional 'Create Quotation' button */}
-                            {/* <button
-              type="button"
-              className="mx-1 text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-4 py-2"
-            >
-              Create Quotation
-            </button> */}
-                            <button
-                              type="button"
-                              className="mx-1 text-red bg-white hover:text-white  hover:bg-red focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                  {visibleCount < serviceRequests.length && (
-                    <div className="flex justify-center mt-6">
-                      <button
-                        onClick={handleShowMore}
-                        className="mx-1 text-white bg-red  hover:bg-red-32 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
-                      >
-                        Show More
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {showServiceQuotation && (
-                <div className="container mx-auto mt-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {serviceQuotation.slice(0, visibleCount).map((quotation) => (
-                      <div
-                        key={quotation.serviceQuotationId}
-                        className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                      >
-                        <h3 className="text-lg font-semibold text-center mb-4">
-                          Quotation ID: {quotation.serviceQuotationId}
-                        </h3>
-
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Category Type:</strong>{" "}
-                          {quotation.serviceRequest.serviceCategory.type || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Category Cost:</strong>{" "}
-                          {quotation.serviceRequest.serviceCategory.cost || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Customer Name:</strong>{" "}
-                          {quotation.customer.name || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Request ID:</strong>{" "}
-                          {quotation.serviceRequest.serviceRequestId}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Description:</strong> {quotation.description}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Address:</strong>{" "}
-                          {quotation.serviceRequest.address || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Total Cost:</strong>{" "}
-                          {quotation.totalCost || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>VAT:</strong> {quotation.vat || "N/A"}
-                        </p>
-                        <td className="px-6 py-4 text-sm text-center">
-                          <button
-                            className={`px-4 py-2 rounded-lg ${
-                              quotation.confirm
-                                ? "bg-green text-white cursor-not-allowed opacity-50"
-                                : "bg-red text-white hover:bg-red-600"
-                            }`}
-                            onClick={() =>
-                              handleConfirmToggle(quotation.serviceQuotationId)
-                            }
-                            disabled={quotation.confirm}
-                          >
-                            {quotation.confirm ? "Confirmed" : "Not Confirmed"}
-                          </button>
-                        </td>
-                      </div>
-                    ))}
-                  </div>
-
-                  {visibleCount < serviceQuotation.length && (
-                    <div className="flex justify-center mt-6">
-                      <button
-                        onClick={handleShowMore}
-                        className="text-white bg-red hover:opacity-50 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-6 py-2.5"
-                      >
-                        Show More
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {showServiceProgress && (
-                <div className="container mx-auto mt-8">
-                  <div className="overflow-hidden rounded-lg border border-b-black-27 shadow-md">
-                    <table className="min-w-full">
-                      <thead className="bg-gray-A0 border">
-                        <tr>
-                          {[
-                            "Index",
-                            "Service Progress ID",
-                            "Service Detail ID",
-                            "Start Date",
-                            "End Date",
-                            "Step",
-                            "Description",
-                            "Is Confirmed",
-                            "Actions",
-                          ].map((header) => (
-                            <th
-                              key={header}
-                              className="px-6 py-3 text-left text-xs font-medium text-black-15 uppercase tracking-wider text-center"
-                            >
-                              {header}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {serviceProgress.map((service, index) => (
-                          <tr key={service.serviceProgressID} className="hover:bg-gray-50 transition duration-200">
-                            <td className="px-2 py-4 text-sm text-black-15 text-center">{index + 1}</td>
-                            <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceProgressID}</td>
-                            <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceDetail?.serviceDetailId || "N/A"}</td>
-                            <td className="px-2 py-4 text-sm text-black-15 text-center">{new Date(service.startDate).toLocaleString()}</td>
-                            <td className="px-2 py-4 text-sm text-black-15 text-center">{service.endDate ? new Date(service.endDate).toLocaleString() : "Unfinished"}</td>
-                            <td className="px-2 py-4 text-sm text-black-15 text-center">{service.step}</td>
-                            <td className="px-2 py-4 text-sm text-black-15 text-center">{service.description || ""}</td>
-                            <td className="px-2 py-4 text-sm text-black-15 text-center">{service.isComfirmed ? "✔️" : "❌"}</td>
-                            <td className="px-2 py-4 text-sm">
-                              {!service.isComfirmed && (
-                                <button
-                                  type="button"
-                                  className="mx-1 text-white bg-brown focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
-                                // onClick={() => handleConfirmed(service.serviceProgressID)}
-                                >
-                                  Confirm
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Construction Info Content */}
-          {role === "CUSTOMER" && showConstructionInfoMenu && (
-            <>
-              {/* Construction Requests */}
-              {showConstructionRequest && (
-                <div className="container mx-auto mt-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {constructionRequests.map((request) => (
-                      <div
-                        key={request.id}
-                        className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                      >
-                        <h3 className="text-lg font-semibold text-center mb-4">
-                          Request ID: {request.id}
-                        </h3>
-
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Description:</strong> {request.description}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Address:</strong> {request.address}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Note:</strong> {request.note || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Created Date:</strong>{" "}
-                          {new Date(request.createDate).toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Status:</strong>{" "}
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold
-                            ${request.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 
-                              request.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : 
-                              'bg-gray-100 text-gray-800'}`}
-                          >
-                            {request.status}
-                          </span>
-                        </p>
-                      
-                      </div>
-                    ))}
-                  </div>
-                  {visibleCount < constructionRequests.length && (
-                    <div className="flex justify-center mt-6">
-                      <button
-                        onClick={handleShowMore}
-                        className="mx-1 text-white bg-red  hover:bg-red-32 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
-                      >
-                        Show More
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-
-              {/* Construction Quotations */}
-              {showConstructionQuotation && (
-                <div className="container mx-auto mt-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {quotationConstructions.map((quotation, index) => (
-                      <div
-                        key={quotation.quotationId}
-                        className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
-                      >
-                        <h3 className="text-lg font-semibold text-center mb-4">
-                          Quotation ID: {quotation.quotationId}
-                        </h3>
-
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Consult Date:</strong>{" "}
-                          {new Date(quotation.consult.consultDate).toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Request ID:</strong>{" "}
-                          {quotation.consult.requestDetail.request.id}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Address:</strong>{" "}
-                          {quotation.consult.requestDetail.request.address}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Description:</strong> {quotation.description}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Main Cost:</strong> ${quotation.mainCost.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Sub Cost:</strong> ${quotation.subCost.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>VAT:</strong> ${quotation.vat.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Total Cost:</strong>{" "}
-                          <span className="font-semibold text-lg text-green-600">
-                            ${quotation.totalCost.toLocaleString()}
-                          </span>
-                        </p>
-                        <p className="text-sm text-gray-700 mb-2">
-                          <strong>Status:</strong>{" "}
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold
-                            ${quotation.consult.requestDetail.request.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 
-                              quotation.consult.requestDetail.request.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : 
-                              'bg-gray-100 text-gray-800'}`}
-                          >
-                            {quotation.consult.requestDetail.request.status}
-                          </span>
-                        </p>
-
-                  
-                      </div>
-                    ))}
-                  </div>
-                  {visibleCount < quotationConstructions.length && (
-                    <div className="flex justify-center mt-6">
-                      <button
-                        onClick={handleShowMore}
-                        className="mx-1 text-white bg-red  hover:bg-red-32 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
-                      >
-                        Show More
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Construction Information */}
-              {showConstructionInformation && (
-                <div className="container mx-auto mt-8">
-                  <ConstructionInfomation/>
-                </div>
-              )}
-            </>
-          )}
-
-         {/* edit profile */}
-         <div className="lg:w-2/3 w-full p-4">
-            <div className="card bg-white shadow-lg">
+          {/* Main Content Area */}
+          <div className="lg:w-2/3 w-full p-4">
+            {/* Edit Profile Section - Fixed at top */}
+            <div className="card bg-white shadow-lg mb-6">
               <div className="card-body p-6">
                 <div className="grid grid-cols-3 gap-4 mb-3">
                   <div>
@@ -1022,7 +829,6 @@ const User = () => {
                     )}
                   </div>
                 </div>
-
                 <div className="flex justify-end">
                   <button
                     className="bg-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
@@ -1033,8 +839,396 @@ const User = () => {
                 </div>
               </div>
             </div>
-          </div>
 
+            {/* Service Content - Scrollable area below profile */}
+            <div className="mt-6">
+              {role === "CUSTOMER" && showServiceMenu && (
+                <>
+                  {showServiceRequests && (
+                    <div className="container mx-auto">
+                      <h2 className="text-2xl font-bold mb-4">Service Requests</h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                        {serviceRequests.slice(0, visibleCount).map((service) => (
+                          <div key={service.serviceRequestId}
+                            className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">
+                            <h3 className="text-lg font-semibold text-center mb-4">
+                              Service Request ID: {service.serviceRequestId}
+                            </h3>
+
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Category Type:</strong>{" "}
+                              {service.serviceCategory.type || "N/A"}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Cost:</strong>{" "}
+                              {service.serviceCategory.cost || "N/A"}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Description:</strong> {service.description}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Address:</strong> {service.address || "N/A"}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Note:</strong> {service.note || "N/A"}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Status:</strong> {service.status || "N/A"}
+                            </p>
+
+                            <div className="flex justify-center mt-4">
+                              {service.status === "Finish" && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedRequestId(service.serviceRequestId);
+                                    setIsFeedbackModalOpen(true);
+                                  }}
+                                  className="px-4 py-2 bg-green text-white rounded-lg hover:bg-green transition-colors"
+                                >
+                                  Feedback
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Feedback Modal */}
+                      <FeedbackModal
+                        isOpen={isFeedbackModalOpen}
+                        onClose={() => {
+                          setIsFeedbackModalOpen(false);
+                          setSelectedRequestId(null);
+                        }}
+                        serviceRequestId={selectedRequestId}
+                      />
+
+                      {visibleCount < serviceRequests.length && (
+                        <div className="flex justify-center mt-6">
+                          <button
+                            onClick={handleShowMore}
+                            className="px-6 py-2.5 bg-red text-white rounded-full hover:opacity-80 transition-opacity"
+                          >
+                            Show More
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {showServiceQuotation && (
+                    <div className="container mx-auto">
+                      <h2 className="text-2xl font-bold mb-4">Service Quotations</h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                        {serviceQuotation.slice(0, visibleCount).map((quotation) => (
+                          <div
+                            key={quotation.serviceQuotationId}
+                            className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
+                          >
+                            <div className="flex justify-between items-center mb-4">
+                              <h3 className="text-lg font-semibold">
+                                ID: {quotation.serviceQuotationId}
+                              </h3>
+                              <span className={`px-3 py-1 rounded-full text-sm ${quotation.confirm
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                                }`}>
+                                {quotation.confirm ? "Confirmed" : "Pending"}
+                              </span>
+                            </div>
+
+                            <div className="space-y-2">
+                              <p className="text-sm">
+                                <span className="font-medium">Service Type:</span>{" "}
+                                {quotation.serviceRequest.serviceCategory.type}
+                              </p>
+                              <p className="text-sm">
+                                <span className="font-medium">Customer:</span>{" "}
+                                {quotation.customer.name}
+                              </p>
+                              <p className="text-sm">
+                                <span className="font-medium">Description:</span>{" "}
+                                {quotation.description}
+                              </p>
+                              <p className="text-sm">
+                                <span className="font-medium">Address:</span>{" "}
+                                {quotation.serviceRequest.address}
+                              </p>
+
+                              <div className="border-t pt-2 mt-2">
+                                <p className="text-sm">
+                                  <span className="font-medium">Base Cost:</span>{" "}
+                                  ${quotation.cost.toLocaleString()}
+                                </p>
+                                <p className="text-sm">
+                                  <span className="font-medium">VAT:</span>{" "}
+                                  ${quotation.vat.toLocaleString()}
+                                </p>
+                                <p className="text-lg font-semibold text-green-600">
+                                  <span className="font-medium">Total:</span>{" "}
+                                  ${quotation.totalCost.toLocaleString()}
+                                </p>
+                              </div>
+
+                              <div className="flex justify-center gap-2 mt-4">
+                                {!quotation.confirm && (
+                                  <button
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                    onClick={() => handleConfirmToggle(quotation.serviceQuotationId)}
+                                  >
+                                    Confirm Quotation
+                                  </button>
+                                )}
+
+                                {quotation.confirm === true && (
+                                  <td className="px-6 py-4 text-sm text-center">
+                                    <button
+                                      className="px-4 py-2 rounded-lg bg-[#4A6CF7] text-white"
+                                      onClick={() => handlePaymentClick(quotation)}
+                                    >
+                                      Payment
+                                    </button>
+                                  </td>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Modals */}
+                      <PaymentModal
+                        isOpen={isPaymentModalOpen}
+                        onClose={() => setIsPaymentModalOpen(false)}
+                        servicePayment={selectedPayment}
+                      />
+
+                      <FeedbackModal
+                        isOpen={isFeedbackModalOpen}
+                        onClose={handleCloseFeedbackModal}
+                        serviceRequestId={selectedRequestId}
+                      />
+
+                      {/* Show More Button */}
+                      {visibleCount < serviceQuotation.length && (
+                        <div className="flex justify-center mt-6">
+                          <button
+                            onClick={handleShowMore}
+                            className="px-6 py-2.5 bg-red text-white rounded-full hover:opacity-80 transition-opacity"
+                          >
+                            Show More
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {showServiceProgress && (
+                    <div className="container mx-auto">
+                      <h2 className="text-2xl font-bold mb-4">Service Progress</h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                        {serviceProgress
+                          .slice(0, visibleCount)
+                          .map((service: ServiceProgress) => (
+                            <div
+                              key={service.serviceProgressID}
+                              className={`rounded-lg shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer ${service.isComfirmed ? 'bg-[#EBF8F2]' : 'bg-red bg-opacity-50'
+                                }`}
+                            >
+                              <h3 className="text-lg font-semibold text-center mb-4">
+                                Service Progress ID:  {service.serviceProgressID}
+                              </h3>
+                              <p className="text-sm text-gray-700 mb-2">
+                                <strong>Service Detail ID:  </strong>
+                                {service.serviceDetail.serviceDetailId}
+                              </p>
+                              <p className="text-sm text-gray-700 mb-2">
+                                <strong>Start Date:  </strong>
+                                {new Date(service.startDate).toLocaleString()}
+                              </p>
+                              <p className="text-sm text-gray-700 mb-2">
+                                <strong>End Date:  </strong>
+                                {service.endDate ? new Date(service.endDate).toLocaleString() : "Unfinished"}
+                              </p>
+                              <p className="text-sm text-gray-700 mb-2">
+                                <strong>Step:  </strong>
+                                {service.step}
+                              </p><p className="text-sm text-gray-700 mb-2">
+                                <strong>Description:  </strong>
+                                {service.description}
+                              </p>
+                              <p><strong>Is Confirmed:  </strong> {service.isComfirmed ? "✔️" : "❌"}</p>
+
+
+                              <div className="flex justify-center mt-4">
+
+                                {!service.isComfirmed && service.endDate && service.step == "Complete" && (
+                                  <button
+                                    type="button"
+                                    className="mx-1 text-red bg-white hover:text-white  hover:bg-red focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+                                    onClick={() => handleConfirmed(service)}
+                                  >
+                                    Confirm
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                      {visibleCount < serviceProgress.length && (
+                        <div className="flex justify-center mt-6">
+                          <button
+                            onClick={handleShowMore}
+                            className="text-white bg-red hover:opacity-50 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-6 py-2.5"
+                          >
+                            Show More
+                          </button>
+                        </div>
+                      )}
+                      <br></br>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Construction Info Content */}
+              {role === "CUSTOMER" && showConstructionInfoMenu && (
+                <>
+                  {/* Construction Requests */}
+                  {showConstructionRequest && (
+                    <div className="container mx-auto mt-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {constructionRequests.map((request) => (
+                          <div
+                            key={request.id}
+                            className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+                          >
+                            <h3 className="text-lg font-semibold text-center mb-4">
+                              Request ID: {request.id}
+                            </h3>
+
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Description:</strong> {request.description}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Address:</strong> {request.address}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Note:</strong> {request.note || "N/A"}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Created Date:</strong>{" "}
+                              {new Date(request.createDate).toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Status:</strong>{" "}
+                              <span className={`px-2 py-1 rounded-full text-xs font-semibold
+                                    ${request.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                  request.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                                    'bg-gray-100 text-gray-800'}`}
+                              >
+                                {request.status}
+                              </span>
+                            </p>
+
+                          </div>
+                        ))}
+                      </div>
+                      {visibleCount < constructionRequests.length && (
+                        <div className="flex justify-center mt-6">
+                          <button
+                            onClick={handleShowMore}
+                            className="mx-1 text-white bg-red  hover:bg-red-32 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+                          >
+                            Show More
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+
+                  {/* Construction Quotations */}
+                  {showConstructionQuotation && (
+                    <div className="container mx-auto mt-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {quotationConstructions.map((quotation, index) => (
+                          <div
+                            key={quotation.quotationId}
+                            className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 cursor-pointer"
+                          >
+                            <h3 className="text-lg font-semibold text-center mb-4">
+                              Quotation ID: {quotation.quotationId}
+                            </h3>
+
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Consult Date:</strong>{" "}
+                              {new Date(quotation.consult.consultDate).toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Request ID:</strong>{" "}
+                              {quotation.consult.requestDetail.request.id}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Address:</strong>{" "}
+                              {quotation.consult.requestDetail.request.address}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Description:</strong> {quotation.description}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Main Cost:</strong> ${quotation.mainCost.toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Sub Cost:</strong> ${quotation.subCost.toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>VAT:</strong> ${quotation.vat.toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Total Cost:</strong>{" "}
+                              <span className="font-semibold text-lg text-green-600">
+                                ${quotation.totalCost.toLocaleString()}
+                              </span>
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong>Status:</strong>{" "}
+                              <span className={`px-2 py-1 rounded-full text-xs font-semibold
+                                    ${quotation.consult.requestDetail.request.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                  quotation.consult.requestDetail.request.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                                    'bg-gray-100 text-gray-800'}`}
+                              >
+                                {quotation.consult.requestDetail.request.status}
+                              </span>
+                            </p>
+
+
+                          </div>
+                        ))}
+                      </div>
+                      {visibleCount < quotationConstructions.length && (
+                        <div className="flex justify-center mt-6">
+                          <button
+                            onClick={handleShowMore}
+                            className="mx-1 text-white bg-red  hover:bg-red-32 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+                          >
+                            Show More
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Construction Information */}
+                  {showConstructionInformation && (
+                    <div className="container mx-auto mt-8">
+                      <ConstructionInfomation />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
