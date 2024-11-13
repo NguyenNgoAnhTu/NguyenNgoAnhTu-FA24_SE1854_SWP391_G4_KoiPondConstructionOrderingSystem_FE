@@ -13,9 +13,6 @@ interface FeedbackData {
     serviceFeedbackId: string;
     serviceRequest: {
         serviceRequestId: string;
-        customer: {
-            customerId: string;
-        }
     }
     rating: number;
     feedback: string;
@@ -26,7 +23,6 @@ const FeedbackModal = ({ isOpen, onClose, serviceRequestId }: FeedbackModalProps
     const [loading, setLoading] = useState(false);
     const [rating, setRating] = useState<number>(0);
     const [feedback, setFeedback] = useState<string>('');
-    const [customerId, setCustomerId] = useState<string>('');
     const [existingFeedback, setExistingFeedback] = useState<FeedbackData | null>(null);
     const token = localStorage.getItem('token');
 
@@ -66,9 +62,7 @@ const FeedbackModal = ({ isOpen, onClose, serviceRequestId }: FeedbackModalProps
                 setExistingFeedback(data);
                 setRating(data.rating);
                 setFeedback(data.feedback);
-                setCustomerId(data.serviceRequest.customer.customerId || localStorage.getItem('customerId'));
             }
-            setCustomerId(localStorage.getItem('customerId') || '');
         } catch (error) {
             console.error('Error fetching feedback:', error);
         }
@@ -97,7 +91,6 @@ const FeedbackModal = ({ isOpen, onClose, serviceRequestId }: FeedbackModalProps
 
             const requestBody = {
                 serviceRequestId,
-                customerId,
                 rating,
                 feedback
             };
