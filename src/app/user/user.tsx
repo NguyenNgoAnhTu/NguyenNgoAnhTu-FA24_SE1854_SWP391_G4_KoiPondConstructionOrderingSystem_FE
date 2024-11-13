@@ -930,8 +930,8 @@ const User = () => {
                                 ID: {quotation.serviceQuotationId}
                               </h3>
                               <span className={`px-3 py-1 rounded-full text-sm ${quotation.confirm
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
+                                ? "bg-green-100 text-green"
+                                : "bg-yellow-100 text-yellow"
                                 }`}>
                                 {quotation.confirm ? "Confirmed" : "Pending"}
                               </span>
@@ -973,7 +973,7 @@ const User = () => {
                               <div className="flex justify-center gap-2 mt-4">
                                 {!quotation.confirm && (
                                   <button
-                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                    className="px-4 py-2 bg-green text-white rounded-lg hover:bg-blue transition-colors"
                                     onClick={() => handleConfirmToggle(quotation.serviceQuotationId)}
                                   >
                                     Confirm Quotation

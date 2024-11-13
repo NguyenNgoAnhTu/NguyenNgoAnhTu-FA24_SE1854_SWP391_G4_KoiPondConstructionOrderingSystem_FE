@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 
@@ -55,6 +56,7 @@ function ServiceRequestTable() {
     description: string;
   }
 
+  const navigate = useNavigate();
   const [serviceDetailsData, setServiceDetailsData] = useState<ServiceDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -160,7 +162,7 @@ function ServiceRequestTable() {
     setProgressDetail({
       serviceDetailId: serviceDetail.serviceDetailId,
       description: '',
-      step: 'Pending'
+      step: 'Not started'
     });
     setShowProgressForm(true);
   };
@@ -260,6 +262,7 @@ function ServiceRequestTable() {
                   >
                     Delete
                   </button>
+                  <br></br>
                 </td>
               </tr>
             ))}
@@ -436,7 +439,7 @@ function ServiceRequestTable() {
                   if (!response.ok) {
                     throw new Error("Failed to create service progress");
                   }
-
+                  navigate('/admin/tables/table-service-progress');
                   setShowProgressForm(false);
                   setProgressDetail(null);
                   toast.success("Service progress created successfully!");
@@ -457,6 +460,7 @@ function ServiceRequestTable() {
                     className="w-full p-2 border rounded bg-white text-gray-800"
                     required
                   >
+                    <option value="Not started">Not started</option>
                     <option value="Pending">Pending</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Completed">Completed</option>
