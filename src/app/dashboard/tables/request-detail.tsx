@@ -1,5 +1,5 @@
-import { Table, Button, Modal } from "antd";
-import { EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Form, Input, Popconfirm } from "antd";
+import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { toast } from "react-toastify";
@@ -10,6 +10,9 @@ function RequestDetailTable() {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [pondDesignTemplate, setPondDesignTemplate] = useState<PondDesignTemplateType[]>([]);
   const [showPondDesignTemplateModal, setShowPondDesignTemplateModal] = useState(false);
+  const [form] = Form.useForm();
+  const [selectedRequestDetail, setSelectedRequestDetail] = useState<{ requestDetailId: number } | null>(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   type RequestType = {
     id: number;
@@ -39,6 +42,77 @@ function RequestDetailTable() {
     imageUrl: string;
     description: string;
     note: string;
+  };
+
+  const handleUpdate = (record: any) => {
+    setSelectedRequestDetail(record);
+    form.setFieldsValue({
+      note: record.note,
+      pondDesignTemplateId: record.pondDesignTemplate?.pondDesignTemplateId
+    });
+    setShowUpdateModal(true);
+  };
+
+  const handleUpdateSave = async (values: any) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!selectedRequestDetail) {
+        toast.error("The request detail not exist!");
+        return;
+      }
+
+      const response = await fetch(
+        `http://localhost:8080/api/requestDetail/${selectedRequestDetail.requestDetailId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(values),
+        }
+      );
+
+      if (!response.ok) {
+        toast.error("Failed to update request detail");
+        return;
+      }
+
+      toast.success("Request detail updated successfully!");
+      setShowUpdateModal(false);
+      fetchRequestDetails();
+    } catch (err) {
+      toast.error("Error updating request detail");
+      console.error(err);
+    }
+  };
+
+  // Thêm hàm delete
+  const handleDelete = async (requestDetailId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/requestDetail/${requestDetailId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        toast.error("Failed to delete request detail");
+        return;
+      }
+
+      toast.success("Request detail deleted successfully!");
+      fetchRequestDetails();
+    } catch (err) {
+      toast.error("Error deleting request detail");
+      console.error(err);
+    }
   };
 
 
@@ -207,34 +281,105 @@ function RequestDetailTable() {
       title: "Actions",
       key: "actions",
       render: (record: any) => (
-        <Button
-          icon={<EditOutlined />}
-          style={{
-            backgroundColor: "white",
-            color: "#52c41a", // Màu xanh lá cây nhạt
-            border: "1px solid #52c41a",
-            borderRadius: "50%",
-            width: "32px",
-            height: "32px",
-            padding: 0,
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "all 0.3s ease"
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#52c41a";
-            e.currentTarget.style.color = "white";
-            e.currentTarget.style.transform = "scale(1.1)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "white";
-            e.currentTarget.style.color = "#52c41a";
-            e.currentTarget.style.transform = "scale(1)";
-          }}
-          onClick={() => handleConsult(record)}
-        >
-        </Button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {/* Consult Button */}
+          <Button
+            icon={<EditOutlined />}
+            style={{
+              backgroundColor: "white",
+              color: "#52c41a",
+              border: "1px solid #52c41a",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              padding: 0,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.3s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = "#52c41a";
+              e.currentTarget.style.color = "white";
+              e.currentTarget.style.transform = "scale(1.1)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = "white";
+              e.currentTarget.style.color = "#52c41a";
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+            onClick={() => handleConsult(record)}
+            title="Consult"
+          />
+
+          {/* Update Button */}
+          <Button
+            icon={<EditOutlined />}
+            style={{
+              backgroundColor: "white",
+              color: "#1890ff",
+              border: "1px solid #1890ff",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              padding: 0,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.3s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = "#1890ff";
+              e.currentTarget.style.color = "white";
+              e.currentTarget.style.transform = "scale(1.1)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = "white";
+              e.currentTarget.style.color = "#1890ff";
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+            onClick={() => handleUpdate(record)}
+            title="Update"
+          />
+
+          {/* Delete Button */}
+          <Popconfirm
+            title="Confirm delete"
+            description="Are you sure you want to delete this request detail?"
+            onConfirm={() => handleDelete(record.requestDetailId)}
+            okButtonProps={{ style: { background: "LimeGreen" } }}
+            cancelButtonProps={{ style: { background: "red", color: "white" } }}
+          >
+            <Button
+              icon={<DeleteOutlined />}
+              style={{
+                backgroundColor: "white",
+                color: "#ff4d4f",
+                border: "1px solid #ff4d4f",
+                borderRadius: "50%",
+                width: "32px",
+                height: "32px",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.3s ease"
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = "#ff4d4f";
+                e.currentTarget.style.color = "white";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = "white";
+                e.currentTarget.style.color = "#ff4d4f";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+              title="Delete"
+            />
+          </Popconfirm>
+        </div>
+
       ),
     },
   ];
@@ -404,6 +549,53 @@ function RequestDetailTable() {
         bodyStyle={{ overflowX: "auto" }} // Thêm thanh cuộn ngang nếu cần
       >
         <Table dataSource={pondDesignTemplate} columns={columnsPondDesignTemplate} scroll={{ x: true }}></Table>
+      </Modal>
+      <Modal
+        title="Update Request Detail"
+        open={showUpdateModal}
+        onCancel={() => setShowUpdateModal(false)}
+        footer={[
+          <Button
+            key="cancel"
+            style={{ backgroundColor: "red", color: "white" }}
+            onClick={() => setShowUpdateModal(false)}
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            style={{ backgroundColor: "LimeGreen", color: "white" }}
+            onClick={() => {
+              form
+                .validateFields()
+                .then((values) => {
+                  handleUpdateSave(values);
+                })
+                .catch((info) => {
+                  console.log("Validate Failed:", info);
+                });
+            }}
+          >
+            Update
+          </Button>,
+        ]}
+      >
+        <Form form={form} layout="vertical" name="updateRequestDetailForm">
+          <Form.Item
+            name="pondDesignTemplateId"
+            label="Pond Design Template ID"
+            rules={[{ required: true, message: "Please input the pond design template ID!" }]}
+          >
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item
+            name="note"
+            label="Note"
+            rules={[{ required: true, message: "Please input the note!" }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );
