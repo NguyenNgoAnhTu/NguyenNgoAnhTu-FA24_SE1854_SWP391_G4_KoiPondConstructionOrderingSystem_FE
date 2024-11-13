@@ -15,13 +15,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
+      <div className="relative flex-1 flex flex-col overflow-y-auto">
+        {/* Header - Fixed at top */}
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        {/* Main Content - Only this area will scroll */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-4 lg:p-6">
+        {/* Main Content */}
+        <main className="flex-1">
+          <div className="container mx-auto p-4 lg:p-6">
             {children}
           </div>
         </main>

@@ -43,6 +43,13 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
         }
     }, [servicePayment]);
 
+    useEffect(() => {
+        if (!isOpen) {
+            setServicePaymentData(null);
+            setLoadingPayment(false);
+        }
+    }, [isOpen]);
+
     const fetchServicePayment = async (serviceQuotationID: string) => {
         setLoadingPayment(true);
         try {
@@ -59,6 +66,11 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
 
             if (!response.ok) {
                 throw new Error("Failed to fetch payment data");
+            }
+
+            if (response.status === 404) {
+                setLoadingPayment(false);
+                throw new Error("Payment has not been created yet");
             }
             const data = await response.json();
             setServicePaymentData(data);
@@ -121,11 +133,17 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
         }
     };
 
+    const handleClose = () => {
+        setServicePaymentData(null);
+        setLoadingPayment(false);
+        onClose();
+    };
+
     return (
         <Modal
             title="Payment Details"
             open={isOpen}
-            onCancel={onClose}
+            onCancel={handleClose}
             confirmLoading={loadingPayment}
             onOk={servicePaymentData?.status !== "Paid" ? handlePayment : undefined}
             okText={servicePaymentData?.status !== "Paid" ? "Confirm Payment" : "Transaction completed successfully"}
