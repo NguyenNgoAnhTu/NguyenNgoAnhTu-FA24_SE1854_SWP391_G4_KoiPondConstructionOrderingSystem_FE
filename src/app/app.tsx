@@ -35,7 +35,7 @@ import DesignProfileForm from "app/dashboard/forms/design-profile.tsx";
 // import QuotationForm from "app/dashboard/forms/quotation";
 import DesignProfileManagerTable from "app/dashboard/tables/designprofile-manager";
 import DesignProfileTable from "app/dashboard/tables/designProfile.tsx";
-import Quotation from "app/dashboard/tables/quotation";
+import Quotation from "app/dashboard/tables/quotation.tsx";
 import ShowQuotation from "app/dashboard/tables/showQuotationCus";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

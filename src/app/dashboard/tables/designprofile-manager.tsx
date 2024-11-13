@@ -227,8 +227,16 @@ const response = await fetch(
         onCancel={() => setShowDesignModal(false)}
         open={showDesignModal}
         title="Designs"
+        width={800} // Added width for better visibility
       >
-        <Table dataSource={designs} columns={columnsDesign} pagination={false} />
+        <div style={{ overflowX: 'auto' }}> {/* Added wrapper div with horizontal scroll */}
+          <Table 
+            dataSource={designs} 
+            columns={columnsDesign} 
+            pagination={false}
+            scroll={{ x: true }} // Added scroll property
+          />
+        </div>
       </Modal>
 
       <Modal

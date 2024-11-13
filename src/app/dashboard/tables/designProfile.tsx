@@ -215,26 +215,18 @@ function DesignProfile() {
     },
     {
       title: "Action",
-      key: "action",
-      render: ( design : any) => (
-        // <Button
-        // type="primary"
-        // danger
-        // style={{ marginRight: "3px" }}
-        //   onClick={() => handleFinishDesign(design.designId)}
-        // >
-        //   Finish
-        // </Button>
-        <Popconfirm
-            title="Finish"
-            color="red"
-            description="Do you want to finish this construction?"
-            onConfirm={() => handleFinishDesign(design.designId) }
-          >
-            <Button style={{ backgroundColor: "red", color: "white" }}>
-              Finish
-            </Button>
-          </Popconfirm>
+        key: "action",
+        render: (design: any) => (
+            <Popconfirm
+                title="Finish"
+                color="red"
+                description="Do you want to finish this construction?"
+                onConfirm={() => handleFinishDesign(design.designId)}
+            >
+                <Button style={{ backgroundColor: "red", color: "white" }}>
+                    Finish
+                </Button>
+            </Popconfirm>
         
         // {!design.designStatus && ( // Hiển thị nút Confirm nếu chưa xác nhận
         //   <Button type="link" onClick={() => handleConfirm(record.quotationId)}>
@@ -276,8 +268,16 @@ function DesignProfile() {
         onCancel={() => setShowDesignModal(false)}
         open={showDesignModal}
         title="Designs"
+        width={1000} // Tăng độ rộng của modal
       >
-        <Table dataSource={designs} columns={columnsDesign} pagination={false} />
+        <div style={{ overflowX: 'auto' }}> {/* Thêm wrapper div với overflow */}
+          <Table 
+            dataSource={designs} 
+            columns={columnsDesign} 
+            pagination={false}
+            scroll={{ x: 800 }} // Thêm scroll cho table
+          />
+        </div>
       </Modal>
     </div>
   );

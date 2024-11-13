@@ -416,8 +416,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           </li>
                           <li>
                             <NavLink
-                              to="/admin/tables/quotation"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+
+                              to="/admin/tables/table-quotation"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+
                             >
                               Table Quotation
                             </NavLink>
