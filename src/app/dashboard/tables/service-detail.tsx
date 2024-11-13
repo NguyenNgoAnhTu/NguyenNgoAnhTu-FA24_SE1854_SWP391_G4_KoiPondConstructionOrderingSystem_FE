@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 
@@ -48,6 +49,14 @@ function ServiceRequestTable() {
     role: string;
   }
 
+  interface ServiceProgress {
+    serviceProgressId?: string;
+    serviceDetailId: string;
+    step: string;
+    description: string;
+  }
+
+  const navigate = useNavigate();
   const [serviceDetailsData, setServiceDetailsData] = useState<ServiceDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +65,8 @@ function ServiceRequestTable() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [detailToDelete, setDetailToDelete] = useState<ServiceDetail | null>(null);
   const [staffList, setStaffList] = useState<Staff[]>([]);
+  const [showProgressForm, setShowProgressForm] = useState(false);
+  const [progressDetail, setProgressDetail] = useState<ServiceProgress | null>(null);
 
   useEffect(() => {
     const fetchServiceDetails = async () => {
@@ -99,7 +110,7 @@ function ServiceRequestTable() {
         });
 
         if (!response.ok) throw new Error("Failed to fetch staff list");
-        
+
         const data = await response.json();
         const filteredStaff = data.filter((staff: Staff) => staff.role !== "CUSTOMER");
         setStaffList(filteredStaff);
@@ -134,7 +145,7 @@ function ServiceRequestTable() {
         throw new Error("Failed to delete service detail");
       }
 
-      setServiceDetailsData(prevData => 
+      setServiceDetailsData(prevData =>
         prevData.filter(detail => detail.serviceDetailId !== serviceDetailId)
       );
       setShowDeleteModal(false);
@@ -145,6 +156,15 @@ function ServiceRequestTable() {
       console.error("Delete error:", error);
       toast.error("Failed to delete service detail!");
     }
+  };
+
+  const handleCreateProgress = async (serviceDetail: ServiceDetail) => {
+    setProgressDetail({
+      serviceDetailId: serviceDetail.serviceDetailId,
+      description: '',
+      step: 'Not started'
+    });
+    setShowProgressForm(true);
   };
 
   if (loading) {
@@ -225,7 +245,13 @@ function ServiceRequestTable() {
                   >
                     Edit
                   </button>
-
+                  <button
+                    type="button"
+                    onClick={() => handleCreateProgress(serviceDetail)}
+                    className="mx-1 text-white bg-green hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
+                  >
+                    Create Progress
+                  </button>
                   <button
                     type="button"
                     onClick={() => {
@@ -236,6 +262,7 @@ function ServiceRequestTable() {
                   >
                     Delete
                   </button>
+                  <br></br>
                 </td>
               </tr>
             ))}
@@ -335,8 +362,8 @@ function ServiceRequestTable() {
                   >
                     <option value="">Select Staff</option>
                     {staffList.map(staff => (
-                      <option 
-                        key={staff.customerId} 
+                      <option
+                        key={staff.customerId}
                         value={staff.customerId}
                       >
                         {staff.name}
@@ -358,9 +385,9 @@ function ServiceRequestTable() {
                     required
                   />
                 </div>
-                        
+
                 <div className="flex justify-end gap-4">
-                  
+
                   <button
                     type="button"
                     onClick={() => {
@@ -376,6 +403,104 @@ function ServiceRequestTable() {
                     className="px-4 py-2 bg-green text-white rounded hover:bg-green-600"
                   >
                     Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {showProgressForm && progressDetail && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-70 backdrop-blur-sm"></div>
+          <div className="flex min-h-screen items-center justify-center">
+            <div className="relative bg-white rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-lg font-bold mb-4 text-gray-800">Create Service Progress</h3>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const token = localStorage.getItem("token");
+                  const response = await fetch(
+                    "http://localhost:8080/api/service-progress",
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
+                        serviceDetailID: progressDetail.serviceDetailId,
+                        step: progressDetail.step,
+                        description: progressDetail.description,
+                      }),
+                    }
+                  );
+
+                  if (!response.ok) {
+                    throw new Error("Failed to create service progress");
+                  }
+                  navigate('/admin/tables/table-service-progress');
+                  setShowProgressForm(false);
+                  setProgressDetail(null);
+                  toast.success("Service progress created successfully!");
+
+                } catch (error) {
+                  console.error("Create progress error:", error);
+                  toast.error("Failed to create service progress!");
+                }
+              }}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">Step</label>
+                  <select
+                    value={progressDetail.step}
+                    onChange={(e) => setProgressDetail({
+                      ...progressDetail,
+                      step: e.target.value
+                    })}
+                    className="w-full p-2 border rounded bg-white text-gray-800"
+                    required
+                  >
+                    <option value="Not started">Not started</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">Description</label>
+                  <textarea
+                    value={progressDetail.description}
+                    onChange={(e) => setProgressDetail({
+                      ...progressDetail,
+                      description: e.target.value
+                    })}
+                    className="w-full p-2 border rounded"
+                    rows={4}
+                    placeholder="Enter progress description"
+                    required
+                  />
+                </div>
+
+
+
+                <div className="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowProgressForm(false);
+                      setProgressDetail(null);
+                    }}
+                    className="px-4 py-2 bg-red text-white rounded hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-green text-white rounded hover:bg-green-600"
+                  >
+                    Create Progress
                   </button>
                 </div>
               </form>

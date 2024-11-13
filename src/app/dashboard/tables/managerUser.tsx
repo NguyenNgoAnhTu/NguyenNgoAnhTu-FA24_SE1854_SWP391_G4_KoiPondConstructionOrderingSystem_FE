@@ -164,7 +164,7 @@ function CustomerTable() {
       const addedStaff = await response.json();
       setCustomers(prev => [...prev, addedStaff]);
       setShowAddForm(false);
-      setNewStaff({ name: "", email: "", phoneNumber: "", password: "", role: "STAFF" || "CONSTRUCTOR" || "DESIGNER" || "CONSULTANT" || "MAINTENANCE STAFF" });
+      setNewStaff({ name: "", email: "", phoneNumber: "", password: "", role: "STAFF" || "CONSTRUCTOR" || "DESIGNER" || "CONSULTANT" || "MAINTENANCE" });
       toast.success("Staff added successfully");
       
       fetchCustomers(selectedRole);

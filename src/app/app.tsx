@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "app/home";
+import About from "app/about";
 import Layout from "components/layout/layout.tsx";
 import Login from "./login";
 import Pond_Construction from "./pond-construction";
@@ -45,6 +46,7 @@ const routes = [
   { path: "/contact", element: <Contact /> },
   { path: "/pond-construction", element: <Pond_Construction /> },
   { path: "/pond-cleaning", element: <Pond_Cleaning /> },
+  { path: "/about", element: <About /> },
   { path: "/user", element: <User /> },
   { path: "/user/construction-infomation", element: <ConstructionInfomation /> },
 ];
@@ -84,7 +86,6 @@ const routesAdmin = [
     path: "/admin/tables/table-construction-history",
     element: <ConstructionHistory />,
   },
-
   {
     path: "/admin/forms/design-profile-form",
     element: <DesignProfileForm />,
@@ -115,7 +116,7 @@ const routesAdmin = [
     path: "/admin/tables/table-consult",
     element: < Consult />,
   },
-  
+
   {
     path: "/admin/forms/form-consult",
     element: <ConsultForm />,
@@ -152,7 +153,7 @@ function App() {
         ))}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+
 
         {routesAdmin.map(({ path, element }) => (
           <Route
@@ -161,8 +162,8 @@ function App() {
             element={<LayoutAdmin>{element}</LayoutAdmin>}
           />
         ))}
-        
-      
+
+
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>

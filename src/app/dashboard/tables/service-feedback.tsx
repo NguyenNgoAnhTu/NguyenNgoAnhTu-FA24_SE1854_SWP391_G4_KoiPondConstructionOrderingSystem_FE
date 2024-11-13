@@ -5,8 +5,8 @@ import './button-antd.css'
 function ServiceFeedbackTable() {
     interface ServiceFeedback {
         serviceFeedbackId: string;
-        serviceDetail: {
-            serviceDetailId: string;
+        serviceCategory: {
+            serviceCategoryId: string;
         };
         createDate: string;
         customer: {
@@ -56,6 +56,11 @@ function ServiceFeedbackTable() {
     const handleViewDetail = (service: ServiceFeedback) => {
         setSelectedService(service);
         setIsModalOpen(true);
+    };
+
+    const handleOk = () => {
+        setIsModalOpen(false);
+        setSelectedService(null);
     };
 
     const handleCancel = () => {
@@ -140,8 +145,8 @@ function ServiceFeedbackTable() {
                             <tr key={service.serviceFeedbackId} className="hover:bg-gray-50 transition duration-200">
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{index + 1}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceFeedbackId}</td>
-                                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceDetail.serviceDetailId}</td>
-                                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.customer.name}</td>
+                                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceCategory.serviceCategoryId}</td>
+                                {/* <td className="px-2 py-4 text-sm text-black-15 text-center">{service.customer.name}</td> */}
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.feedback}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.rating}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{new Date(service.createDate).toLocaleString()}</td>
@@ -167,11 +172,11 @@ function ServiceFeedbackTable() {
                 </table>
             </div>
 
-            <Modal title="View Service Feedback" open={isModalOpen} onCancel={handleCancel} confirmLoading={loadingUpdate}>
+            <Modal title="View Service Feedback" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} confirmLoading={loadingUpdate}>
                 {selectedService && (
                     <div>
                         <p><strong>Service Feedback ID:</strong> {selectedService.serviceFeedbackId}</p>
-                        <p><strong>Service Detail ID:</strong> {selectedService.serviceDetail.serviceDetailId}</p>
+                        <p><strong>Service Detail ID:</strong> {selectedService.serviceCategory.serviceCategoryId}</p>
                         <p><strong>Customer Name:</strong> {selectedService.customer.name}</p>
                         <p><strong>Feedback:</strong> {selectedService.feedback}</p>
                         <p><strong>Rating:</strong> {selectedService.rating}</p>

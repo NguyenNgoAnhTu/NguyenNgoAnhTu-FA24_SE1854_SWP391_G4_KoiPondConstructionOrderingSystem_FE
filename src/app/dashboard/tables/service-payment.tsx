@@ -8,7 +8,7 @@ function ServicePaymentTable() {
         servicePaymentID: string;
         paymentMethod: string;
         serviceQuotation: {
-            serviceQuotationID: number;
+            serviceQuotationID: string;
             customer: {
                 name: string;
             };
