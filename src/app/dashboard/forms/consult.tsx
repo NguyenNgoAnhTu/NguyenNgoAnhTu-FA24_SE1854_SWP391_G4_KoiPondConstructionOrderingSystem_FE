@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -6,6 +6,7 @@ const ConsultForm = () => {
   const location = useLocation();
   const { customerId, requestDetailId } = location.state || {};
 
+  const [customerName, setCustomerName] = useState<string>("");
   const [formData, setFormData] = useState({
     customerId: customerId || "",
     description: "",
@@ -66,6 +67,44 @@ const ConsultForm = () => {
       [name]: "",
     });
   };
+
+  useEffect(() => {
+    const fetchCustomerDetail = async () => {
+      if (!formData.customerId) {
+        setCustomerName("");
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/customer?id=${formData.customerId}`,
+          {
+            method: "GET", // Thêm method GET
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log("API Response:", data); // Debug log
+          setCustomerName(data.name);
+        } else {
+          // Thêm xử lý khi response không ok
+          setCustomerName("Customer not found");
+          toast.error("Failed to fetch customer details");
+        }
+      } catch (error) {
+        console.error("Error fetching customer:", error);
+        setCustomerName("Error loading customer name");
+        toast.error("Error loading customer details");
+      }
+    };
+
+    fetchCustomerDetail();
+  }, [formData.customerId]);
 
 
   // Validate the form
@@ -129,16 +168,16 @@ const ConsultForm = () => {
         }
 
         const data = await response.json();
-      console.log("Response data:", data);
+        console.log("Response data:", data);
 
-      toast.success("Consult created successfully!");
-      navigate("/admin/tables/table-consult");
-    } catch (error) {
-      console.error("Error creating consult:", error);
-      toast.error(error instanceof Error ? error.message : "Create consult failed!");
-    } finally {
-      setLoading(false);
-    }
+        toast.success("Consult created successfully!");
+        navigate("/admin/tables/table-consult");
+      } catch (error) {
+        console.error("Error creating consult:", error);
+        toast.error(error instanceof Error ? error.message : "Create consult failed!");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -159,8 +198,16 @@ const ConsultForm = () => {
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400`}
             placeholder="Enter customer ID"
           />
+          {customerName && (
+            <p className="text-gray-600 text-sm mt-1">
+              Customer Name: {customerName}
+            </p>
+          )}
           {errors.customerId && (
             <p className="text-red-500 text-sm mt-1">{errors.customerId}</p>
+          )}
+          {customerName && (
+            <p className="text-gray-600 text-sm mt-1">Customer Name: {customerName}</p>
           )}
         </div>
 
@@ -259,6 +306,7 @@ const ConsultForm = () => {
         </button>
       </form>
     </div>
+
   );
 };
 

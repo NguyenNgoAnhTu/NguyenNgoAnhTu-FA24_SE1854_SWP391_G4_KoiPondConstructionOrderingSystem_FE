@@ -1,7 +1,16 @@
-import { Button, Form, Input, Modal, Table, Popconfirm } from "antd";
+import { Button, Form, Input, Modal, Table, Popconfirm, Space } from "antd";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+
+// Add new type for Customer
+type CustomerType = {
+  customerId: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  // Add other customer fields as needed
+};
 
 type ConsultType = {
   id: number;
@@ -11,8 +20,8 @@ type ConsultType = {
   requestDetailId: number;
   createDate: string; // Có thể đổi thành Date nếu cần
   isCustomerConfirm: boolean; // Thêm trường isCustomerConfirm
- // customers: number;
- customers: { customerId: number }[];
+  // customers: number;
+  customers: { customerId: number }[];
 };
 
 function Consult() {
@@ -22,9 +31,12 @@ function Consult() {
   const [quotationForm] = Form.useForm();
   const [selectedConsult, setSelectedConsult] = useState<ConsultType | null>(null);
   const [selectedConsultId, setSelectedConsultId] = useState<number | null>(null);
-  
+
   const [showQuotationModal, setShowQuotationModal] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+
+  const [customerData, setCustomerData] = useState<CustomerType | null>(null);
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
   const navigate = useNavigate();
   const fetchConsultData = async () => {
     try {
@@ -48,16 +60,45 @@ function Consult() {
     }
   };
 
+
+  // Add new function to fetch customer details
+  const fetchCustomerDetails = async (customerId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/customer`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch customer details');
+      }
+
+      const customers = await response.json();
+      const customer = customers.find((c: CustomerType) => c.customerId === customerId);
+      
+      if (customer) {
+        setCustomerData(customer);
+        setShowCustomerModal(true);
+      } else {
+        toast.error('Customer not found');
+      }
+    } catch (error) {
+      toast.error('Error fetching customer details');
+    }
+  };
+
   useEffect(() => {
     fetchConsultData();
   }, []);
   // const handleFormCreate = async (values: any) => {
-    
+
   //   try {
   //     const token = localStorage.getItem("token");
   //     console.log("Selected Customer ID:", selectedCustomerId);
   //     console.log("Selected Consult ID:", selectedConsultId);
-      
+
   //     // Đảm bảo customerId được set khi click vào nút Create quotation
   //     if (!selectedCustomerId) {
   //       toast.error("Customer ID is missing!");
@@ -75,17 +116,17 @@ function Consult() {
   //       mainCost: values.mainCost,
   //       subCost: values.subCost,
   //       vat: values.vat
-        
+
   //     };
   const handleFormCreate = async (values: any) => {
     try {
       const token = localStorage.getItem("token");
-      
+
       if (!selectedConsult) {
         toast.error("No consult selected!");
         return;
       }
-  
+
       const requestBody = {
         customerId: selectedCustomerId, // Sử dụng selectedCustomerId đã lưu
         consultId: selectedConsultId,
@@ -95,20 +136,20 @@ function Consult() {
         subCost: values.subCost,
         vat: values.vat
       };
-      
-        const response = await fetch("http://localhost:8080/api/quotation", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(requestBody),
-        }
+
+      const response = await fetch("http://localhost:8080/api/quotation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      }
       );
       // 
       if (!response.ok) {
         // Kiểm tra xem response có phải JSON không
-        const text = await response.text(); 
+        const text = await response.text();
         try {
           const errorData = JSON.parse(text); // Parse JSON nếu có thể
           console.error("Error response:", errorData);
@@ -129,18 +170,16 @@ function Consult() {
 
   const consultUpdate = (record: ConsultType) => {
     console.log("Selected Consult Record:", record);
-    console.log("Request Detail ID:", record.requestDetailId); //
     setSelectedConsult(record);
 
-  
+    console.log("Request Detail ID:", record.requestDetailId); // Kiểm tra giá trị của requestDetailId
+
     form.setFieldsValue({
       description: record.description,
-      customerId: record.customerId,
-      requestDetailId: record.requestDetailId, // Đảm bảo tên trường trùng khớp
+      customerId: record.customers[1].customerId, // Lấy customerId từ mảng customers
+      requestDetailId: record.requestDetailId,
       consultDate: record.consultDate,
     });
-
-    console.log("Request Detail ID:", record.requestDetailId); // Kiểm tra giá trị của requestDetailId
 
     setShowModal(true);
   }
@@ -193,7 +232,7 @@ function Consult() {
       }
     }
   };
-  
+
 
   const consultCancel = () => {
     setShowModal(false);
@@ -251,7 +290,7 @@ function Consult() {
       console.log("Consult confirmed successfully!");
       toast.success("Consult confirmed!");
       fetchConsultData(); // Tải lại dữ liệu sau khi xác nhận
-      
+
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
@@ -260,10 +299,10 @@ function Consult() {
       }
     }
   };
-  
-      
-    
-  
+
+
+
+
   const columns = [
     { title: "Consult ID", dataIndex: "id", key: "id" },
     { title: "Description", dataIndex: "description", key: "description" },
@@ -284,43 +323,52 @@ function Consult() {
       title: "Customer ID",
       dataIndex: "customerId",
       key: "customerId",
-      render: (text: any, record: ConsultType) =>
-        record.customers && Array.isArray(record.customers) && record.customers.length > 0
-          ? record.customers[1].customerId
-          : "N/A",
+      render: (text: any, record: ConsultType) => (
+        <Space>
+          {record.customers && Array.isArray(record.customers) && record.customers.length > 0
+            ? record.customers[1].customerId
+            : "N/A"}
+          <Button 
+            type="link" 
+            onClick={() => fetchCustomerDetails(record.customers[1].customerId)}
+          >
+            View Detail
+          </Button>
+        </Space>
+      ),
     },
     {
       title: "Actions",
       dataIndex: "actions",
       render: (text: any, record: ConsultType) => (
         <>
-          <Button 
-            type="primary" 
-            danger 
-            style={{ backgroundColor: "blue", color: "white", marginRight: "3px" }} 
+          <Button
+            type="primary"
+            danger
+            style={{ backgroundColor: "blue", color: "white", marginRight: "3px" }}
             onClick={() => consultUpdate(record)}
           >
             Update
           </Button>
-    
-          <Popconfirm 
-            title="Confirm delete" 
-            color="white" 
-            okButtonProps={{style: {background: "LimeGreen"}}} 
-            cancelButtonProps={{style: {background: "red", color: "white"}}} 
-            description="Do you want to delete this consult?" 
+
+          <Popconfirm
+            title="Confirm delete"
+            color="white"
+            okButtonProps={{ style: { background: "LimeGreen" } }}
+            cancelButtonProps={{ style: { background: "red", color: "white" } }}
+            description="Do you want to delete this consult?"
             onConfirm={() => consultDeleteSave(record.id)}
           >
             <Button type="primary" danger style={{ backgroundColor: "red", color: "white", marginRight: "3px" }}>
               Delete
             </Button>
           </Popconfirm>
-    
+
           {!record.isCustomerConfirm ? (
-            <Button 
-              type="primary" 
-              danger 
-              style={{ backgroundColor: "LimeGreen", color: "white", marginRight: "3px" }} 
+            <Button
+              type="primary"
+              danger
+              style={{ backgroundColor: "LimeGreen", color: "white", marginRight: "3px" }}
               onClick={() => consultConfirm(record.id)}
             >
               Confirm
@@ -332,11 +380,11 @@ function Consult() {
               onClick={() => {
                 const consultId = record.id;
                 const customerId = record.customers[1].customerId;
-                
+
                 setSelectedConsult(record);
                 setSelectedConsultId(consultId);
                 setSelectedCustomerId(customerId);
-                
+
                 quotationForm.setFieldsValue({
                   customerId: customerId,
                   description: '',
@@ -344,7 +392,7 @@ function Consult() {
                   subCost: 0,
                   vat: 0
                 });
-    
+
                 setShowQuotationModal(true);
               }}
             >
@@ -365,9 +413,9 @@ function Consult() {
         open={showModal}
         onCancel={consultCancel}
         footer={[
-          <Button key="cancel" 
-          style={{ backgroundColor: "red", color: "white" }} 
-          onClick={consultCancel}>
+          <Button key="cancel"
+            style={{ backgroundColor: "red", color: "white" }}
+            onClick={consultCancel}>
             Cancel
           </Button>,
           <Button
@@ -426,19 +474,40 @@ function Consult() {
           </Form.Item>
         </Form>
       </Modal>
-      
-     
       <Modal
-  onCancel={() => setShowQuotationModal(false)} // Đóng modal khi hủy
-  onOk={() => quotationForm.submit()}// Gửi form khi nhấn OK
-  open={showQuotationModal} // Mở/đóng modal
-  title="Create Quotation" // Tiêu đề modal
->
-  <Form
-    form={quotationForm}
-    onFinish={handleFormCreate} // Xử lý khi form được submit
-    labelCol={{ span: 24 }} // Cài đặt chiều rộng label
-  >
+        title="Customer Details"
+        open={showCustomerModal}
+        onCancel={() => setShowCustomerModal(false)}
+        footer={[
+          <Button 
+            key="close" 
+            onClick={() => setShowCustomerModal(false)}
+          >
+            Close
+          </Button>
+        ]}
+      >
+        {customerData && (
+          <div>
+            <p><strong>Customer ID:</strong> {customerData.customerId}</p>
+            <p><strong>Name:</strong> {customerData.name}</p>
+            <p><strong>Email:</strong> {customerData.email}</p>
+            <p><strong>Phone:</strong> {customerData.phoneNumber}</p>
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        onCancel={() => setShowQuotationModal(false)} // Đóng modal khi hủy
+        onOk={() => quotationForm.submit()}// Gửi form khi nhấn OK
+        open={showQuotationModal} // Mở/đóng modal
+        title="Create Quotation" // Tiêu đề modal
+      >
+        <Form
+          form={quotationForm}
+          onFinish={handleFormCreate} // Xử lý khi form được submit
+          labelCol={{ span: 24 }} // Cài đặt chiều rộng label
+        >
           {/* <Form.Item
             name="customerId"
             label="CustomerId"
@@ -476,77 +545,77 @@ function Consult() {
             <Input type="number" />
           </Form.Item> */}
 
-<Form.Item
-  name="customerId"
-  label="CustomerId"
-  // rules={[{ required: true, message: "Please input the CustomerId!" }]}
->
-  <Input disabled/>
-</Form.Item>
+          <Form.Item
+            name="customerId"
+            label="CustomerId"
+          // rules={[{ required: true, message: "Please input the CustomerId!" }]}
+          >
+            <Input disabled />
+          </Form.Item>
 
-<Form.Item
-  name="description"
-  label="Description"
-  rules={[{ required: true, message: "Please input the description!" }]}
->
-  <Input />
-</Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true, message: "Please input the description!" }]}
+          >
+            <Input />
+          </Form.Item>
 
-<Form.Item
-  name="mainCost"
-  label="Main Cost"
-  rules={[
-    { required: true, message: "Please input the main cost!" },
-    ({ }) => ({
-      validator(_, value) {
-        if (value > 0) {
-          return Promise.resolve();
-        }
-        return Promise.reject(new Error("Main Cost must be greater than 0!"));
-      },
-    }),
-  ]}
->
-  <Input type="number" />
-</Form.Item>
+          <Form.Item
+            name="mainCost"
+            label="Main Cost"
+            rules={[
+              { required: true, message: "Please input the main cost!" },
+              ({ }) => ({
+                validator(_, value) {
+                  if (value > 0) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Main Cost must be greater than 0!"));
+                },
+              }),
+            ]}
+          >
+            <Input type="number" />
+          </Form.Item>
 
-<Form.Item
-  name="subCost"
-  label="Sub Cost"
-  rules={[
-    { required: true, message: "Please input the sub cost!" },
-    ({ }) => ({
-      validator(_, value) {
-        if (value > 0) {
-          return Promise.resolve();
-        }
-        return Promise.reject(new Error("Sub Cost must be greater than 0!"));
-      },
-    }),
-  ]}
->
-  <Input type="number" />
-</Form.Item>
+          <Form.Item
+            name="subCost"
+            label="Sub Cost"
+            rules={[
+              { required: true, message: "Please input the sub cost!" },
+              ({ }) => ({
+                validator(_, value) {
+                  if (value > 0) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Sub Cost must be greater than 0!"));
+                },
+              }),
+            ]}
+          >
+            <Input type="number" />
+          </Form.Item>
 
-<Form.Item
-  name="vat"
-  label="VAT"
-  rules={[
-    { required: true, message: "Please input the VAT!" },
-    ({ }) => ({
-      validator(_, value) {
-        if (value >= 0 && value <= 10) {
-          return Promise.resolve();
-        }
-        return Promise.reject(new Error("VAT must be greater than 0 and less than or equal to 10!"));
-      },
-    }),
-  ]}
->
-  <Input type="number" />
-</Form.Item>
+          <Form.Item
+            name="vat"
+            label="VAT"
+            rules={[
+              { required: true, message: "Please input the VAT!" },
+              ({ }) => ({
+                validator(_, value) {
+                  if (value >= 0 && value <= 10) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("VAT must be greater than 0 and less than or equal to 10!"));
+                },
+              }),
+            ]}
+          >
+            <Input type="number" />
+          </Form.Item>
         </Form>
-</Modal>
+      </Modal>
 
     </div>
   );
