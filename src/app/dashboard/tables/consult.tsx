@@ -37,7 +37,7 @@ function Consult() {
         },
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch consult data");
+        toast.error("Failed to fetch consult data");
       }
 
       const data = await response.json();
@@ -149,7 +149,7 @@ function Consult() {
     try {
       const token = localStorage.getItem("token");
       if (!selectedConsult) {
-        alert("The consult not exist!");
+        toast.error("The consult not exist!");
         return;
       }
 
@@ -178,12 +178,12 @@ function Consult() {
       if (!response.ok) {
         const errorText = await response.text(); // Nhận phản hồi dưới dạng văn bản
         console.error("Server Error:", errorText);
-        throw new Error("Network response was not ok");
+        toast.error("Network response was not ok");
       }
 
       console.log("Consult updated successfully!");
       setShowModal(false);
-      alert("Consult updated!");
+      toast.success("Consult updated!");
       fetchConsultData();
     } catch (err) {
       if (err instanceof Error) {
@@ -215,17 +215,17 @@ function Consult() {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete the consult");
+        toast.error("Failed to delete the consult");
       }
 
       console.log("Consult deleted successfully!");
-      alert("Consult deleted!");
+      toast.success("Consult deleted!");
       fetchConsultData();
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
       } else {
-        alert("Error Deleted!");
+        toast.error("Error Deleted!");
       }
     }
   };
@@ -249,14 +249,14 @@ function Consult() {
       }
 
       console.log("Consult confirmed successfully!");
-      alert("Consult confirmed!");
+      toast.success("Consult confirmed!");
       fetchConsultData(); // Tải lại dữ liệu sau khi xác nhận
       
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
       } else {
-        alert("Error Confirm");
+        toast.error("Error Confirm");
       }
     }
   };
@@ -294,56 +294,66 @@ function Consult() {
       dataIndex: "actions",
       render: (text: any, record: ConsultType) => (
         <>
-          <Button type="primary" danger style={{ backgroundColor: "blue", color: "white", marginRight: "3px" }} onClick={() => consultUpdate(record)}>
+          <Button 
+            type="primary" 
+            danger 
+            style={{ backgroundColor: "blue", color: "white", marginRight: "3px" }} 
+            onClick={() => consultUpdate(record)}
+          >
             Update
           </Button>
-
-          {/* Tạo xác nhận có xóa hay không */}
-          <Popconfirm title="Confirm delete" color="white" okButtonProps={{style: {background: "LimeGreen"}}} cancelButtonProps={{style: {background: "red", color: "white"}}} description="Do you want to delete this consult?" onConfirm={() => consultDeleteSave(record.id)}>
-          <Button type="primary" danger style={{ backgroundColor: "red", color: "white", marginRight: "3px" }}>
-            Delete</Button>
+    
+          <Popconfirm 
+            title="Confirm delete" 
+            color="white" 
+            okButtonProps={{style: {background: "LimeGreen"}}} 
+            cancelButtonProps={{style: {background: "red", color: "white"}}} 
+            description="Do you want to delete this consult?" 
+            onConfirm={() => consultDeleteSave(record.id)}
+          >
+            <Button type="primary" danger style={{ backgroundColor: "red", color: "white", marginRight: "3px" }}>
+              Delete
+            </Button>
           </Popconfirm>
-          
-            
-          <Button
-  type="primary"
-  style={{ backgroundColor: "orange", color: "white", marginRight: "3px" }}
-  onClick={() => {
-    console.log("Selected record:", record);
     
-    const consultId = record.id;
-    // Lấy customerId từ phần tử thứ hai của mảng customers
-    const customerId = record.customers[1].customerId;
-    
-    setSelectedConsult(record);
-    setSelectedConsultId(consultId);
-    setSelectedCustomerId(customerId);
-    
-    quotationForm.setFieldsValue({
-      customerId: customerId,
-      description: '',
-      mainCost: 0,
-      subCost: 0,
-      vat: 0
-    });
-
-    console.log("Setting customerId:", customerId); // Debug log
-    setShowQuotationModal(true);
-  }}
->
-  Create quotation
-</Button>
-        
-
-          {!record.isCustomerConfirm && ( // Hiển thị nút Confirm nếu chưa xác nhận
-            <Button type="primary" danger style={{ backgroundColor: "LimeGreen", color: "white", marginRight: "3px" }} onClick={() => consultConfirm(record.id)}>
+          {!record.isCustomerConfirm ? (
+            <Button 
+              type="primary" 
+              danger 
+              style={{ backgroundColor: "LimeGreen", color: "white", marginRight: "3px" }} 
+              onClick={() => consultConfirm(record.id)}
+            >
               Confirm
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              style={{ backgroundColor: "orange", color: "white", marginRight: "3px" }}
+              onClick={() => {
+                const consultId = record.id;
+                const customerId = record.customers[1].customerId;
+                
+                setSelectedConsult(record);
+                setSelectedConsultId(consultId);
+                setSelectedCustomerId(customerId);
+                
+                quotationForm.setFieldsValue({
+                  customerId: customerId,
+                  description: '',
+                  mainCost: 0,
+                  subCost: 0,
+                  vat: 0
+                });
+    
+                setShowQuotationModal(true);
+              }}
+            >
+              Create quotation
             </Button>
           )}
         </>
-      ),
-      
-    },
+      )
+    }
   ];
 
   return (

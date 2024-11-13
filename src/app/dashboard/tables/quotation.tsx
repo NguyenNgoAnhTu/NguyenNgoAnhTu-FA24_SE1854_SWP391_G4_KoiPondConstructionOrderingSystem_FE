@@ -256,28 +256,33 @@ function Quotation() {
       render: (text: boolean) => (text ? "Yes" : "No"), // Hiển thị Yes/No
     },
     {
-      
-        title: "Actions",
-        dataIndex: "actions",
-        render: (text: any, record: QuotationType) => (
-          <>
-            <Button onClick={() => handleUpdate(record)}>
-              Update
+      title: "Actions",
+      dataIndex: "actions",
+      render: (text: any, record: QuotationType) => (
+        <>
+          <Button onClick={() => handleUpdate(record)}>
+            Update
+          </Button>
+          <Button onClick={() => handleDelete(record.quotationId)}>
+            Delete
+          </Button>
+          
+          {!record.isConfirm ? (
+            <Button onClick={() => handleConfirm(record.quotationId)}>
+              Confirm
             </Button>
-            <Button onClick={() => handleDelete(record.quotationId)}>
-              Delete
-            </Button>
-            {!record.isConfirm && (
-              <Button onClick={() => handleConfirm(record.quotationId)}>
-                Confirm
-              </Button>
-            )}
-            <Button onClick={() => handleCreateDesignProfile(record.quotationId)}>
+          ) : (
+            <Button 
+              onClick={() => handleCreateDesignProfile(record.quotationId)}
+              type="primary"
+              style={{ backgroundColor: "green" }}
+            >
               Create Design Profile
             </Button>
-          </>
+          )}
+        </>
       ),
-    },
+    }
   ];
 
   return (
@@ -396,5 +401,10 @@ function Quotation() {
 }
 
 export default Quotation;
+
+
+
+
+
 
 
