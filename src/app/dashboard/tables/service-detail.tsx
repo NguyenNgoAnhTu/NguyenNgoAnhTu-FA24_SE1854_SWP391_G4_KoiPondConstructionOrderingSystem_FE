@@ -302,7 +302,7 @@ function ServiceRequestTable() {
           <div className="fixed inset-0 bg-gray-800 bg-opacity-70 backdrop-blur-sm"></div>
           <div className="flex min-h-screen items-center justify-center">
             <div className="relative bg-white rounded-lg p-6 max-w-md mx-auto">
-              <h3 className="text-lg font-bold mb-4 text-white">Edit Service Detail</h3>
+              <h3 className="text-lg font-bold mb-4 text-black">Edit Service Detail</h3>
               <form onSubmit={async (e) => {
                 e.preventDefault();
                 try {

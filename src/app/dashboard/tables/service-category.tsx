@@ -494,7 +494,7 @@ function ServiceCategoryTable() {
                     }
                   }}
                   min="0"
-                  step="100"
+                  step="100 "
                   required
                 />
                 {errors.cost && (

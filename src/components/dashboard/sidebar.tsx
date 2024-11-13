@@ -8,6 +8,16 @@ interface SidebarProps {
   setSidebarOpen: (arg: boolean) => void;
 }
 
+// Định nghĩa interface cho menu items
+interface MenuItem {
+  path: string;
+  label: string;
+  roles: string[];
+}
+
+// Định nghĩa đầy đủ các menu items theo role
+
+
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const location = useLocation();
   const { pathname } = location;
@@ -19,6 +29,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(
     storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
   );
+
+  const userRole = localStorage.getItem("role");
+  
+  const hasAccess = (allowedRoles: string[]): boolean => {
+    return allowedRoles.includes(userRole || "");
+  };
 
   // close on click outside
   useEffect(() => {
@@ -347,6 +363,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                        {userRole === "MANAGER" && (
+                        <li>
+                            <NavLink
+                              to="/admin/tables/manager-user"
+                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                            >
+                             Manager User
+                            </NavLink>
+                          </li>
+                        )}
+                      
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
                         <li>
                             <NavLink
                               to="/admin/tables/table-service-category"
@@ -355,7 +383,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Service Category
                             </NavLink>
                           </li>
-                          
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-service-requests"
@@ -364,6 +393,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Service Request
                             </NavLink>
                           </li>
+                          )}
+
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-service-quotation"
@@ -372,7 +404,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Service Quotation
                             </NavLink>
                           </li>
+                          )}
 
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-service-details"
@@ -381,7 +415,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Service Detail
                             </NavLink>
                           </li>
-
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="MAINTENANCE")  && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-service-progress"
@@ -390,6 +425,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Service Progress
                             </NavLink>
                           </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="MAINTENANCE")  && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-service-payment"
@@ -398,6 +435,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Service Payment
                             </NavLink>
                           </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="MAINTENANCE")  && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-service-feedback"
@@ -406,6 +445,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Service Feedback
                             </NavLink>
                           </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="CONSTRUCTOR" || userRole==="CONSULTANT")  && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-construction-history"
@@ -414,6 +455,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Construction history
                             </NavLink>
                           </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="CONSULTANT")  && (
                           <li>
                             <NavLink
                               to="/admin/tables/quotation"
@@ -422,6 +465,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Quotation
                             </NavLink>
                           </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="DESIGNER")   && (
                           <li>
                             <NavLink
                               to="/admin/tables/design-profile"
@@ -430,6 +475,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Design Profile
                             </NavLink>
                           </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="DESIGNER")     && (
                           <li>
                             <NavLink
                               to="/admin/tables/design-profile-manager"
@@ -438,6 +485,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Design Profile Manager
                             </NavLink>
                           </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="CONSULTANT")         && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-consult"
@@ -446,6 +495,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Consult
                             </NavLink>
                           </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF")  && (
                           <li>
                             <NavLink
                               to="/admin/tables/table-requestDetail"
@@ -454,6 +505,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Table Request Detail
                             </NavLink>
                           </li>
+                          )}
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}

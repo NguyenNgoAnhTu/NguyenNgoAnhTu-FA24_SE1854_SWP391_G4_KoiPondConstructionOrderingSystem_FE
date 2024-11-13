@@ -40,8 +40,8 @@ function CustomerTable() {
     
   });
 
-  const roles = ["CUSTOMER", "STAFF","CONSTRUCTOR", "DESIGNER", "CONSULTANT", "MAINTENANCE STAFF"];
-  const staffRoles = ["STAFF", "CONSTRUCTOR", "DESIGNER", "CONSULTANT", "MAINTENANCE STAFF"];
+  const roles = ["CUSTOMER", "STAFF","CONSTRUCTOR", "DESIGNER", "CONSULTANT", "MAINTENANCE"];
+  const staffRoles = ["STAFF", "CONSTRUCTOR", "DESIGNER", "CONSULTANT", "MAINTENANCE"];
 
   const fetchCustomers = async (role: string) => {
     try {

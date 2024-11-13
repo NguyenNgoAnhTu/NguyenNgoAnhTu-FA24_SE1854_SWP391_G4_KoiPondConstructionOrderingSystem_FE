@@ -51,7 +51,7 @@ const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotatio
     const fetchStaff = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8080/staff", {   
+        const response = await fetch("http://localhost:8080/api/customer/MAINTENANCE  ", {   
           method: "GET",
             headers: {
             "Content-Type": "application/json",
