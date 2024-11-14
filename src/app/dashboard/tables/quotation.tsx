@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Input, Modal, Table } from "antd";
+import { Button, Form, Input, Modal, Table, message, Upload } from "antd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { UploadOutlined } from '@ant-design/icons';
+import type { UploadProps } from 'antd';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { storage } from "../../../config/firebase";
+
 type QuotationType = {
   quotationId: number;
   customerId: number;
@@ -10,6 +15,7 @@ type QuotationType = {
   subCost: number;
   vat: number;
   description: string;
+  url: string;
   createDate: string; // Có thể đổi thành Date nếu cần
   isConfirm: boolean; // Thêm trường isConfirm
 };
@@ -21,8 +27,10 @@ function Quotation() {
   const [form] = Form.useForm();
   const [selectedQuotation, setSelectedQuotation] = useState<QuotationType | null>(null);
   const [showCreateProfileModal, setShowCreateProfileModal] = useState(false);
-  
+  const [uploading, setUploading] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string>("");
   const [profileForm] = Form.useForm();
+  const [fileList, setFileList] = useState<any[]>([]);
 
   const fetchData = async () => {
     try {
@@ -58,8 +66,22 @@ function Quotation() {
     try {
       const token = localStorage.getItem("token");
       if (!selectedQuotation) {
-        alert("No quotation selected for update");
+        toast.error("No quotation selected for update");
         return;
+      }
+      let newFileUrl = selectedQuotation.url;
+
+      // Xử lý upload file nếu có file mới
+      if (fileList.length > 0) {
+        const file = fileList[0].originFileObj;
+
+        // Upload file mới
+        newFileUrl = await handleUploadFile(file);
+
+        // Xóa file cũ nếu có
+        if (selectedQuotation.url) {
+          await deleteOldFile(selectedQuotation.url);
+        }
       }
 
       const requestBody = {
@@ -187,7 +209,7 @@ function Quotation() {
 
       toast.success("Design profile created successfully!");
 
-      
+
       setShowCreateProfileModal(false);
       navigate('/admin/tables/design-profile-manager');
     } catch (error) {
@@ -195,7 +217,56 @@ function Quotation() {
       toast.error("Failed to create design profile");
     }
   };
+  const handleUploadFile = async (file: File): Promise<string> => {
+    try {
+      setUploading(true);
+      const fileName = `quotations/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, fileName);
 
+      // Upload file
+      const snapshot = await uploadBytes(storageRef, file);
+      // Lấy URL download
+      const url = await getDownloadURL(snapshot.ref);
+
+      return url;
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      throw error;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Hàm xóa file cũ trên Firebase
+  const deleteOldFile = async (fileUrl: string) => {
+    try {
+      if (!fileUrl) return;
+      const fileRef = ref(storage, fileUrl);
+      await deleteObject(fileRef);
+    } catch (error) {
+      console.error("Error deleting old file:", error);
+    }
+  };
+
+  const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
+
+  const props = async (file: any, onSuccess: any, onError: any) => {
+    try {
+      setUploading(true);
+      const url = await handleUploadFile(file);
+      setFileUrl(url);
+      onSuccess("ok");
+    } catch (error) {
+      onError(error);
+    } finally {
+      setUploading(false);
+    }
+  };
   const columnsQuotation = [
     {
       title: "QuotationID",
@@ -238,16 +309,21 @@ function Quotation() {
       key: "description",
     },
     {
+      title: "Url",
+      dataIndex: "url",
+      key: "url",
+    },
+    {
       title: "Created",
       dataIndex: "createDate",
       key: "createDate",
-      render: (date: string) => new Intl.DateTimeFormat('vi-VN').format(new Date(date)),
+      
     },
     {
       title: "Updated",
       dataIndex: "updateDate",
       key: "updateDate",
-      render: (date: string) => new Intl.DateTimeFormat('vi-VN').format(new Date(date)),
+    
     },
     {
       title: "Is Confirmed",
@@ -266,13 +342,13 @@ function Quotation() {
           <Button onClick={() => handleDelete(record.quotationId)}>
             Delete
           </Button>
-          
+
           {!record.isConfirm ? (
             <Button onClick={() => handleConfirm(record.quotationId)}>
               Confirm
             </Button>
           ) : (
-            <Button 
+            <Button
               onClick={() => handleCreateDesignProfile(record.quotationId)}
               type="primary"
               style={{ backgroundColor: "green" }}
@@ -280,6 +356,7 @@ function Quotation() {
               Create Design Profile
             </Button>
           )}
+
         </>
       ),
     }
@@ -345,6 +422,23 @@ function Quotation() {
             <Input type="number" />
           </Form.Item>
         </Form>
+        <Form.Item
+          label="Upload PDF"
+          name="fileUrl"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+          rules={[{ required: true, message: "Please upload a file!" }]}
+        >
+          <Upload
+            accept=".pdf"
+            customRequest={({ file, onSuccess, onError }) =>
+              props(file, onSuccess, onError)
+            }
+            listType="text"
+          >
+            <Button icon={<UploadOutlined />}>Upload PDF</Button>
+          </Upload>
+        </Form.Item>
       </Modal>
       <Modal
         title="Create Design Profile"
@@ -380,13 +474,13 @@ function Quotation() {
           >
             <Input readOnly />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="address"
             label="Address"
             rules={[{ required: true, message: "Please input the address!" }]}
           >
-            <Input />
-          </Form.Item>
+            <Input readOnly />
+          </Form.Item> */}
           <Form.Item
             name="description"
             label="Description"
@@ -394,6 +488,26 @@ function Quotation() {
           >
             <Input />
           </Form.Item>
+          {/* <Form.Item
+            label="Upload PDF"
+            name="fileUrl"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+          >
+            <Upload
+              accept=".pdf"
+              fileList={fileList}
+              onChange={({ fileList }) => setFileList(fileList)}
+              customRequest={({ file, onSuccess, onError }) =>
+                props(file, onSuccess, onError)
+              }
+              listType="text"
+            >
+              <Button icon={<UploadOutlined />} loading={uploading}>
+                Upload PDF
+              </Button>
+            </Upload>
+          </Form.Item> */}
         </Form>
       </Modal>
     </div>
