@@ -76,7 +76,7 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
             setServicePaymentData(data);
         } catch (error: unknown) {
             if (error instanceof Error) {
-                message.error(error.message);
+                console.error(error.message);
             }
         } finally {
             setLoadingPayment(false);
@@ -160,23 +160,26 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
                         <p><strong>Customer:</strong> {servicePaymentData.serviceQuotation.customer.name}</p>
                         <p><strong>Cost:</strong> ${servicePaymentData.serviceQuotation.cost}</p>
                         <p><strong>VAT:</strong> {servicePaymentData.serviceQuotation.vat}%</p>
+                        {servicePaymentData.status !== "Paid" ? (
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-semibold">Payment Method</h3>
+                                <div className="space-y-2">
+                                    <Select
+                                        defaultValue={servicePaymentData.paymentMethod}
+                                        style={{ width: '100%' }}
+                                        onChange={(value) => handleInputChange("paymentMethod", value)}
+                                        options={paymentMethodOptions}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <p><strong>Payment Method: </strong> {servicePaymentData.paymentMethod}</p>
+                        )}
                         <p><strong>Description:</strong> {servicePaymentData.description}</p>
                         <p><strong>Status:</strong> {servicePaymentData.status}</p>
                         <p className="text-xl font-bold text-green-600">
                             <strong>Total Amount:</strong> ${servicePaymentData.serviceQuotation.totalCost.toFixed(2)}
                         </p>
-                    </div>
-
-                    <div className="space-y-3">
-                        <h3 className="text-lg font-semibold">Payment Method</h3>
-                        <div className="space-y-2">
-                            <Select
-                                defaultValue={servicePaymentData.paymentMethod}
-                                style={{ width: '100%' }}
-                                onChange={(value) => handleInputChange("paymentMethod", value)}
-                                options={paymentMethodOptions}
-                            />
-                        </div>
                     </div>
 
                     <div className="mt-4 p-4 bg-blue-50 rounded-lg">
@@ -187,7 +190,7 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
                     </div>
                 </div>
             ) : (
-                <div className="text-center">Loading payment details...</div>
+                <div className="text-center">No payment information available.</div>
             )}
         </Modal>
     );

@@ -5,10 +5,11 @@ import './button-antd.css'
 function ServiceFeedbackTable() {
     interface ServiceFeedback {
         serviceFeedbackId: string;
-        serviceCategory: {
-            serviceCategoryId: string;
-        };
+        serviceRequest: {
+            serviceRequestId: string;
+        }
         createDate: string;
+        updateDate?: string;
         customer: {
             name: string;
         };
@@ -129,6 +130,7 @@ function ServiceFeedbackTable() {
                                 "Feedback",
                                 "Rating",
                                 "Create date",
+                                "Update date",
                                 "Actions",
                             ].map((header) => (
                                 <th
@@ -145,11 +147,14 @@ function ServiceFeedbackTable() {
                             <tr key={service.serviceFeedbackId} className="hover:bg-gray-50 transition duration-200">
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{index + 1}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceFeedbackId}</td>
-                                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceCategory.serviceCategoryId}</td>
-                                {/* <td className="px-2 py-4 text-sm text-black-15 text-center">{service.customer.name}</td> */}
+                                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceRequest.serviceRequestId}</td>
+                                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.customer.name}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.feedback}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.rating}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{new Date(service.createDate).toLocaleString()}</td>
+                                {service.updateDate && (
+                                    <td className="px-2 py-4 text-sm text-black-15 text-center">{new Date(service.updateDate).toLocaleString()}</td>
+                                )}
                                 <td className="px-2 py-4 text-sm">
                                     <button
                                         type="button"
@@ -176,7 +181,7 @@ function ServiceFeedbackTable() {
                 {selectedService && (
                     <div>
                         <p><strong>Service Feedback ID:</strong> {selectedService.serviceFeedbackId}</p>
-                        <p><strong>Service Detail ID:</strong> {selectedService.serviceCategory.serviceCategoryId}</p>
+                        <p><strong>Service Detail ID:</strong> {selectedService.serviceRequest.serviceRequestId}</p>
                         <p><strong>Customer Name:</strong> {selectedService.customer.name}</p>
                         <p><strong>Feedback:</strong> {selectedService.feedback}</p>
                         <p><strong>Rating:</strong> {selectedService.rating}</p>

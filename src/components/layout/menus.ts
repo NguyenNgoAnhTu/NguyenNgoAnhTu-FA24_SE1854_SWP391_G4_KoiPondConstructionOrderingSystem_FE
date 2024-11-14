@@ -18,8 +18,8 @@ export const menus: Menus = [
     title: "About",
     slug: "/about",
   },
-  {
-    title: "Contact",
-    slug: "/contact",
-  },
+  // {
+  //   title: "Dashboard",
+  //   slug: "/admin/dashboard",
+  // },
 ];

@@ -162,7 +162,7 @@ function ServiceRequestTable() {
     setProgressDetail({
       serviceDetailId: serviceDetail.serviceDetailId,
       description: '',
-      step: 'Not started'
+      step: 'Not started',
     });
     setShowProgressForm(true);
   };
@@ -443,7 +443,6 @@ function ServiceRequestTable() {
                   setShowProgressForm(false);
                   setProgressDetail(null);
                   toast.success("Service progress created successfully!");
-
                 } catch (error) {
                   console.error("Create progress error:", error);
                   toast.error("Failed to create service progress!");

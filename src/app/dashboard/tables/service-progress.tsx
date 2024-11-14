@@ -8,6 +8,12 @@ function ServiceProgressTable() {
     serviceProgressID: string;
     serviceDetail: {
       serviceDetailId: string;
+      staff: {
+        customerId: string;
+      };
+      serviceQuotation: {
+        serviceQuotationId: string;
+      };
     };
     startDate: string;
     endDate?: string;
@@ -25,7 +31,6 @@ function ServiceProgressTable() {
   const token = localStorage.getItem('token');
 
   const options = [
-    { value: "Not started", label: "Not started" },
     { value: "On hold", label: "On hold" },
     { value: "In progress", label: "In progress" },
     { value: "Complete", label: "Complete" },
@@ -68,7 +73,13 @@ function ServiceProgressTable() {
 
   const handleOk = async () => {
     if (!selectedService) return;
-
+    if (selectedService.step === "Canceled") {
+      if (!selectedService.description || selectedService.description.trim() === "")
+        message.error("Description is required when status is Canceled");
+      else if (selectedService.description.length < 0 || selectedService.description.length > 100)
+        message.error("Description must be between 0 and 100 characters");
+      return;
+    }
     setLoadingUpdate(true);
     try {
       const response = await fetch(
@@ -126,9 +137,9 @@ function ServiceProgressTable() {
     }
   };
 
-  const handleConfirmed = async (id: string) => {
+  const handleConfirmed = async (service: ServiceProgress) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/acceptance-service-progress/${id}`, {
+      const response = await fetch(`http://localhost:8080/api/acceptance-service-progress/${service.serviceProgressID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -137,38 +148,36 @@ function ServiceProgressTable() {
       });
 
       if (response.ok) {
-        message.success(`Successfully confirmed service progress with ID: ${id}`); // Show success message
+        message.success(`Successfully confirmed service progress with ID: ${service.serviceProgressID}`); // Show success message
         setServiceProgressData((prevList) =>
           prevList.map((service) =>
-            service.serviceProgressID === id ? { ...service, isComfirmed: true } : service
+            service.serviceProgressID === service.serviceProgressID ? { ...service, isComfirmed: true } : service
           )
         );
+        const resPayment = await fetch(`http://localhost:8080/api/service-payment`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            "serviceQuotationID": service.serviceDetail.serviceQuotation.serviceQuotationId,
+            "paymentMethod": "Cash",
+            "maintenanceStaffID": service.serviceDetail.staff.customerId,
+            "status": "Pending"
+          }),
+        });
+        if (!resPayment.ok) {
+          throw new Error(`Failed to create service payment`);
+        }
       } else {
-        throw new Error(`Failed to confirm service progress with ID: ${id}`);
+        throw new Error(`Failed to confirm service progress with ID: ${service.serviceProgressID}`);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
         message.error(error.message); // Show error message
       }
     }
-  }
-
-  if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="text-center text-red py-4">
-        Error: {error}
-        <button
-          onClick={() => window.location.reload()}
-          className="ml-4 text-blue-500 underline"
-        >
-          Retry
-        </button>
-      </div>
-    );
   }
 
   if (serviceProgressData.length === 0) {
@@ -238,7 +247,7 @@ function ServiceProgressTable() {
                     <button
                       type="button"
                       className="mx-1 text-white bg-brown focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
-                      onClick={() => handleConfirmed(service.serviceProgressID)}
+                      onClick={() => handleConfirmed(service)}
                     >
                       Confirm
                     </button>

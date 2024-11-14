@@ -17,6 +17,7 @@ interface FeedbackData {
     rating: number;
     feedback: string;
     createDate: string;
+    updateDate: string;
 }
 
 const FeedbackModal = ({ isOpen, onClose, serviceRequestId }: FeedbackModalProps) => {
@@ -147,7 +148,11 @@ const FeedbackModal = ({ isOpen, onClose, serviceRequestId }: FeedbackModalProps
                         Created: {new Date(existingFeedback.createDate).toLocaleString()}
                     </div>
                 )}
-
+                {existingFeedback && existingFeedback.updateDate && (
+                    <div className="text-sm text-gray-500">
+                        Updated: {new Date(existingFeedback.updateDate).toLocaleString()}
+                    </div>
+                )}
                 {/* Rating Section */}
                 <div className="space-y-2">
                     <h3 className="text-lg font-semibold text-gray-500">Rating</h3>
