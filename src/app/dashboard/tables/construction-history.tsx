@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import { Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Table } from "antd";
+import { Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Table, Upload } from "antd";
 import { toast } from "react-toastify";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../config/firebase";
+import { UploadOutlined } from "@ant-design/icons";
 
 function ConstructionHistory() {
   const [datas, setDatas] = useState([]);
@@ -20,10 +23,41 @@ function ConstructionHistory() {
     description: string;
     confirmCustomerName: string;
     confirmConstructorName: string;
+    fileUrl: string;
   };
   type StaffType = {
     name: string;
   };
+
+//Handle upload
+
+const normFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e?.fileList;
+};
+
+const handleUpload = (file: any, onSuccess: any, onError: any) => {
+  const storageRef = ref(storage, `uploads/${file.name}`);
+  const uploadTask = uploadBytesResumable(storageRef, file);
+
+  uploadTask.on(
+    "state_changed",
+    null,
+    (error) => onError(error),
+    async () => {
+      try {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        onSuccess(downloadURL);
+      } catch (error) {
+        onError(error);
+      }
+    }
+  );
+};
+
+//Handle upload
 
   const fetchData = async (address: any) => {
     try {
@@ -163,6 +197,12 @@ function ConstructionHistory() {
 
   const handleDocumentCreate = async (values: any) => {
     try {
+      const fileUrl = values.fileUrl[0]?.response || values.fileUrl[0]?.url;
+
+      if (!fileUrl) {
+      throw new Error("File upload failed or URL is missing");
+      }
+
       const token = localStorage.getItem("token");
       const requestBody = {
         description: values.description,
@@ -170,6 +210,7 @@ function ConstructionHistory() {
         confirmCustomerName: values.confirmCustomerName,
         confirmConstructorName: values.confirmConstructorName,
         designProfileId: selectedDesignProfileId, // Include the stored ID
+        fileUrl: fileUrl,
       };
       const response = await fetch(
         "http://localhost:8080/api/construction_history/acceptance_document",
@@ -288,6 +329,16 @@ function ConstructionHistory() {
       title: "Staff",
       dataIndex: "confirmConstructorName",
       key: "confirmConstructorName",
+    },
+    {
+      title: "Download PDF",
+      dataIndex: "fileUrl",
+      key: "fileUrl",
+      render: (text: any, record: any) => (
+        <a href={record.fileUrl} target="_blank" rel="noopener noreferrer">
+          Download
+        </a>
+      ),
     },
   ];
 
@@ -508,6 +559,23 @@ function ConstructionHistory() {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+          <Form.Item
+            label="Upload PDF"
+            name="fileUrl"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+            rules={[{ required: true, message: "Please upload a file!" }]}
+          >
+            <Upload
+              accept=".pdf"
+              customRequest={({ file, onSuccess, onError }) =>
+              handleUpload(file, onSuccess, onError)
+              }
+              listType="text"
+            >
+              <Button icon={<UploadOutlined />}>Upload PDF</Button>
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>
