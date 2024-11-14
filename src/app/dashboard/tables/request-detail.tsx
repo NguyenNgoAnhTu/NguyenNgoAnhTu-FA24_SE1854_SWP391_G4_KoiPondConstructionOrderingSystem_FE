@@ -415,9 +415,9 @@ function RequestDetailTable() {
       key: "createBy",
     },
     {
-      title: "Customer ID",
-      dataIndex: ["customer", "customerId"], // Accessing nested customerId 
-      key: "customerId",
+      title: "Customer Name",
+      dataIndex: ["customer", "name"], // Accessing nested customerId 
+      key: "name",
     },
     {
       title: "RequestId",

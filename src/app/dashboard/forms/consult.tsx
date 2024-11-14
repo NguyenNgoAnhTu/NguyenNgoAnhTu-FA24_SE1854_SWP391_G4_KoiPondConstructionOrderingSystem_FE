@@ -51,21 +51,21 @@ const ConsultForm = () => {
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-
-    // Xử lý 'checked' chỉ khi là checkbox
-    const inputValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
-
-
-    setFormData({
-      ...formData,
-      [name]: inputValue,
-    });
-
-    setErrors({
-      ...errors,
-      [name]: "",
-    });
+    const { name, value } = e.target;
+    
+    if (name === 'customerId') {
+      // Xóa customerName khi người dùng bắt đầu nhập ID mới
+      setCustomerName("");
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   useEffect(() => {
@@ -78,32 +78,39 @@ const ConsultForm = () => {
       const token = localStorage.getItem("token");
       try {
         const response = await fetch(
-          `http://localhost:8080/api/customer?id=${formData.customerId}`,
+          `http://localhost:8080/api/customer`,
           {
-            method: "GET", // Thêm method GET
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           }
         );
+
         if (response.ok) {
-          const data = await response.json();
-          console.log("API Response:", data); // Debug log
-          setCustomerName(data.name);
+          const customers = await response.json();
+          // Tìm customer có id trùng với formData.customerId
+          const customer = customers.find(
+            (c: any) => c.customerId === parseInt(formData.customerId)
+          );
+
+          if (customer) {
+            setCustomerName(customer.name);
+          } else {
+            setCustomerName("Customer not found");
+          }
         } else {
-          // Thêm xử lý khi response không ok
-          setCustomerName("Customer not found");
-          toast.error("Failed to fetch customer details");
+          setCustomerName("Error loading customer");
         }
       } catch (error) {
         console.error("Error fetching customer:", error);
         setCustomerName("Error loading customer name");
-        toast.error("Error loading customer details");
       }
     };
 
-    fetchCustomerDetail();
+    if (formData.customerId) {
+      fetchCustomerDetail();
+    }
   }, [formData.customerId]);
 
 
@@ -188,26 +195,18 @@ const ConsultForm = () => {
       </h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
-          <label className="block text-black-15 mb-2">Customer ID</label>
+          <label className="block text-black-15 mb-2">Customer Name</label>
           <input
             type="text"
             name="customerId"
-            value={formData.customerId}
+            value={customerName || formData.customerId}
             onChange={handleChange}
             className={`w-full p-3 border ${errors.customerId ? "border-red-500" : "border-gray-300"
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400`}
             placeholder="Enter customer ID"
           />
-          {customerName && (
-            <p className="text-gray-600 text-sm mt-1">
-              Customer Name: {customerName}
-            </p>
-          )}
           {errors.customerId && (
             <p className="text-red-500 text-sm mt-1">{errors.customerId}</p>
-          )}
-          {customerName && (
-            <p className="text-gray-600 text-sm mt-1">Customer Name: {customerName}</p>
           )}
         </div>
 
