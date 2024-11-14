@@ -1,9 +1,11 @@
-import { Button, Form, Input, Modal, Table, Popconfirm } from "antd";
+import { Button, Form, Input, Modal, Table, Popconfirm,Upload } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-
+import { UploadOutlined } from "@ant-design/icons";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../config/firebase";
 // Add new type for Customer
 type CustomerType = {
   customerId: number;
@@ -23,6 +25,31 @@ type ConsultType = {
   isCustomerConfirm: boolean; // Thêm trường isCustomerConfirm
   // customers: number;
   customers: { customerId: number }[];
+};
+const normFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e?.fileList;
+};
+
+const handleUpload = (file: any, onSuccess: any, onError: any) => {
+  const storageRef = ref(storage, `quotations/${file.name}`);
+  const uploadTask = uploadBytesResumable(storageRef, file);
+
+  uploadTask.on(
+    "state_changed",
+    null,
+    (error) => onError(error),
+    async () => {
+      try {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        onSuccess(downloadURL);
+      } catch (error) {
+        onError(error);
+      }
+    }
+  );
 };
 
 function Consult() {
@@ -122,6 +149,7 @@ function Consult() {
   const handleFormCreate = async (values: any) => {
     try {
       const token = localStorage.getItem("token");
+      const url = values.url?.[0]?.response || values.url?.[0]?.url;
 
       if (!selectedConsult) {
         toast.error("No consult selected!");
@@ -135,7 +163,8 @@ function Consult() {
         description: values.description,
         mainCost: values.mainCost,
         subCost: values.subCost,
-        vat: values.vat
+        vat: values.vat,
+        url: url
       };
 
       const response = await fetch("http://localhost:8080/api/quotation", {
@@ -610,6 +639,23 @@ function Consult() {
           >
             <Input type="number" />
           </Form.Item>
+          <Form.Item
+        label="Upload PDF"
+        name="url"
+        valuePropName="fileList"
+        getValueFromEvent={normFile}
+        rules={[{ required: true, message: "Please upload a file!" }]}
+      >
+        <Upload
+          accept=".pdf"
+          customRequest={({ file, onSuccess, onError }) =>
+            handleUpload(file, onSuccess, onError)
+          }
+          listType="text"
+        >
+          <Button icon={<UploadOutlined />}>Upload PDF</Button>
+        </Upload>
+      </Form.Item>
         </Form>
       </Modal>
 

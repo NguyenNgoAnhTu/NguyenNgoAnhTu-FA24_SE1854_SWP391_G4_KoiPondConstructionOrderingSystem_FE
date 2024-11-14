@@ -9,6 +9,9 @@ function ConstructionInfomation() {
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [showDocumentModal, setShowDocumentModal] = useState(false);
     const [visibleCount, setVisibleCount] = useState(6);
+    const [showDesignModal, setShowDesignModal] = useState(false);
+    const [designs, setDesigns] = useState([]);
+    
 
     const fetchData = async () => {
         try {
@@ -90,6 +93,32 @@ function ConstructionInfomation() {
       const handleShowMore = () => {
         setVisibleCount(prev => prev + 6);
       };
+          // Fetch designs by design profile ID
+  const handleViewDesign = async (designProfileId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/design/getDesignByDesignProfile/${designProfileId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      setDesigns(data);
+      setShowDesignModal(true);
+    } catch (err) {
+      alert(err);
+    }
+  };
 
       useEffect(() => {
         fetchData();
@@ -144,6 +173,18 @@ function ConstructionInfomation() {
               >
                 View document
               </Button>
+              <Button
+            type="primary"
+            danger
+                style={{
+                  marginRight: "3px",
+                  backgroundColor: "LimeGreen",
+                  color: "white",
+                }}
+            onClick={() => handleViewDesign(designProfileId)}
+          >
+            View Designs
+          </Button>
             </>
           ),
         },
@@ -214,6 +255,23 @@ function ConstructionInfomation() {
           key: "confirmConstructorName",
         },
       ];
+      const columnsDesign = [
+        {
+          title: "Design",
+          dataIndex: "design",
+          key: "design",
+        },
+        {
+          title: "DesignStatus",
+          dataIndex: "designStatus",
+          key: "designStatus",
+        },
+        {
+          title: "Description",
+          dataIndex: "description",
+          key: "description",
+        },
+      ];
 
       return (
         <div className="container mx-auto mt-8">
@@ -253,6 +311,12 @@ function ConstructionInfomation() {
                     className="text-white bg-green hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-4 py-2"
                   >
                     View Document
+                  </button>
+                  <button
+                    onClick={() => handleViewDesign(data.designProfileId)}
+                    className="text-white bg-green hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-4 py-2"
+                  >
+                    View Designs
                   </button>
                 </div>
               </div>
@@ -315,6 +379,31 @@ function ConstructionInfomation() {
               <Table 
                 dataSource={datasDocument} 
                 columns={columnsDocument} 
+                scroll={{ x: 600, y: 400 }}
+                className="min-w-full"
+                rowClassName="hover:bg-gray-50 transition duration-200"
+              />
+            </div>
+          </Modal>
+
+          <Modal
+            width={1200}
+            open={showDesignModal}
+            title={
+              <h3 className="text-lg font-semibold">
+                Designs
+              </h3>
+            }
+            onCancel={() => setShowDesignModal(false)}
+            onOk={() => setShowDesignModal(false)}
+            okButtonProps={{
+              className: "bg-blue-600 hover:bg-blue-700"
+            }}
+          >
+            <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md">
+              <Table 
+                dataSource={designs} 
+                columns={columnsDesign} 
                 scroll={{ x: 600, y: 400 }}
                 className="min-w-full"
                 rowClassName="hover:bg-gray-50 transition duration-200"
