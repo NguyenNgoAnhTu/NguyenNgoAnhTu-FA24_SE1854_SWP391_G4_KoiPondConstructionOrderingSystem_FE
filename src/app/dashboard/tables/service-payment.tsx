@@ -82,7 +82,6 @@ function ServicePaymentTable() {
 
     const handleOk = async () => {
         if (!selectedService) return;
-
         setLoadingUpdate(true);
         try {
             const response = await fetch(

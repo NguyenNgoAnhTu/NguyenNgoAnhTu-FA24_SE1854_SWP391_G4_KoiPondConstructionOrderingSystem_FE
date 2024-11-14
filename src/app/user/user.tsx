@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
 import "./user.css";
 import { message } from 'antd';
@@ -81,6 +80,7 @@ const User = () => {
     description?: string;
     isComfirmed: boolean;
   }
+
   interface Request {
     id: string;
     description: string;
@@ -191,7 +191,7 @@ const User = () => {
   const [constructionRequests, setConstructionRequests] = useState<Request[]>([]);
 
   const [quotationConstructions, setQuotationConstructions] = useState<GetAllQuotationResponse[]>([]);
-  const [showQuotations, setShowQuotations] = useState(false)
+  // const [showQuotations, setShowQuotations] = useState(false)
 
   const [showServiceMenu, setShowServiceMenu] = useState(false);
   const [activeServiceTab, setActiveServiceTab] = useState<string | null>(null);
@@ -345,7 +345,7 @@ const User = () => {
         }
 
         // Fetch construction info
-        if (showConstructionInfo) {
+        if (showConstructionRequest) {
           const constructionResponse = await fetch(
             `http://localhost:8080/api/request/customer/${customerId}`,
             {
@@ -390,7 +390,7 @@ const User = () => {
     };
 
     fetchData();
-  }, [showServiceRequests, showServiceQuotation, showServiceProgress, showConstructionInfo, showConstructionQuotation]);
+  }, [showServiceRequests, showServiceQuotation, showServiceProgress, showConstructionRequest, showConstructionQuotation]);
 
 
 
