@@ -1,4 +1,5 @@
-import { Button, Form, Input, Modal, Table, Popconfirm, Space } from "antd";
+import { Button, Form, Input, Modal, Table, Popconfirm } from "antd";
+import { EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -320,21 +321,16 @@ function Consult() {
       key: "requestDetailId",
     },
     {
-      title: "Customer ID",
+      title: "Customer Info",
       dataIndex: "customerId",
       key: "customerId",
-      render: (text: any, record: ConsultType) => (
-        <Space>
-          {record.customers && Array.isArray(record.customers) && record.customers.length > 0
-            ? record.customers[1].customerId
-            : "N/A"}
+      render: (text: any, record: ConsultType) => (       
           <Button 
             type="link" 
             onClick={() => fetchCustomerDetails(record.customers[1].customerId)}
+            icon={<EyeOutlined />}
           >
-            View Detail
           </Button>
-        </Space>
       ),
     },
     {
