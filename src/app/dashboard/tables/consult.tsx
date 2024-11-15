@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Table, Popconfirm,Upload } from "antd";
+import { Button, Form, Input, Modal, Table, Popconfirm,Upload,Select } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
@@ -603,8 +603,8 @@ function Consult() {
           >
             <Input type="number" />
           </Form.Item>
-
-          <Form.Item
+{/* form cũ */}
+          {/* <Form.Item
             name="subCost"
             label="Sub Cost"
             rules={[
@@ -620,7 +620,72 @@ function Consult() {
             ]}
           >
             <Input type="number" />
-          </Form.Item>
+          </Form.Item> */}
+
+          {/* form text cho sub cost rate */}
+          {/* <Form.Item
+  name="subRate"
+  label="Sub Rate (%)"
+  rules={[
+    { required: true, message: "Please input the sub rate!" },
+    ({ }) => ({
+      validator(_, value) {
+        if (value > 0 && value <= 100) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error("Sub Rate must be between 0 and 100!"));
+      },
+    }),
+  ]}
+>
+  <Input 
+    type="number" 
+    onChange={(e) => {
+      const mainCost = quotationForm.getFieldValue('mainCost');
+      const subRate = parseFloat(e.target.value);
+      if (mainCost && subRate) {
+        const subCost = (mainCost * subRate) / 100;
+        quotationForm.setFieldsValue({ subCost });
+      }
+    }}
+  />
+</Form.Item>
+
+<Form.Item
+  name="subCost"
+  label="Sub Cost"
+>
+  <Input type="number" disabled />
+</Form.Item> */}
+
+
+{/* combo box */}
+<Form.Item
+  name="subRate"
+  label="Sub Rate (%)"
+  rules={[{ required: true, message: "Please select the sub rate!" }]}
+>
+  <Select
+    onChange={(value) => {
+      const mainCost = quotationForm.getFieldValue('mainCost');
+      if (mainCost) {
+        const subCost = (mainCost * value) / 100;
+        quotationForm.setFieldsValue({ subCost });
+      }
+    }}
+  >
+    <Select.Option value={10}>10%</Select.Option>
+    <Select.Option value={20}>20%</Select.Option>
+    <Select.Option value={30}>30%</Select.Option>
+  </Select>
+</Form.Item>
+
+<Form.Item
+  name="subCost"
+  label="Sub Cost"
+>
+  <Input type="number" disabled />
+</Form.Item>
 
           <Form.Item
             name="vat"
