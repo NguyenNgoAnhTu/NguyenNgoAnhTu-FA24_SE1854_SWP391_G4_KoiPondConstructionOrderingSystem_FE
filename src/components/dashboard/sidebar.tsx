@@ -31,7 +31,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   );
 
   const userRole = localStorage.getItem("role");
-  
+
   const hasAccess = (allowedRoles: string[]): boolean => {
     return allowedRoles.includes(userRole || "");
   };
@@ -160,7 +160,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 }}
               </SidebarLinkGroup>
               {/* <!-- Menu Item Dashboard --> */}
-                
+
               {/* <!-- Menu Item Forms --> */}
               <SidebarLinkGroup
                 activeCondition={
@@ -172,7 +172,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <React.Fragment>
                       <NavLink
                         to="#"
-                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname === "/forms" || pathname.includes("forms")
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white ${pathname === "/forms" || pathname.includes("forms")
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -181,38 +181,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
+                        <div className="flex items-center gap-2.5 min-w-max">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="fill-current"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 576 512"
+                            fill="none"
+                          >
+                            <path d="M413.5 237.5c-28.2 4.8-58.2-3.6-80-25.4l-38.1-38.1C280.4 159 272 138.8 272 117.6l0-12.1L192.3 62c-5.3-2.9-8.6-8.6-8.3-14.7s3.9-11.5 9.5-14l47.2-21C259.1 4.2 279 0 299.2 0l18.1 0c36.7 0 72 14 98.7 39.1l44.6 42c24.2 22.8 33.2 55.7 26.6 86L503 183l8-8c9.4-9.4 24.6-9.4 33.9 0l24 24c9.4 9.4 9.4 24.6 0 33.9l-88 88c-9.4 9.4-24.6 9.4-33.9 0l-24-24c-9.4-9.4-9.4-24.6 0-33.9l8-8-17.5-17.5zM27.4 377.1L260.9 182.6c3.5 4.9 7.5 9.6 11.8 14l38.1 38.1c6 6 12.4 11.2 19.2 15.7L134.9 484.6c-14.5 17.4-36 27.4-58.6 27.4C34.1 512 0 477.8 0 435.7c0-22.6 10.1-44.1 27.4-58.6z" />
+                          </svg>
+                          Construction
+                        </div>
+
                         <svg
-                          className="fill-current"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 18 18"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M1.43425 7.5093H2.278C2.44675 7.5093 2.55925 7.3968 2.58737 7.31243L2.98112 6.32805H5.90612L6.27175 7.31243C6.328 7.48118 6.46862 7.5093 6.58112 7.5093H7.453C7.76237 7.48118 7.87487 7.25618 7.76237 7.03118L5.428 1.4343C5.37175 1.26555 5.3155 1.23743 5.14675 1.23743H3.88112C3.76862 1.23743 3.59987 1.29368 3.57175 1.4343L1.153 7.08743C1.0405 7.2843 1.20925 7.5093 1.43425 7.5093ZM4.47175 2.98118L5.3155 5.17493H3.59987L4.47175 2.98118Z"
-                            fill=""
-                          />
-                          <path
-                            d="M10.1249 2.5031H16.8749C17.2124 2.5031 17.5218 2.22185 17.5218 1.85623C17.5218 1.4906 17.2405 1.20935 16.8749 1.20935H10.1249C9.7874 1.20935 9.47803 1.4906 9.47803 1.85623C9.47803 2.22185 9.75928 2.5031 10.1249 2.5031Z"
-                            fill=""
-                          />
-                          <path
-                            d="M16.8749 6.21558H10.1249C9.7874 6.21558 9.47803 6.49683 9.47803 6.86245C9.47803 7.22808 9.75928 7.50933 10.1249 7.50933H16.8749C17.2124 7.50933 17.5218 7.22808 17.5218 6.86245C17.5218 6.49683 17.2124 6.21558 16.8749 6.21558Z"
-                            fill=""
-                          />
-                          <path
-                            d="M16.875 11.1656H1.77187C1.43438 11.1656 1.125 11.4469 1.125 11.8125C1.125 12.1781 1.40625 12.4594 1.77187 12.4594H16.875C17.2125 12.4594 17.5219 12.1781 17.5219 11.8125C17.5219 11.4469 17.2125 11.1656 16.875 11.1656Z"
-                            fill=""
-                          />
-                          <path
-                            d="M16.875 16.1156H1.77187C1.43438 16.1156 1.125 16.3969 1.125 16.7625C1.125 17.1281 1.40625 17.4094 1.77187 17.4094H16.875C17.2125 17.4094 17.5219 17.1281 17.5219 16.7625C17.5219 16.3969 17.2125 16.1156 16.875 16.1156Z"
-                            fill="white"
-                          />
-                        </svg>
-                        Forms
-                        <svg
-                          className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                          className={`absolute right-0 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
                             }`}
                           width="20"
                           height="20"
@@ -234,57 +218,66 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                          {/* <li>
-                            <NavLink
-                              to="/admin/forms/form-service-progress"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white "
-                            >
-                              Form Service Progress
-                            </NavLink>
-                          </li> */}
-                          <li>
-                            <NavLink
-                              to="/admin/forms/design-profile-form"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Form Design Profile
-                            </NavLink>
-                          </li>
-                          {/* <li>
-                            <NavLink
-                              to="/admin/forms/quotation-form"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white "
-                            >
-                              Form Quotation
-                            </NavLink>
-                          </li> */}
-                          <li>
-                            <NavLink
-                              to="/admin/forms/form-consult"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Form Consult
-                            </NavLink>
-                          </li>
-
-                          {/* <!-- nơi viết link form vào siderbar --> */}
-                          <li>
-                            <NavLink
-                              to="/admin/forms/form-layout"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Form Layout
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to="/admin/forms/pondDesignTemplate"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
-                            >
-                              Form pondDesignTemplate
-                            </NavLink>
-                          </li>
-                          {/* <!-- hết --> */}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSTRUCTOR" || userRole === "CONSULTANT") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-construction-history"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Construction history
+                              </NavLink>
+                            </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-quotation"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                              >
+                                Table Quotation
+                              </NavLink>
+                            </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "DESIGNER") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/design-profile"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Design Profile
+                              </NavLink>
+                            </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "DESIGNER") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/design-profile-manager"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Design Profile Manager
+                              </NavLink>
+                            </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-consult"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Consult
+                              </NavLink>
+                            </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-requestDetail"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Request Detail
+                              </NavLink>
+                            </li>
+                          )}
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}
@@ -305,7 +298,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <React.Fragment>
                       <NavLink
                         to="#"
-                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname === "/tables" || pathname.includes("tables")
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname === "/maintenace" || pathname.includes("maintenace")
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -317,31 +310,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         <svg
                           className="fill-current"
                           width="18"
-                          height="19"
-                          viewBox="0 0 18 19"
+                          height="18"
+                          viewBox="0 0 512 512"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
-                          <g clipPath="url(#clip0_130_9756)">
-                            <path
-                              d="M15.7501 0.55835H2.2501C1.29385 0.55835 0.506348 1.34585 0.506348 2.3021V15.8021C0.506348 16.7584 1.29385 17.574 2.27822 17.574H15.7782C16.7345 17.574 17.5501 16.7865 17.5501 15.8021V2.3021C17.522 1.34585 16.7063 0.55835 15.7501 0.55835ZM6.69385 10.599V6.4646H11.3063V10.5709H6.69385V10.599ZM11.3063 11.8646V16.3083H6.69385V11.8646H11.3063ZM1.77197 6.4646H5.45635V10.5709H1.77197V6.4646ZM12.572 6.4646H16.2563V10.5709H12.572V6.4646ZM2.2501 1.82397H15.7501C16.0313 1.82397 16.2563 2.04897 16.2563 2.33022V5.2271H1.77197V2.3021C1.77197 2.02085 1.96885 1.82397 2.2501 1.82397ZM1.77197 15.8021V11.8646H5.45635V16.3083H2.2501C1.96885 16.3083 1.77197 16.0834 1.77197 15.8021ZM15.7501 16.3083H12.572V11.8646H16.2563V15.8021C16.2563 16.0834 16.0313 16.3083 15.7501 16.3083Z"
-                              fill=""
-                            />
-                          </g>
-                          <defs>
-                            <clipPath id="clip0_130_9756">
-                              <rect
-                                width="18"
-                                height="18"
-                                fill="white"
-                                transform="translate(0 0.052124)"
-                              />
-                            </clipPath>
-                          </defs>
+                          <path
+                            d="M78.6 5C69.1-2.4 55.6-1.5 47 7L7 47c-8.5 8.5-9.4 22-2.1 31.6l80 104c4.5 5.9 11.6 9.4 19 9.4l54.1 0 109 109c-14.7 29-10 65.4 14.3 89.6l112 112c12.5 12.5 32.8 12.5 45.3 0l64-64c12.5-12.5 12.5-32.8 0-45.3l-112-112c-24.2-24.2-60.6-29-89.6-14.3l-109-109 0-54.1c0-7.5-3.5-14.5-9.4-19L78.6 5zM19.9 396.1C7.2 408.8 0 426.1 0 444.1C0 481.6 30.4 512 67.9 512c18 0 35.3-7.2 48-19.9L233.7 374.3c-7.8-20.9-9-43.6-3.6-65.1l-61.7-61.7L19.9 396.1zM512 144c0-10.5-1.1-20.7-3.2-30.5c-2.4-11.2-16.1-14.1-24.2-6l-63.9 63.9c-3 3-7.1 4.7-11.3 4.7L352 176c-8.8 0-16-7.2-16-16l0-57.4c0-4.2 1.7-8.3 4.7-11.3l63.9-63.9c8.1-8.1 5.2-21.8-6-24.2C388.7 1.1 378.5 0 368 0C288.5 0 224 64.5 224 144l0 .8 85.3 85.3c36-9.1 75.8 .5 104 28.7L429 274.5c49-23 83-72.8 83-130.5zM56 432a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z"
+                            fill=""
+                          />
                         </svg>
-                        Tables
+
+                        Maintenance
                         <svg
-                          className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                          className={`absolute right-0 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
                             }`}
                           width="20"
                           height="20"
@@ -363,150 +345,88 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                        {userRole === "MANAGER" && (
-                        <li>
-                            <NavLink
-                              to="/admin/tables/manager-user"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
-                            >
-                             Manager User
-                            </NavLink>
-                          </li>
-                        )}
-                      
-                          {(userRole === "MANAGER" || userRole === "STAFF") && (
-                        <li>
-                            <NavLink
-                              to="/admin/tables/table-service-category"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
-                            >
-                              Table Service Category
-                            </NavLink>
-                          </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF") && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-service-requests"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Service Request
-                            </NavLink>
-                          </li>
+                          {userRole === "MANAGER" && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/manager-user"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                              >
+                                Manager User
+                              </NavLink>
+                            </li>
                           )}
 
                           {(userRole === "MANAGER" || userRole === "STAFF") && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-service-quotation"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Service Quotation
-                            </NavLink>
-                          </li>
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-service-category"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                              >
+                                Table Service Category
+                              </NavLink>
+                            </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-service-requests"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Service Request
+                              </NavLink>
+                            </li>
                           )}
 
                           {(userRole === "MANAGER" || userRole === "STAFF") && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-service-details"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Service Detail
-                            </NavLink>
-                          </li>
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-service-quotation"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Service Quotation
+                              </NavLink>
+                            </li>
                           )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="MAINTENANCE")  && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-service-progress"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Service Progress
-                            </NavLink>
-                          </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="MAINTENANCE")  && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-service-payment"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Service Payment
-                            </NavLink>
-                          </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="MAINTENANCE")  && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-service-feedback"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Service Feedback
-                            </NavLink>
-                          </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="CONSTRUCTOR" || userRole==="CONSULTANT")  && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-construction-history"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Construction history
-                            </NavLink>
-                          </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="CONSULTANT")  && (
-                          <li>
-                            <NavLink
 
-                              to="/admin/tables/table-quotation"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
-
-                            >
-                              Table Quotation
-                            </NavLink>
-                          </li>
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-service-details"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Service Detail
+                              </NavLink>
+                            </li>
                           )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="DESIGNER")   && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/design-profile"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Design Profile
-                            </NavLink>
-                          </li>
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "MAINTENANCE") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-service-progress"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Service Progress
+                              </NavLink>
+                            </li>
                           )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="DESIGNER")     && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/design-profile-manager"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Design Profile Manager
-                            </NavLink>
-                          </li>
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "MAINTENANCE") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-service-payment"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Service Payment
+                              </NavLink>
+                            </li>
                           )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole==="CONSULTANT")         && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-consult"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Consult
-                            </NavLink>
-                          </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF")  && (
-                          <li>
-                            <NavLink
-                              to="/admin/tables/table-requestDetail"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                            >
-                              Table Request Detail
-                            </NavLink>
-                          </li>
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "MAINTENANCE") && (
+                            <li>
+                              <NavLink
+                                to="/admin/tables/table-service-feedback"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Table Service Feedback
+                              </NavLink>
+                            </li>
                           )}
                         </ul>
                       </div>
