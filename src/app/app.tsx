@@ -16,7 +16,7 @@ import User from "app/user/user";
 import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
-import PondDesignTemplateForm from "app/dashboard/forms/pondDesignTemplate";
+// import PondDesignTemplateForm from "app/dashboard/forms/pondDesignTemplate";
 
 import ConstructionInfomation from "app/user/construction-infomation.tsx";
 import ConsultForm from "app/dashboard/forms/consult.tsx";
@@ -24,6 +24,8 @@ import ConsultForm from "app/dashboard/forms/consult.tsx";
 import Consult from "app/dashboard/tables/consult";
 // import Quotation from "./dashboard/forms/quotation";
 import RequestDetailTable from "app/dashboard/tables/request-detail";
+
+import PondDesignTemplateTable from "app/dashboard/tables/pondDesignTemplate";
 
 // import DesignProfileForm from "app/dashboard/forms/design-profile.tsx"
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
@@ -90,10 +92,10 @@ const routesAdmin = [
     path: "/admin/forms/design-profile-form",
     element: <DesignProfileForm />,
   },
-  {
-    path: "/admin/forms/pondDesignTemplate",
-    element: <PondDesignTemplateForm />,
-  },
+  // {
+  //   path: "/admin/forms/pondDesignTemplate",
+  //   element: <PondDesignTemplateForm />,
+  // },
 
 
   {
@@ -128,6 +130,10 @@ const routesAdmin = [
   {
     path: "/admin/tables/table-requestDetail",
     element: <RequestDetailTable />,
+  },
+  {
+    path: "/admin/tables/table-pondDesignTemplate",
+    element: <PondDesignTemplateTable />,
   },
   {
     path: "/admin/tables/table-quotation",
