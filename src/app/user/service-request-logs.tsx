@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 
-interface RequestLog {
-  requestLogId: string;
-  request: {
-    id: string;
+interface ServiceRequestLog {
+  serviceRequestLogId: string;
+  serviceRequest: {
+    serviceRequestId: string;
     customer: {
       name: string;
       email: string;
@@ -17,31 +17,30 @@ interface RequestLog {
   updateBy: string;
 }
 
-interface RequestLogProps {
+interface ServiceRequestLogsProps {
   isOpen: boolean;
   onClose: () => void;
-  requestId: string;
+  serviceRequestId: string;
 }
 
-const RequestLog: React.FC<RequestLogProps> = ({
+const ServiceRequestLogs: React.FC<ServiceRequestLogsProps> = ({
   isOpen,
   onClose,
-  requestId
+  serviceRequestId
 }) => {
-  const [logs, setLogs] = useState<RequestLog[]>([]);
+  const [logs, setLogs] = useState<ServiceRequestLog[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchLogs = async () => {
-      if (!requestId) return;
+      if (!serviceRequestId) return;
       
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
         const response = await fetch(
-          `http://localhost:8080/api/request_log/${requestId}`,
-          {
-            method: 'GET',
+          `http://localhost:8080/api/service-requests-logs/${serviceRequestId}`,
+          { method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -66,16 +65,15 @@ const RequestLog: React.FC<RequestLogProps> = ({
     if (isOpen) {
       fetchLogs();
     }
-  }, [requestId, isOpen]);
+  }, [serviceRequestId, isOpen]);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
       <div className="bg-white rounded-xl p-6 max-w-3xl w-full max-h-[70vh] overflow-y-auto shadow-2xl transform transition-all">
-        {/* Header */}
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">Request Logs</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Service Request Logs</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
@@ -86,7 +84,6 @@ const RequestLog: React.FC<RequestLogProps> = ({
           </button>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green"></div>
@@ -97,10 +94,9 @@ const RequestLog: React.FC<RequestLogProps> = ({
             {logs.length > 0 ? (
               logs.map((log) => (
                 <div
-                  key={log.requestLogId}
+                  key={log.serviceRequestLogId}
                   className="border border-gray-200 rounded-lg p-5 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm"
                 >
-                  {/* Status and Date */}
                   <div className="flex justify-between items-start mb-3">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium bg-green text-black`}>
                       {log.status}
@@ -114,12 +110,10 @@ const RequestLog: React.FC<RequestLogProps> = ({
                     </span>
                   </div>
 
-                  {/* Description */}
                   <p className="text-gray-700 text-base mb-3 leading-relaxed">
                     {log.description}
                   </p>
 
-                  {/* Updated By */}
                   <div className="flex items-center text-sm text-gray-500 mt-2 pt-2 border-t border-gray-100">
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
@@ -145,4 +139,4 @@ const RequestLog: React.FC<RequestLogProps> = ({
   );
 };
 
-export default RequestLog;
+export default ServiceRequestLogs;

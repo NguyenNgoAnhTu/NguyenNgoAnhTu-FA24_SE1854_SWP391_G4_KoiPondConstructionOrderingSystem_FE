@@ -13,6 +13,7 @@ interface FormQuotationProps {
       cost: number;
     };
     description: string;
+    cost: number;
   };
 }
 
@@ -24,8 +25,8 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
     description: "",
     note: "",
     cost: serviceRequest.serviceCategory.cost,
-    totalCost: 0,
-    vat: 0,
+    totalCost: "",
+    vat: 10,
   });
   const [errors, setErrors] = useState({
     description: '',
@@ -67,27 +68,38 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
     return '';
   };
 
+  const calculateTotalCost = (cost: number, vat: number): number => {
+    return Number((cost * (1 + vat/100)).toFixed(2));
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     
-    const updatedFormData = {
-      ...formData,
-      [name]: value,
-      totalCost: name === 'cost' ? Number(value) * (1 + formData.vat/100) : 
-                name === 'vat' ? formData.cost * (1 + Number(value)/100) : 
-                formData.totalCost
-    };
+    if (name === 'vat') return;
+    
+    let updatedFormData;
+    if (name === 'cost') {
+      const newCost = Number(value);
+      updatedFormData = {
+        ...formData,
+        cost: newCost,
+        totalCost: calculateTotalCost(newCost, formData.vat).toString()
+      };
+    } else {
+      updatedFormData = {
+        ...formData,
+        [name]: value
+      };
+    }
+    
     setFormData(updatedFormData);
 
     let fieldError = '';
     switch (name) {
       case 'description':
         fieldError = validateDescription(value);
-        break;
-      case 'vat':
-        fieldError = validateVAT(Number(value));
         break;
       case 'cost':
         fieldError = validateCost(Number(value));
@@ -125,6 +137,16 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
   
     try {
       const token = localStorage.getItem('token');
+      const requestData = {
+        serviceRequestId: formData.requestID,
+        description: formData.description,
+        cost: Number(formData.cost),
+        totalCost: Number(formData.totalCost),
+        vat: Number(formData.vat),
+      };
+
+      console.log('Sending data:', requestData);
+
       const response = await fetch(
         'http://localhost:8080/api/service-quotations',
         {
@@ -133,13 +155,7 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            serviceRequestId: formData.requestID,
-            description: formData.description,
-            cost: Number(formData.cost),
-            totalCost: Number(formData.totalCost),
-            vat: Number(formData.vat),
-          }),
+          body: JSON.stringify(requestData),
         }
       );
   
@@ -211,12 +227,12 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
             <input
               type="number"
               name="cost"
-              value={formData.cost}
+              value={formData.cost.toString()}
               onChange={handleChange}
               className={`w-full p-2 border rounded ${
                 errors.cost ? 'border-red-500' : 'border-gray-300'
               }`}
-              readOnly
+              required
             />
             {errors.cost && (
               <p className="text-red-500 text-sm mt-1">{errors.cost}</p>
@@ -228,16 +244,10 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
             <input
               type="number"
               name="vat"
-              value={formData.vat}
-              onChange={handleChange}
-              className={`w-full p-2 border rounded ${
-                errors.vat ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
+              value={formData.vat.toString()}
+              readOnly
+              className="w-full p-2 border rounded bg-gray-100"
             />
-            {errors.vat && (
-              <p className="text-red-500 text-sm mt-1">{errors.vat}</p>
-            )}
           </div>
 
           <div className="mb-4">
@@ -245,7 +255,7 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
             <input
               type="number"
               name="totalCost"
-              value={formData.totalCost}
+              value={formData.totalCost.toString()}
               readOnly
               className="w-full p-2 border rounded bg-gray-100"
             />
