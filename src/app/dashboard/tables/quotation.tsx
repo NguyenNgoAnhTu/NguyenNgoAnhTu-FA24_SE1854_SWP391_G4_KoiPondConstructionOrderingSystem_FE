@@ -6,6 +6,8 @@ import { UploadOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "../../../config/firebase";
+import { EyeOutlined } from '@ant-design/icons';
+
 
 type QuotationType = {
   quotationId: number;
@@ -19,6 +21,13 @@ type QuotationType = {
   createDate: string; // Có thể đổi thành Date nếu cần
   isConfirm: boolean; // Thêm trường isConfirm
 };
+type CustomerType = {
+  customerId: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  // Add other customer fields as needed
+};
 
 function Quotation() {
   const navigate = useNavigate();
@@ -31,6 +40,8 @@ function Quotation() {
   const [fileUrl, setFileUrl] = useState<string>("");
   const [profileForm] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([]);
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
+const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
 
   const fetchData = async () => {
     try {
@@ -49,6 +60,26 @@ function Quotation() {
       setDatas(data);
     } catch (err) {
       alert(err);
+    }
+  };
+  const fetchCustomerDetail = async (customerId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/customer/getCustomerById/${customerId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch customer details');
+      }
+  
+      const data = await response.json();
+      setCustomerDetail(data);
+      setShowCustomerModal(true);
+    } catch (error) {
+      toast.error('Error fetching customer details');
     }
   };
 
@@ -279,9 +310,21 @@ function Quotation() {
       key: "consultId",
     },
     {
-      title: "CustomerId",
-      dataIndex: "customerId",
-      key: "customerId",
+      // title: "CustomerId",
+      // dataIndex: "customerId",
+      // key: "customerId",
+      title: "Customer",
+    dataIndex: "customerId",
+    key: "customerId",
+    render: (customerId: number) => (
+      <Button 
+        type="link" 
+        onClick={() => fetchCustomerDetail(customerId)}
+      >
+        {<EyeOutlined />}
+      </Button>
+    ),
+      
     },
     {
       title: "MainCost",
@@ -363,9 +406,39 @@ function Quotation() {
   ];
 
   return (
-    <div>
-      <Table dataSource={datas} columns={columnsQuotation} />
-
+    
+        <div style={{ margin: '20px', overflow: 'hidden' }}>
+    <div style={{ overflowX: 'auto' }}>
+      <Table 
+        dataSource={datas} 
+        columns={columnsQuotation}
+        scroll={{ x: 1300 }} // Điều chỉnh giá trị này tùy theo tổng width của các cột
+        pagination={{
+          pageSize: 10,
+          position: ['bottomCenter']
+        }}
+      />
+    </div>
+      <Modal
+      title="Customer Details"
+      open={showCustomerModal}
+      onCancel={() => setShowCustomerModal(false)}
+      footer={[
+        <Button key="close" onClick={() => setShowCustomerModal(false)}>
+          Close
+        </Button>
+      ]}
+    >
+      {customerDetail && (
+        <div style={{ padding: '10px' }}>
+          <p><strong>Customer ID:</strong> {customerDetail.customerId}</p>
+          <p><strong>Name:</strong> {customerDetail.name}</p>
+          <p><strong>Email:</strong> {customerDetail.email}</p>
+          <p><strong>Phone Number:</strong> {customerDetail.phoneNumber}</p>
+          
+        </div>
+      )}
+    </Modal>
       <Modal
         title="Update Quotation"
         visible={showModal}

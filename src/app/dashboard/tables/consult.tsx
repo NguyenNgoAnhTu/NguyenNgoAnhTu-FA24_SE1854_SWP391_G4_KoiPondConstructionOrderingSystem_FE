@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../../../config/firebase";
+
 // Add new type for Customer
 type CustomerType = {
   customerId: number;
@@ -65,6 +66,7 @@ function Consult() {
 
   const [customerData, setCustomerData] = useState<CustomerType | null>(null);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
+  const [customerName, setCustomerName] = useState<string>("");
   const navigate = useNavigate();
   const fetchConsultData = async () => {
     try {
@@ -88,6 +90,29 @@ function Consult() {
     }
   };
 
+  const fetchCustomerName = async (customerId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/customer`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch customer details');
+      }
+  
+      const customers = await response.json();
+      const customer = customers.find((c: CustomerType) => c.customerId === customerId);
+      
+      if (customer) {
+        setCustomerName(customer.name);
+      }
+    } catch (error) {
+      toast.error('Error fetching customer details');
+    }
+  };
 
   // Add new function to fetch customer details
   const fetchCustomerDetails = async (customerId: number) => {
@@ -146,6 +171,9 @@ function Consult() {
   //       vat: values.vat
 
   //     };
+ 
+  
+  
   const handleFormCreate = async (values: any) => {
     try {
       const token = localStorage.getItem("token");
@@ -163,7 +191,7 @@ function Consult() {
         description: values.description,
         mainCost: values.mainCost,
         subCost: values.subCost,
-        vat: values.vat,
+        vat: 10,
         url: url
       };
 
@@ -409,13 +437,15 @@ function Consult() {
                 setSelectedConsult(record);
                 setSelectedConsultId(consultId);
                 setSelectedCustomerId(customerId);
+                fetchCustomerName(customerId);
 
                 quotationForm.setFieldsValue({
                   customerId: customerId,
                   description: '',
                   mainCost: 0,
                   subCost: 0,
-                  vat: 0
+                  vat: 10,
+                 
                 });
 
                 setShowQuotationModal(true);
@@ -522,6 +552,7 @@ function Consult() {
         )}
       </Modal>
 
+        {/* create quotation */}
       <Modal
         onCancel={() => setShowQuotationModal(false)} // Đóng modal khi hủy
         onOk={() => quotationForm.submit()}// Gửi form khi nhấn OK
@@ -533,42 +564,11 @@ function Consult() {
           onFinish={handleFormCreate} // Xử lý khi form được submit
           labelCol={{ span: 24 }} // Cài đặt chiều rộng label
         >
-          {/* <Form.Item
-            name="customerId"
-            label="CustomerId"
-            rules={[{ required: true, message: "Please input the CustomerId!" }]}
-            >
-              <Input />
-          </Form.Item>
-    
           <Form.Item
-            name="description"
-            label="Description"
-            rules={[{ required: true, message: "Please input the description!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="mainCost"
-            label="Main Cost"
-            rules={[{ required: true, message: "Please input the main cost!" }]}
-          >
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item
-            name="subCost"
-            label="Sub Cost"
-            rules={[{ required: true, message: "Please input the sub cost!" }]}
-          >
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item
-            name="vat"
-            label="VAT"
-            rules={[{ required: true, message: "Please input the VAT!" }]}
-          >
-            <Input type="number" />
-          </Form.Item> */}
+        label="Customer"
+      >
+        <Input value={customerName} disabled />
+      </Form.Item>
 
           <Form.Item
             name="customerId"
@@ -625,19 +625,19 @@ function Consult() {
           <Form.Item
             name="vat"
             label="VAT"
-            rules={[
-              { required: true, message: "Please input the VAT!" },
-              ({ }) => ({
-                validator(_, value) {
-                  if (value >= 0 && value <= 10) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error("VAT must be greater than 0 and less than or equal to 10!"));
-                },
-              }),
-            ]}
+            // rules={[
+            //   { required: true, message: "Please input the VAT!" },
+            //   ({ }) => ({
+            //     validator(_, value) {
+            //       if (value >= 0 && value <= 10) {
+            //         return Promise.resolve();
+            //       }
+            //       return Promise.reject(new Error("VAT must be greater than 0 and less than or equal to 10!"));
+            //     },
+            //   }),
+            // ]}
           >
-            <Input type="number" />
+            <Input type="number" readOnly />
           </Form.Item>
           <Form.Item
         label="Upload PDF"
