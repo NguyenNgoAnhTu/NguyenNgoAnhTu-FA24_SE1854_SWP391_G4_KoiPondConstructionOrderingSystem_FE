@@ -546,7 +546,7 @@ function RequestDetailTable() {
           maxWidth: "1200px", // Đảm bảo modal không quá lớn so với màn hình
           top: 20, // Điều chỉnh vị trí dọc nếu cần
         }}
-        bodyStyle={{ overflowX: "auto" }} // Thêm thanh cuộn ngang nếu cần
+        styles={{ body: { overflowX: "auto" } }}  // Updated from bodyStyle to styles
       >
         <Table dataSource={pondDesignTemplate} columns={columnsPondDesignTemplate} scroll={{ x: true }}></Table>
       </Modal>
