@@ -160,11 +160,43 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 }}
               </SidebarLinkGroup>
               {/* <!-- Menu Item Dashboard --> */}
-
+              {hasAccess(["MANAGER", "STAFF"]) && (
+                <SidebarLinkGroup
+                  activeCondition={
+                    pathname === "/user-management" || pathname.includes("user-management")
+                  }
+                >
+                  {() => {
+                    return (
+                      <NavLink
+                        to="/admin/user-management"
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname.includes(
+                          "dashboard"
+                        )}`}
+                      >
+                        <svg
+                          className="fill-current"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 448 512"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464l349.5 0c-8.9-63.3-63.3-112-129-112l-91.4 0c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3z"
+                            fill=""
+                          />
+                        </svg>
+                        User Management
+                      </NavLink>
+                    );
+                  }}
+                </SidebarLinkGroup>
+              )}
               {/* <!-- Menu Item Forms --> */}
               <SidebarLinkGroup
                 activeCondition={
-                  pathname === "/forms" || pathname.includes("forms")
+                  pathname === "/constructions" || pathname.includes("constructions")
                 }
               >
                 {(handleClick, open) => {
@@ -172,7 +204,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <React.Fragment>
                       <NavLink
                         to="#"
-                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white ${pathname === "/forms" || pathname.includes("forms")
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white ${pathname === "/constructions" || pathname.includes("constructions")
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -218,63 +250,63 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                            <li>
+                              <NavLink
+                                to="/admin/constructions/consult"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Consult
+                              </NavLink>
+                            </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                            <li>
+                              <NavLink
+                                to="/admin/constructions/quotation"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Quotation
+                              </NavLink>
+                            </li>
+                          )}
                           {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSTRUCTOR" || userRole === "CONSULTANT") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/table-construction-history"
+                                to="/admin/constructions/construction-history"
                                 className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
                                 Construction history
                               </NavLink>
                             </li>
                           )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "DESIGNER") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/table-quotation"
-                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                                to="/admin/constructions/design-profile-manager"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
-                                Table Quotation
+                                Design Profile Manager
                               </NavLink>
                             </li>
                           )}
                           {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "DESIGNER") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/design-profile"
+                                to="/admin/constructions/design-profile"
                                 className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
-                                Table Design Profile
-                              </NavLink>
-                            </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "DESIGNER") && (
-                            <li>
-                              <NavLink
-                                to="/admin/tables/design-profile-manager"
-                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                              >
-                                Table Design Profile Manager
+                                Design Profile
                               </NavLink>
                             </li>
                           )}
                           {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/table-consult"
+                                to="/admin/constructions/requestDetail"
                                 className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
-                                Table Consult
-                              </NavLink>
-                            </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
-                            <li>
-                              <NavLink
-                                to="/admin/tables/table-requestDetail"
-                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                              >
-                                Table Request Detail
+                                Request Detail
                               </NavLink>
                             </li>
                           )}
@@ -295,12 +327,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   );
                 }}
               </SidebarLinkGroup>
-              {/* <!-- Menu Item Forms --> */}
 
-              {/* <!-- Menu Item Forms --> */}
               <SidebarLinkGroup
                 activeCondition={
-                  pathname === "/forms" || pathname.includes("forms")
+                  pathname === "/maintenances" || pathname.includes("maintenances")
                 }
               >
                 {(handleClick, open) => {
@@ -308,7 +338,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <React.Fragment>
                       <NavLink
                         to="#"
-                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname === "/maintenace" || pathname.includes("maintenace")
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname === "/maintenances" || pathname.includes("maintenances")
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -355,13 +385,23 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                          {userRole === "MANAGER" && (
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/manager-user"
-                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
+                                to="/admin/maintenances/service-category"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
-                                Manager User
+                                Service Category
+                              </NavLink>
+                            </li>
+                          )}
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
+                            <li>
+                              <NavLink
+                                to="/admin/maintenances/service-requests"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Service Request
                               </NavLink>
                             </li>
                           )}
@@ -369,20 +409,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           {(userRole === "MANAGER" || userRole === "STAFF") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/table-service-category"
-                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:bg-gray-A0 "
-                              >
-                                Table Service Category
-                              </NavLink>
-                            </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF") && (
-                            <li>
-                              <NavLink
-                                to="/admin/tables/table-service-requests"
+                                to="/admin/maintenances/service-quotation"
                                 className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
-                                Table Service Request
+                                Service Quotation
                               </NavLink>
                             </li>
                           )}
@@ -390,51 +420,40 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           {(userRole === "MANAGER" || userRole === "STAFF") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/table-service-quotation"
+                                to="/admin/maintenances/service-details"
                                 className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
-                                Table Service Quotation
+                                Service Detail
                               </NavLink>
                             </li>
                           )}
-
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "MAINTENANCE") && (
+                            <li>
+                              <NavLink
+                                to="/admin/maintenances/service-progress"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Service Progress
+                              </NavLink>
+                            </li>
+                          )}
                           {(userRole === "MANAGER" || userRole === "STAFF") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/table-service-details"
+                                to="/admin/maintenances/service-payment"
                                 className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
-                                Table Service Detail
+                                Service Payment
                               </NavLink>
                             </li>
                           )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "MAINTENANCE") && (
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/table-service-progress"
+                                to="/admin/maintenances/service-feedback"
                                 className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
-                                Table Service Progress
-                              </NavLink>
-                            </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "MAINTENANCE") && (
-                            <li>
-                              <NavLink
-                                to="/admin/tables/table-service-payment"
-                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                              >
-                                Table Service Payment
-                              </NavLink>
-                            </li>
-                          )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "MAINTENANCE") && (
-                            <li>
-                              <NavLink
-                                to="/admin/tables/table-service-feedback"
-                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
-                              >
-                                Table Service Feedback
+                                Service Feedback
                               </NavLink>
                             </li>
                           )}
