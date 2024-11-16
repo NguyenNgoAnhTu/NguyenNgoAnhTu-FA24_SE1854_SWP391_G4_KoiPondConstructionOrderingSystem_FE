@@ -640,13 +640,13 @@ const [consultData, setConsultData] = useState<ConsultType | null>(null);
           >
             <Input readOnly />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="address"
             label="Address"
             // rules={[{ required: true, message: "Please input the address!" }]}
           >
             <Input readOnly />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             name="description"
             label="Description"
