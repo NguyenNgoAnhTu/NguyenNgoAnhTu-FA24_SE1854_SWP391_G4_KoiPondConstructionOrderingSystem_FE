@@ -172,6 +172,11 @@ const response = await fetch(
       key: "description",
     },
     {
+      title: "Note",
+      dataIndex: "note",
+      key: "note",
+    },
+    {
       title: "Created",
       dataIndex: "createDate",
       key: "createDate",
