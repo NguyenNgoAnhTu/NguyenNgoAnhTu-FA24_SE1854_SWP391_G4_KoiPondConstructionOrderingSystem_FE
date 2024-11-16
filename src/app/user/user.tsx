@@ -30,6 +30,7 @@ const User = () => {
     note: string;
     createBy: string;
     createDate: string;
+    isActive: boolean;
   }
 
   interface ServiceQuotation {
@@ -95,6 +96,7 @@ const User = () => {
     status: string;
     createDate: string;
     updatedAt: string;
+    isActive: boolean;
   }
 
   interface GetAllQuotationResponse {
@@ -210,7 +212,8 @@ const User = () => {
 
   const [role, setRole] = useState(localStorage.getItem("role") || "");
 
-
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [address, setAddress] = useState(localStorage.getItem("address") || "N/A");  
 
   const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
   const [isRequestLogsModalOpen, setIsRequestLogsModalOpen] = useState(false);
@@ -541,10 +544,11 @@ const User = () => {
         name: name,
         email: email,
         phoneNumber: phone,
+        address: address,
       };
 
       const response = await fetch(
-        `http://localhost:8080/api/customer`,  // Đã bỏ customerId khỏi URL
+        `http://localhost:8080/api/customer/${customerId}`,  // Đã bỏ customerId khỏi URL
         {
           method: "PUT",
           headers: {
@@ -558,28 +562,30 @@ const User = () => {
       if (!response.ok) {
         throw new Error("Failed to update profile");
       }
-
+      if(response.ok){
       const updatedProfile = await response.json();
 
       // Update local storage với dữ liệu từ response
       localStorage.setItem("name", updatedProfile.name);
       localStorage.setItem("email", updatedProfile.email);
       localStorage.setItem("phone", updatedProfile.phoneNumber);
-
-
+      localStorage.setItem("address", updatedProfile.address);
+      console.log(updatedProfile.address);
+      console.log(updatedProfile.name);
       // Update state với dữ liệu từ response
       setName(updatedProfile.name);
       setEmail(updatedProfile.email);
       setPhone(updatedProfile.phoneNumber);
-
+      setAddress(updatedProfile.address);
 
       // Reset editing states
       setIsEditingName(false);
       setIsEditingEmail(false);
       setIsEditingPhone(false);
+      setIsEditingAddress(false);
 
-
-      toast.success("Profile updated successfully");
+        toast.success("Profile updated successfully");
+      }
     } catch (error) {
       console.error("Update profile error:", error);
       toast.error("Failed to update profile");
@@ -850,6 +856,30 @@ const User = () => {
                     )}
                   </div>
                 </div>
+
+                <div className="grid grid-cols-3 gap-4 mb-3">
+                  <div>
+                    <h6 className="mb-0">Address</h6>
+                  </div>
+                  <div className="col-span-2 text-gray-500">
+                    {isEditingAddress ? (
+                      <input
+                        type="text"
+                        className="form-input w-full"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                      />
+                    ) : (
+                      <div className="flex justify-between">
+                        <span>{address}</span>
+                        <button onClick={() => setIsEditingAddress(true)}>
+                          Edit
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="flex justify-end">
                   <button
                     className="bg-green text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
@@ -870,8 +900,19 @@ const User = () => {
                       <h2 className="text-2xl font-bold mb-4">Service Requests</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                         {serviceRequests.slice(0, visibleCount).map((service) => (
-                          <div key={service.serviceRequestId}
-                            className="rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">
+                          <div 
+                            key={service.serviceRequestId}
+                            className={`rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 relative
+                              ${!service.isActive ? 'opacity-60' : ''}`}
+                          >
+                            {!service.isActive && (
+                              <div className="absolute top-2 right-2">
+                                <span className="bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                                  Inactive
+                                </span>
+                              </div>
+                            )}
+
                             <h3 className="text-lg font-semibold text-center mb-4">
                               Service Request ID: {service.serviceRequestId}
                             </h3>
@@ -907,7 +948,7 @@ const User = () => {
                               >
                                 View Logs
                               </button>
-                              {service.status === "Finish" && (
+                              {service.isActive && service.status === "Finish" && (
                                 <button
                                   onClick={() => {
                                     setSelectedRequestId(service.serviceRequestId);

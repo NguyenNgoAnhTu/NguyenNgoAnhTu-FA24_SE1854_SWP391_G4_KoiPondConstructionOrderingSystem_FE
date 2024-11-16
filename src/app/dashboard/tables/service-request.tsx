@@ -25,28 +25,64 @@ function ServiceRequestTable() {
   const [error, setError] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<ServiceRequest | null>(null);
   const [showQuotationForm, setShowQuotationForm] = useState(false);
-  const handleDelete = async (serviceRequestId: string) => {
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you really want to delete this service request? This action cannot be undone.',
-      icon: 'warning',
+
+  const canDelete = (status: string) => {
+    const allowedStatuses = ['PENDING', 'PROCESSING', 'QUOTING'];
+    return allowedStatuses.includes(status);
+  };
+
+  const handleDelete = async (serviceRequestId: string, status: string) => {
+    if (!canDelete(status)) {
+      toast.error("Can only delete requests with status: PENDING, PROCESSING, or QUOTING");
+      return;
+    }
+
+    const { value: note, isConfirmed } = await Swal.fire({
+      title: 'Delete Service Request',
+      html: `
+        <div class="mb-4">
+          <p class="text-red-500 mb-2">Are you sure you want to delete this service request?</p>
+          <p class="text-sm text-gray-600 mb-4">This action cannot be undone.</p>
+          <textarea 
+            id="note" 
+            class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400" 
+            placeholder="Please enter a note explaining why you're deleting this request (required)"
+            rows="3"
+          ></textarea>
+        </div>
+      `,
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      preConfirm: () => {
+        const note = (document.getElementById('note') as HTMLTextAreaElement).value;
+        if (!note.trim()) {
+          Swal.showValidationMessage('Note is required');
+          return false;
+        }
+        if (note.length < 10) {
+          Swal.showValidationMessage('Note must be at least 10 characters long');
+          return false;
+        }
+        return note;
+      }
     });
 
-    if (result.isConfirmed) {
+    if (isConfirmed && note) {
       try {
         const token = localStorage.getItem('token');
+        const encodedNote = encodeURIComponent(note);
+        
         const response = await fetch(
-          `http://localhost:8080/api/service-requests/${serviceRequestId}`,
+          `http://localhost:8080/api/service-requests/${serviceRequestId}?note=${encodedNote}`,
           {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
         );
 
@@ -54,18 +90,31 @@ function ServiceRequestTable() {
           throw new Error('Failed to delete service request');
         }
 
-        // Remove the deleted item from the state
         setServiceRequestData((prevData) =>
           prevData.filter((request) => request.serviceRequestId !== serviceRequestId)
         );
 
         toast.success('Service request deleted successfully!');
+        
+        Swal.fire({
+          title: 'Deleted Successfully',
+          html: `
+            <div class="text-left">
+              <p class="mb-2">The service request has been deleted.</p>
+              <p class="text-sm text-gray-600"><strong>Note:</strong></p>
+              <p class="text-sm text-gray-600 italic">${note}</p>
+            </div>
+          `,
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+        });
       } catch (error) {
         console.error('Error:', error);
         toast.error('Failed to delete service request!');
       }
     }
   };
+
   useEffect(() => {
     const fetchServiceRequest = async () => {
       try {
@@ -182,14 +231,14 @@ function ServiceRequestTable() {
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
                   {service.status || "N/A"}
-                </td>
+                  </td>
                 <td className="px-6 py-4 text-sm">
                   <button
                     type="button"
                     className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
                       ${service.status === "PENDING"
                         ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
-                        : "bg-[#d3d3d3] cursor-not-allowed"
+                        : "bg-[#d3d3d3] cursor-not-allowed" 
                       }`}
                     onClick={() => handleCreateQuotation(service)}
                   >
@@ -198,8 +247,16 @@ function ServiceRequestTable() {
 
                   <button
                     type="button"
-                    className="mx-1 text-white bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2"
-                    onClick={() => handleDelete(service.serviceRequestId)}
+                    className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2
+                      ${canDelete(service.status)
+                        ? "bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300"
+                        : "bg-[#d3d3d3] cursor-not-allowed"
+                      }`}
+                    onClick={() => {
+                      if (canDelete(service.status)) {
+                        handleDelete(service.serviceRequestId, service.status);
+                      }
+                    }}
                   >
                     Delete
                   </button>

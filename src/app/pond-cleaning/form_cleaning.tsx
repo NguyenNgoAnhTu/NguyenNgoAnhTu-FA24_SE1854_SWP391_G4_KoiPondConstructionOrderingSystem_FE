@@ -53,6 +53,17 @@ const FormCleaning: React.FC<FormCleaningProps> = ({
     };
   }, [onClose]);
 
+  // Thêm useEffect để lấy address từ localStorage
+  useEffect(() => {
+    const savedAddress = localStorage.getItem('address');
+    if (savedAddress) {
+      setFormData(prev => ({
+        ...prev,
+        address: savedAddress
+      }));
+    }
+  }, []); // Empty dependency array means this runs once when component mounts
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -88,6 +99,21 @@ const FormCleaning: React.FC<FormCleaningProps> = ({
 
     setErrors(newErrors);
     return isValid;
+  };
+
+  // Thêm button để sử dụng saved address
+  const handleUseSavedAddress = () => {
+    const savedAddress = localStorage.getItem('address');
+    if (savedAddress) {
+      setFormData(prev => ({
+        ...prev,
+        address: savedAddress
+      }));
+      setErrors(prev => ({
+        ...prev,
+        address: ''
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -188,18 +214,34 @@ const FormCleaning: React.FC<FormCleaningProps> = ({
 
           <div className="mb-6">
             <label className="block text-black-15 mb-2">Address</label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className={`w-full p-3 border ${
-                errors.address ? "border-red" : "border-black"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400`}
-              placeholder="Enter address"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className={`w-full p-3 border ${
+                  errors.address ? "border-red" : "border-black"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400`}
+                placeholder="Enter address"
+              />
+              {localStorage.getItem('address') && formData.address !== localStorage.getItem('address') && (
+                <button
+                  type="button"
+                  onClick={handleUseSavedAddress}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-blue-600 hover:text-blue-800"
+                >
+                  Use Saved Address
+                </button>
+              )}
+            </div>
             {errors.address && (
               <p className="text-red text-sm mt-1">{errors.address}</p>
+            )}
+            {formData.address === localStorage.getItem('address') && (
+              <p className="text-gray-500 text-sm mt-1">
+                Using your saved address
+              </p>
             )}
           </div>
 
