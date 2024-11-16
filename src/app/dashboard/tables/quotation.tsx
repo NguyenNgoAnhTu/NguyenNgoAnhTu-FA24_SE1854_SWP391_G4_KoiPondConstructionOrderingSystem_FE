@@ -378,31 +378,63 @@ const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
       title: "Actions",
       dataIndex: "actions",
       render: (text: any, record: QuotationType) => (
-        <>
-          <Button onClick={() => handleUpdate(record)}>
-            Update
-          </Button>
-          <Button onClick={() => handleDelete(record.quotationId)}>
-            Delete
-          </Button>
+    //     <>
+    //       <Button onClick={() => handleUpdate(record)}>
+    //         Update
+    //       </Button>
+    //       <Button onClick={() => handleDelete(record.quotationId)}>
+    //         Delete
+    //       </Button>
 
-          {!record.isConfirm ? (
-            <Button onClick={() => handleConfirm(record.quotationId)}>
-              Confirm
-            </Button>
-          ) : (
-            <Button
-              onClick={() => handleCreateDesignProfile(record.quotationId)}
-              type="primary"
-              style={{ backgroundColor: "green" }}
-            >
-              Create Design Profile
-            </Button>
-          )}
+    //       {!record.isConfirm ? (
+    //         <Button onClick={() => handleConfirm(record.quotationId)}>
+    //           Confirm
+    //         </Button>
+    //       ) : (
+    //         <Button
+    //           onClick={() => handleCreateDesignProfile(record.quotationId)}
+    //           type="primary"
+    //           style={{ backgroundColor: "green" }}
+    //         >
+    //           Create Design Profile
+    //         </Button>
+    //       )}
 
-        </>
-      ),
-    }
+    //     </>
+    //   ),
+    // }
+    <>
+    <Button 
+      onClick={() => handleUpdate(record)}
+      disabled={record.isConfirm}
+      style={{ marginRight: '8px' }}
+    >
+      Update
+    </Button>
+    <Button 
+      onClick={() => handleDelete(record.quotationId)}
+      disabled={record.isConfirm}
+      style={{ marginRight: '8px' }}
+    >
+      Delete
+    </Button>
+
+    {!record.isConfirm ? (
+      <Button onClick={() => handleConfirm(record.quotationId)}>
+        Confirm
+      </Button>
+    ) : (
+      <Button
+        onClick={() => handleCreateDesignProfile(record.quotationId)}
+        type="primary"
+        style={{ backgroundColor: "green" }}
+      >
+        Create Design Profile
+      </Button>
+    )}
+  </>
+),
+}
   ];
 
   return (
@@ -557,6 +589,13 @@ const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
           <Form.Item
             name="description"
             label="Description"
+            rules={[{ required: true, message: "Please input the description!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="note"
+            label="Note"
             rules={[{ required: true, message: "Please input the description!" }]}
           >
             <Input />
