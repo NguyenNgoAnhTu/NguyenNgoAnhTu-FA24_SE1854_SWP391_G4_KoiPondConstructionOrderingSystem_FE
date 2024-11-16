@@ -596,7 +596,7 @@ const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
           <Form.Item
             name="note"
             label="Note"
-            rules={[{ required: true, message: "Please input the description!" }]}
+            rules={[{ required: true, message: "Please input the note!" }]}
           >
             <Input />
           </Form.Item>
