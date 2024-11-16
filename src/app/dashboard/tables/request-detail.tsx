@@ -44,6 +44,24 @@ function RequestDetailTable() {
     note: string;
   };
 
+  // Update the type definition
+  type RequestDetailType = {
+    requestDetailId: number;
+    note: string;  // "Not Started" | "In Progressing" | "Completed"
+    consult?: {
+      isCustomerConfirm: boolean;
+    };
+  };
+
+  const isActionDisabled = (note: string) => {
+    return note === "Consult completed!";
+  };
+
+  // Thêm hàm mới để kiểm tra việc vô hiệu hóa nút Consult
+  const isConsultDisabled = (note: string) => {
+    return note === "Consult completed!" || note === "Consult is in progressing!";
+  };
+
   const handleUpdate = (record: any) => {
     setSelectedRequestDetail(record);
     form.setFieldsValue({
@@ -276,86 +294,28 @@ function RequestDetailTable() {
         </>
       ),
     },
-    { title: "Note", dataIndex: "note", key: "note", render: (text: any) => text || "null" }, // Nếu `note` không có giá trị, hiển thị "null"}, 
+    { 
+      title: "Note", 
+      dataIndex: "note", 
+      key: "note", 
+    },
     {
       title: "Actions",
       key: "actions",
-      render: (record: any) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          {/* Consult Button */}
-          <Button
-            icon={<EditOutlined />}
-            style={{
-              backgroundColor: "white",
-              color: "#52c41a",
-              border: "1px solid #52c41a",
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              padding: 0,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.3s ease"
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = "#52c41a";
-              e.currentTarget.style.color = "white";
-              e.currentTarget.style.transform = "scale(1.1)";
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = "white";
-              e.currentTarget.style.color = "#52c41a";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-            onClick={() => handleConsult(record)}
-            title="Consult"
-          />
-
-          {/* Update Button */}
-          <Button
-            icon={<EditOutlined />}
-            style={{
-              backgroundColor: "white",
-              color: "#1890ff",
-              border: "1px solid #1890ff",
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              padding: 0,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.3s ease"
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = "#1890ff";
-              e.currentTarget.style.color = "white";
-              e.currentTarget.style.transform = "scale(1.1)";
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = "white";
-              e.currentTarget.style.color = "#1890ff";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-            onClick={() => handleUpdate(record)}
-            title="Update"
-          />
-
-          {/* Delete Button */}
-          <Popconfirm
-            title="Confirm delete"
-            description="Are you sure you want to delete this request detail?"
-            onConfirm={() => handleDelete(record.requestDetailId)}
-            okButtonProps={{ style: { background: "LimeGreen" } }}
-            cancelButtonProps={{ style: { background: "red", color: "white" } }}
-          >
+      render: (record: RequestDetailType) => {
+        const disabled = isActionDisabled(record.note);
+        const consultDisabled = isConsultDisabled(record.note);
+        
+        return (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {/* Consult Button */}
             <Button
-              icon={<DeleteOutlined />}
+              icon={<EditOutlined />}
+              disabled={consultDisabled}
               style={{
-                backgroundColor: "white",
-                color: "#ff4d4f",
-                border: "1px solid #ff4d4f",
+                backgroundColor: consultDisabled ? '#f5f5f5' : "white",
+                color: consultDisabled ? '#d9d9d9' : "#52c41a",
+                border: `1px solid ${consultDisabled ? '#d9d9d9' : "#52c41a"}`,
                 borderRadius: "50%",
                 width: "32px",
                 height: "32px",
@@ -363,24 +323,73 @@ function RequestDetailTable() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                transition: "all 0.3s ease"
+                cursor: consultDisabled ? 'not-allowed' : 'pointer',
+                opacity: consultDisabled ? 0.5 : 1
               }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = "#ff4d4f";
-                e.currentTarget.style.color = "white";
-                e.currentTarget.style.transform = "scale(1.1)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = "white";
-                e.currentTarget.style.color = "#ff4d4f";
-                e.currentTarget.style.transform = "scale(1)";
-              }}
-              title="Delete"
+              onClick={() => !consultDisabled && handleConsult(record)}
+              title={
+                record.note === "Consult completed!" 
+                  ? "Cannot consult completed requests" 
+                  : record.note === "Consult is in progressing!"
+                  ? "Request is already in progress"
+                  : "Consult"
+              }
             />
-          </Popconfirm>
-        </div>
 
-      ),
+            {/* Update Button - không thay đổi */}
+            <Button
+              icon={<EditOutlined />}
+              disabled={disabled}
+              style={{
+                backgroundColor: disabled ? '#f5f5f5' : "white",
+                color: disabled ? '#d9d9d9' : "#1890ff",
+                border: `1px solid ${disabled ? '#d9d9d9' : "#1890ff"}`,
+                borderRadius: "50%",
+                width: "32px",
+                height: "32px",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.5 : 1
+              }}
+              onClick={() => !disabled && handleUpdate(record)}
+              title={disabled ? "Cannot update completed requests" : "Update"}
+            />
+
+            {/* Delete Button - không thay đổi */}
+            <Popconfirm
+              title="Confirm delete"
+              description="Are you sure you want to delete this request detail?"
+              onConfirm={() => handleDelete(record.requestDetailId)}
+              okButtonProps={{ style: { background: "LimeGreen" } }}
+              cancelButtonProps={{ style: { background: "red", color: "white" } }}
+              disabled={disabled}
+            >
+              <Button
+                icon={<DeleteOutlined />}
+                disabled={disabled}
+                style={{
+                  backgroundColor: disabled ? '#f5f5f5' : "white",
+                  color: disabled ? '#d9d9d9' : "#ff4d4f",
+                  border: `1px solid ${disabled ? '#d9d9d9' : "#ff4d4f"}`,
+                  borderRadius: "50%",
+                  width: "32px",
+                  height: "32px",
+                  padding: 0,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: disabled ? 'not-allowed' : 'pointer',
+                  opacity: disabled ? 0.5 : 1
+                }}
+                title={disabled ? "Cannot delete completed requests" : "Delete"}
+              />
+            </Popconfirm>
+          </div>
+        );
+      },
     },
   ];
 
