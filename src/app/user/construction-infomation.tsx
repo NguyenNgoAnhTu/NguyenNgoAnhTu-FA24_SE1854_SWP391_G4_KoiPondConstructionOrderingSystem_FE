@@ -254,6 +254,16 @@ function ConstructionInfomation() {
           dataIndex: "confirmConstructorName",
           key: "confirmConstructorName",
         },
+        {
+          title: "PDF file",
+          dataIndex: "fileUrl",
+          key: "fileUrl",
+          render: (text: any, record: any) => (
+            <a href={record.fileUrl} target="_blank" rel="noopener noreferrer">
+              View
+            </a>
+          ),
+        },
       ];
       const columnsDesign = [
         {

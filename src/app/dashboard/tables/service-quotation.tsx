@@ -211,7 +211,7 @@ function ServiceQuotationTable() {
                 "Request ID",
                 "Customer Name",
                 "Category Type",
-                "Category Cost",
+                "Cost",
                 "Description",
                 "Address",
                 "Total Cost",
@@ -247,7 +247,7 @@ function ServiceQuotationTable() {
                   {quotation.serviceRequest.serviceCategory.type || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
-                  {quotation.serviceRequest.serviceCategory.cost || "N/A"}
+                  {quotation.cost || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
                   {quotation.description}

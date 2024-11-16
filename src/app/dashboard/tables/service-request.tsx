@@ -100,8 +100,8 @@ function ServiceRequestTable() {
   }, []);
 
   const handleCreateQuotation = (service: ServiceRequest) => {
-    if (service.status !== "PROCESSING") {
-      toast.error("Can only create quotation for requests with PROCESSING status");
+    if (service.status !== "PENDING") {
+      toast.error("Can only create quotation for requests with PENDING status");
       return;
     }
     setSelectedService(service);
@@ -187,7 +187,7 @@ function ServiceRequestTable() {
                   <button
                     type="button"
                     className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
-                      ${service.status === "PROCESSING"
+                      ${service.status === "PENDING"
                         ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
                         : "bg-[#d3d3d3] cursor-not-allowed"
                       }`}

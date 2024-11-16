@@ -7,6 +7,8 @@ import ConstructionInfomation from "./construction-infomation";
 import PaymentModal from './paymentModal';
 import FeedbackModal from './feedbackModal';
 import Swal from 'sweetalert2';
+import ServiceRequestLogs from './service-request-logs';
+import RequestLog from './request-log';
 
 const User = () => {
   interface ServiceRequest {
@@ -26,6 +28,8 @@ const User = () => {
     address: string;
     status: string;
     note: string;
+    createBy: string;
+    createDate: string;
   }
 
   interface ServiceQuotation {
@@ -61,6 +65,8 @@ const User = () => {
     totalCost: number;
     vat: number;
     confirm: boolean;
+    createBy: string;
+    createDate: string;
   }
 
   interface ServiceProgress {
@@ -203,6 +209,11 @@ const User = () => {
   const [showConstructionInformation, setShowConstructionInformation] = useState(false);
 
   const [role, setRole] = useState(localStorage.getItem("role") || "");
+
+
+
+  const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
+  const [isRequestLogsModalOpen, setIsRequestLogsModalOpen] = useState(false);
 
   useEffect(() => {
     const userRole = localStorage.getItem("role");
@@ -479,6 +490,16 @@ const User = () => {
     setSelectedRequestId(null);
   };
 
+  const handleViewLogs = (serviceRequestId: string) => {
+    setSelectedRequestId(serviceRequestId);
+    setIsLogsModalOpen(true);
+  };
+
+  const handleViewRequestLogs = (requestId: string) => {
+    setSelectedRequestId(requestId);
+    setIsRequestLogsModalOpen(true);
+  };
+
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
   }
@@ -569,7 +590,7 @@ const User = () => {
       <div className="main-body">
         <div className="flex flex-wrap">
           <div className="lg:w-1/3 w-full p-4">
-            <div className="card bg-white shadow-lg h-[400px]">
+            <div className="card bg-white shadow-lg ">
               <div className="card-body p-6">
                 <div className="flex flex-col items-center text-center">
                   <img
@@ -873,10 +894,19 @@ const User = () => {
                               <strong>Note:</strong> {service.note || "N/A"}
                             </p>
                             <p className="text-sm text-gray-700 mb-2">
+                              <strong>Create Date:</strong> {new Date(service.createDate).toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
                               <strong>Status:</strong> {service.status || "N/A"}
                             </p>
 
-                            <div className="flex justify-center mt-4">
+                            <div className="flex justify-center mt-4 gap-2">
+                              <button
+                                onClick={() => handleViewLogs(service.serviceRequestId)}
+                                className="px-4 py-2 bg-green text-white rounded-lg hover:bg-blue-600 transition-colors"
+                              >
+                                View Logs
+                              </button>
                               {service.status === "Finish" && (
                                 <button
                                   onClick={() => {
@@ -943,8 +973,8 @@ const User = () => {
                                 {quotation.serviceRequest.serviceCategory.type}
                               </p>
                               <p className="text-sm">
-                                <span className="font-medium">Customer:</span>{" "}
-                                {quotation.customer.name}
+                                <span className="font-medium">Create By:</span>{" "}
+                                {quotation.createBy}
                               </p>
                               <p className="text-sm">
                                 <span className="font-medium">Description:</span>{" "}
@@ -954,7 +984,10 @@ const User = () => {
                                 <span className="font-medium">Address:</span>{" "}
                                 {quotation.serviceRequest.address}
                               </p>
-
+                              <p className="text-sm">
+                                <span className="font-medium">Create Date:</span>{" "}
+                                {new Date(quotation.createDate).toLocaleString()}
+                              </p>
                               <div className="border-t pt-2 mt-2">
                                 <p className="text-sm">
                                   <span className="font-medium">Base Cost:</span>{" "}
@@ -962,7 +995,7 @@ const User = () => {
                                 </p>
                                 <p className="text-sm">
                                   <span className="font-medium">VAT:</span>{" "}
-                                  ${quotation.vat.toLocaleString()}
+                                   {quotation.vat.toLocaleString()}%
                                 </p>
                                 <p className="text-lg font-semibold text-green-600">
                                   <span className="font-medium">Total:</span>{" "}
@@ -1131,6 +1164,14 @@ const User = () => {
                               </span>
                             </p>
 
+                            <div className="flex justify-center mt-4 gap-2">
+                              <button
+                                onClick={() => handleViewRequestLogs(request.id)}
+                                className="px-4 py-2 bg-green text-white rounded-lg hover:bg-blue-600 transition-colors"
+                              >
+                                View Logs
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1231,6 +1272,22 @@ const User = () => {
           </div>
         </div>
       </div>
+      <ServiceRequestLogs
+        isOpen={isLogsModalOpen}
+        onClose={() => {
+          setIsLogsModalOpen(false);
+          setSelectedRequestId(null);
+        }}
+        serviceRequestId={selectedRequestId || ''}
+      />
+      <RequestLog
+        isOpen={isRequestLogsModalOpen}
+        onClose={() => {
+          setIsRequestLogsModalOpen(false);
+          setSelectedRequestId(null);
+        }}
+        requestId={selectedRequestId || ''}
+      />
     </div>
   );
 };

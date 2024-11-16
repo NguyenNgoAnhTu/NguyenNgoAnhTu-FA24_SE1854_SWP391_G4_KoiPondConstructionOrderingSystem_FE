@@ -11,10 +11,12 @@ function ConstructionHistory() {
   const [datasDocument, setDatasDocument] = useState<DocumentType[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [showFormDocumentModal, setShowFormDocumentModal] = useState(false);
+  const [showUpdateFormDocumentModal, setShowUpdateFormDocumentModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [form] = Form.useForm();
   const [selectedDesignProfileId, setSelectedDesignProfileId] = useState(null);
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [constructors, setConstructors] = useState<StaffType[]>([]);
 
   type DocumentType = {
@@ -166,7 +168,7 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
       const token = localStorage.getItem("token");
       const requestBody = {
         step: values.step,
-        description: values.description,
+        description: values.descriptionH,
         startDate: values.startDate,
         endDate: values.endDate,
         note: values.note,
@@ -190,6 +192,8 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
       console.log("Construction history created successfully!");
       setShowModal(false);
       toast.success("Construction history created!");
+      fetchData("");
+      form.resetFields();
     } catch (err: any) {
       toast.error(err.message);
     }
@@ -232,6 +236,48 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
       console.log("Construction history created successfully!");
       setShowFormDocumentModal(false);
       toast.success("Acceptance document created!");
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleDocumentUpdate = async (values: any) => {
+    try {
+      const fileUrl = values.fileUrl[0]?.response || values.fileUrl[0]?.url;
+
+      if (!fileUrl) {
+      throw new Error("File upload failed or URL is missing");
+      }
+
+      const token = localStorage.getItem("token");
+      const requestBody = {
+        description: values.description,
+        confirmDate: values.confirmDate,
+        confirmCustomerName: values.confirmCustomerName,
+        confirmConstructorName: values.confirmConstructorName,
+        fileUrl: fileUrl,
+      };
+      const response = await fetch(
+        `http://localhost:8080/api/construction_history/update-document/${selectedDocumentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+      if (!response.ok) {
+        toast.error(
+          "This design profile is either already finished or has a document!"
+        );
+        return;
+      }
+      console.log("Construction history created successfully!");
+      setShowUpdateFormDocumentModal(false);
+      setShowDocumentModal(false);
+      toast.success("Acceptance document updated!");
     } catch (err: any) {
       toast.error(err.message);
     }
@@ -331,13 +377,35 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
       key: "confirmConstructorName",
     },
     {
-      title: "Download PDF",
+      title: "PDF file",
       dataIndex: "fileUrl",
       key: "fileUrl",
       render: (text: any, record: any) => (
         <a href={record.fileUrl} target="_blank" rel="noopener noreferrer">
-          Download
+          View
         </a>
+      ),
+    },
+    {
+      title: "Action",
+      dataIndex: "acceptanceDocumentId",
+      key: "acceptanceDocumentId",
+      render: (acceptanceDocumentId: any) => (
+        <>
+          <Button
+            style={{
+              marginRight: "3px",
+              backgroundColor: "DodgerBlue",
+              color: "white",
+            }}
+            onClick={() => {
+              setSelectedDocumentId(acceptanceDocumentId);
+              setShowUpdateFormDocumentModal(true);
+            }}
+          >
+            Update
+          </Button>
+        </>
       ),
     },
   ];
@@ -413,7 +481,10 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
               backgroundColor: "LimeGreen",
               color: "white",
             }}
-            onClick={() => fetchDataDocument(designProfileId)}
+            onClick={() => {
+              setSelectedDesignProfileId(designProfileId);
+              fetchDataDocument(designProfileId)
+            }}
           >
             View document
           </Button>
@@ -449,6 +520,8 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
         }}
       />
       <Table dataSource={datas} columns={columns}></Table>
+
+
       <Modal
         onCancel={() => setShowModal(false)}
         onOk={() => form.submit()}
@@ -468,7 +541,7 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
           </Form.Item>
           <Form.Item
             label="Description"
-            name="description"
+            name="descriptionH"
             rules={[{ required: true, message: "Cannot be blank!" }]}
           >
             <Input.TextArea />
@@ -506,6 +579,8 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
           </Form.Item>
         </Form>
       </Modal>
+
+
       <Modal
         onCancel={() => setShowFormDocumentModal(false)}
         onOk={() => form.submit()}
@@ -532,7 +607,7 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
             name="confirmDate"
             rules={[{ required: true, message: "Please select a date!" }]}
           >
-            <DatePicker
+            <DatePicker showTime
               disabledDate={(current) => current && current.isAfter(new Date())}
             />
           </Form.Item>
@@ -579,6 +654,8 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
           </Form.Item>
         </Form>
       </Modal>
+
+
       <Modal
         width={1200}
         open={showHistoryModal}
@@ -595,6 +672,8 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
           scroll={{ x: 600, y: 400 }}
         ></Table>
       </Modal>
+
+
       <Modal
         width={1200}
         open={showDocumentModal}
@@ -610,6 +689,81 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
           columns={columnsDocument}
           scroll={{ x: 600, y: 400 }}
         ></Table>
+      </Modal>
+
+
+      <Modal
+        onCancel={() => setShowUpdateFormDocumentModal(false)}
+        onOk={() => form.submit()}
+        open={showUpdateFormDocumentModal}
+        title="Update Acceptance document"
+        okButtonProps={{
+          style: { backgroundColor: "DodgerBlue", borderColor: "DodgerBlue" },
+        }}
+      >
+        <Form
+          onFinish={handleDocumentUpdate}
+          form={form}
+          labelCol={{ span: 24 }}
+        >
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true, message: "Cannot be blank!" }]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item
+            label="Confirm date"
+            name="confirmDate"
+            rules={[{ required: true, message: "Please select a date!" }]}
+          >
+            <DatePicker showTime
+              disabledDate={(current) => current && current.isAfter(new Date())}
+            />
+          </Form.Item>
+          <Form.Item
+            label="Customer"
+            name="confirmCustomerName"
+            rules={[{ required: true, message: "Cannot be blank!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Staff"
+            name="confirmConstructorName"
+            rules={[{ required: true, message: "Cannot be blank!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a constructor"
+              onFocus={() => fetchDataStaffs(selectedDesignProfileId)}
+            >
+              {constructors.map((constructor) => (
+                <Select.Option key={constructor.name} value={constructor.name}>
+                  {constructor.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Document PDF"
+            name="fileUrl"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+            rules={[{ required: true, message: "Please upload a file!" }]}
+          >
+            <Upload
+              accept=".pdf"
+              customRequest={({ file, onSuccess, onError }) =>
+              handleUpload(file, onSuccess, onError)
+              }
+              listType="text"
+            >
+              <Button icon={<UploadOutlined />}>Upload PDF</Button>
+            </Upload>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );
