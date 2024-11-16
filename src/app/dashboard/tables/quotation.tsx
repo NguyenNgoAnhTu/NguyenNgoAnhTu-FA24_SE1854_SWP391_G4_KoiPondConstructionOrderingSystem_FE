@@ -28,6 +28,14 @@ type CustomerType = {
   phoneNumber: string;
   // Add other customer fields as needed
 };
+type ConsultType = {
+  id: number;
+  description: string;
+ // consultDate: string;
+ // createDate: string;
+//  isCustomerConfirm: boolean;
+ // customers: Array<{ customerId: number }>;
+};
 
 function Quotation() {
   const navigate = useNavigate();
@@ -42,6 +50,8 @@ function Quotation() {
   const [fileList, setFileList] = useState<any[]>([]);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
 const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
+const [showConsultModal, setShowConsultModal] = useState(false);
+const [consultData, setConsultData] = useState<ConsultType | null>(null);
 
   const fetchData = async () => {
     try {
@@ -220,7 +230,7 @@ const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
     profileForm.setFieldsValue({ quotationId });
     setShowCreateProfileModal(true);
   };
-
+// create design profile
   const handleCreateProfileSubmit = async (values: any) => {
     try {
       const token = localStorage.getItem("token");
@@ -246,6 +256,25 @@ const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
     } catch (error) {
       console.error(error);
       toast.error("Failed to create design profile");
+    }
+  };
+// view consult
+  const handleViewConsult = async (consultId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/consult/getConsultById/${consultId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setConsultData(data);
+      setShowConsultModal(true);
+    } catch (error) {
+      toast.error("Failed to fetch consult details");
     }
   };
   const handleUploadFile = async (file: File): Promise<string> => {
@@ -307,8 +336,18 @@ const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
     {
       title: "ConsultId",
       dataIndex: "consultId",
-      key: "consultId",
+      // key: "consultId",
+      render: (consultId: number) => (
+        <Button 
+          type="link" 
+          onClick={() => handleViewConsult(consultId)}
+        >
+           {<EyeOutlined />}
+        </Button>
+      ),
     },
+    
+    
     {
       // title: "CustomerId",
       // dataIndex: "customerId",
@@ -451,6 +490,28 @@ const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
         }}
       />
     </div>
+    <Modal
+  title="Consult Details"
+  open={showConsultModal}
+  onCancel={() => setShowConsultModal(false)}
+  footer={[
+    <Button key="close" onClick={() => setShowConsultModal(false)}>
+      Close
+    </Button>
+  ]}
+>
+{consultData && (
+    <div>
+      <p><strong>Consult ID:</strong> {consultData.id}</p>
+      <p><strong>Description:</strong> {consultData.description}</p>
+     {/* <p><strong>Consult Date:</strong> {consultData.consultDate}</p>
+      <p><strong>Create Date:</strong> {consultData.createDate}</p>
+      <p><strong>Customer Confirmed:</strong> {consultData.isCustomerConfirm ? "Yes" : "No"}</p>
+      <p><strong>Request Detail ID:</strong> {consultData.requestDetailId}</p>
+      <p><strong>Customer ID:</strong> {consultData.customers[1].customerId}</p> */}
+    </div>
+  )}
+</Modal>
       <Modal
       title="Customer Details"
       open={showCustomerModal}
@@ -579,13 +640,13 @@ const [customerDetail, setCustomerDetail] = useState<CustomerType | null>(null);
           >
             <Input readOnly />
           </Form.Item>
-          {/* <Form.Item
+          <Form.Item
             name="address"
             label="Address"
-            rules={[{ required: true, message: "Please input the address!" }]}
+            // rules={[{ required: true, message: "Please input the address!" }]}
           >
             <Input readOnly />
-          </Form.Item> */}
+          </Form.Item>
           <Form.Item
             name="description"
             label="Description"
