@@ -17,24 +17,17 @@ import TableServiceQuotation from "app/dashboard/tables/service-quotation.tsx";
 import TableServiceRequest from "app/dashboard/tables/service-request.tsx"
 import TableServiceDetail from "app/dashboard/tables/service-detail.tsx"
 // import PondDesignTemplateForm from "app/dashboard/forms/pondDesignTemplate";
-
 import ConstructionInfomation from "app/user/construction-infomation.tsx";
 import ConsultForm from "app/dashboard/forms/consult.tsx";
-
 import Consult from "app/dashboard/tables/consult";
-// import Quotation from "./dashboard/forms/quotation";
 import RequestDetailTable from "app/dashboard/tables/request-detail";
-
 import PondDesignTemplateTable from "app/dashboard/tables/pondDesignTemplate";
-
 // import DesignProfileForm from "app/dashboard/forms/design-profile.tsx"
 import TableServicePayment from "app/dashboard/tables/service-payment.tsx";
 import TableServiceFeedback from "app/dashboard/tables/service-feedback.tsx";
-
 import ServiceCategoryTable from "app/dashboard/tables/service-category.tsx"
 import ManagerUser from "app/dashboard/tables/managerUser.tsx"
 import DesignProfileForm from "app/dashboard/forms/design-profile.tsx";
-// import QuotationForm from "app/dashboard/forms/quotation";
 import DesignProfileManagerTable from "app/dashboard/tables/designprofile-manager";
 import DesignProfileTable from "app/dashboard/tables/designProfile.tsx";
 import Quotation from "app/dashboard/tables/quotation.tsx";
@@ -57,35 +50,35 @@ const routesAdmin = [
   { path: "/admin", element: <Dashboard /> },
   { path: "/admin/dashboard", element: <Dashboard /> },
   {
-    path: "/admin/forms/form-service-progress",
+    path: "/admin/constructions/form-service-progress",
     element: <FormServiceProgress />,
   },
   {
-    path: "/admin/tables/table-service-progress",
+    path: "/admin/maintenances/service-progress",
     element: <TableServiceProgress />,
   },
   {
-    path: "/admin/tables/table-service-payment",
+    path: "/admin/maintenances/service-payment",
     element: <TableServicePayment />,
   },
   {
-    path: "/admin/tables/table-service-feedback",
+    path: "/admin/maintenances/service-feedback",
     element: <TableServiceFeedback />,
   },
   {
-    path: "/admin/tables/table-service-requests",
+    path: "/admin/maintenances/service-requests",
     element: <TableServiceRequest />,
   },
   {
-    path: "/admin/tables/table-service-quotation",
+    path: "/admin/maintenances/service-quotation",
     element: <TableServiceQuotation />,
   },
   {
-    path: "/admin/tables/table-service-details",
+    path: "/admin/maintenances/service-details",
     element: <TableServiceDetail />,
   },
   {
-    path: "/admin/tables/table-construction-history",
+    path: "/admin/constructions/construction-history",
     element: <ConstructionHistory />,
   },
   {
@@ -96,26 +89,20 @@ const routesAdmin = [
   //   path: "/admin/forms/pondDesignTemplate",
   //   element: <PondDesignTemplateForm />,
   // },
-
-
   {
-    path: "/admin/tables/design-profile-manager",
+    path: "/admin/constructions/design-profile-manager",
     element: <DesignProfileManagerTable />,
   },
   {
-    path: "/admin/tables/design-profile",
+    path: "/admin/constructions/design-profile",
     element: <DesignProfileTable />,
   },
-  // {
-  //   path: "/admin/tables/quotation",
-  //   element: < Quotation />,
-  // },
   {
     path: "/admin/tables/show-quotation-cus",
     element: < ShowQuotation />,
   },
   {
-    path: "/admin/tables/table-consult",
+    path: "/admin/constructions/consult",
     element: < Consult />,
   },
 
@@ -124,11 +111,11 @@ const routesAdmin = [
     element: <ConsultForm />,
   },
   {
-    path: "/admin/tables/table-consult",
+    path: "/admin/constructions/consult",
     element: <Consult />,
   },
   {
-    path: "/admin/tables/table-requestDetail",
+    path: "/admin/constructions/requestDetail",
     element: <RequestDetailTable />,
   },
   {
@@ -141,11 +128,11 @@ const routesAdmin = [
 
   },
   {
-    path: "/admin/tables/table-service-category",
+    path: "/admin/maintenances/service-category",
     element: <ServiceCategoryTable />,
   },
   {
-    path: "/admin/tables/manager-user",
+    path: "/admin/user-management",
     element: <ManagerUser />,
   },
 ];

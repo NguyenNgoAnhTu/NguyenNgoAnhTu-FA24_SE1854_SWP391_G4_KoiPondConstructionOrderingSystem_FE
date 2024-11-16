@@ -35,7 +35,7 @@ function ServiceRequestTable() {
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
     });
-  
+
     if (result.isConfirmed) {
       try {
         const token = localStorage.getItem('token');
@@ -49,16 +49,16 @@ function ServiceRequestTable() {
             },
           }
         );
-  
+
         if (!response.ok) {
           throw new Error('Failed to delete service request');
         }
-  
+
         // Remove the deleted item from the state
         setServiceRequestData((prevData) =>
           prevData.filter((request) => request.serviceRequestId !== serviceRequestId)
         );
-  
+
         toast.success('Service request deleted successfully!');
       } catch (error) {
         console.error('Error:', error);
@@ -182,14 +182,14 @@ function ServiceRequestTable() {
                 </td>
                 <td className="px-6 py-4 text-sm text-black-15 text-center">
                   {service.status || "N/A"}
-                  </td>
+                </td>
                 <td className="px-6 py-4 text-sm">
                   <button
                     type="button"
                     className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
                       ${service.status === "PENDING"
                         ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
-                        : "bg-[#d3d3d3] cursor-not-allowed" 
+                        : "bg-[#d3d3d3] cursor-not-allowed"
                       }`}
                     onClick={() => handleCreateQuotation(service)}
                   >

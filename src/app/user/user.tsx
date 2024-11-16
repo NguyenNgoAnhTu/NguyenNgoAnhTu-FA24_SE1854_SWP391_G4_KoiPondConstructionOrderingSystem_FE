@@ -1090,7 +1090,7 @@ const User = () => {
                                 <strong>Description:  </strong>
                                 {service.description}
                               </p>
-                              <p><strong>Is Confirmed:  </strong> {service.isComfirmed ? "✔️" : "❌"}</p>
+                              <p><strong>Confirmed:  </strong> {service.isComfirmed ? "✔️" : "❌"}</p>
 
 
                               <div className="flex justify-center mt-4">
