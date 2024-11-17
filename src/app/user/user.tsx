@@ -224,60 +224,129 @@ const User = () => {
   }, []);
 
   const handleConfirmToggle = async (serviceQuotationId: string) => {
-    // Only show confirmation dialog if not already confirmed
-    if (!serviceQuotation || serviceQuotation.length === 0) {
-      console.warn('Service quotation data is not available.');
-      toast.error('Service data is not available. Please try again later.');
-      return;
-    }
-    const quotation = serviceQuotation.find(
-      (q) => q.serviceQuotationId === serviceQuotationId
-    );
+    try {
+      // Validate serviceQuotationId
+      if (!serviceQuotationId) {
+        toast.error('Invalid quotation ID');
+        return;
+      }
 
-    if (!quotation?.confirm) {
+      // Find quotation
+      const quotation = serviceQuotation.find(
+        (q) => q.serviceQuotationId === serviceQuotationId
+      );
+
+      if (!quotation) {
+        toast.error('Quotation not found');
+        return;
+      }
+
+      // Check if already confirmed
+      if (quotation.confirm) {
+        toast.info('This quotation has already been confirmed');
+        return;
+      }
+
+      // Show confirmation dialog
       const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'Do you want to confirm this quotation? This action cannot be undone.',
+        title: 'Confirm Quotation',
+        text: 'Are you sure you want to confirm this quotation?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, confirm it!',
+        confirmButtonText: 'Yes, confirm it!'
       });
 
       if (result.isConfirmed) {
-        try {
-          const token = localStorage.getItem('token');
-          const response = await fetch(
-            `http://localhost:8080/api/service-quotations/${serviceQuotationId}/toggle-confirm`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (!response.ok) {
-            throw new Error('Failed to toggle confirmation status');
-          }
-
-          const updatedQuotation = await response.json();
-          setServiceQuotation((prevData) =>
-            prevData.map((quotation) =>
-              quotation.serviceQuotationId === serviceQuotationId
-                ? updatedQuotation
-                : quotation
-            )
-          );
-
-          toast.success('Quotation confirmed successfully!');
-        } catch (error) {
-          console.error('Error toggling confirmation status:', error);
-          toast.error('Failed to confirm quotation');
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
         }
+
+        // Log request details
+     
+
+        const response = await fetch(
+          `http://localhost:8080/api/service-quotations/${serviceQuotationId}/toggle-confirm`,
+          {
+            method: 'PATCH',
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+
+        // Read response text first
+        const responseText = await response.text();
+      //  console.log('Response text:', responseText);
+
+        // Try to parse JSON if possible
+        let data;
+        try {
+          data = responseText ? JSON.parse(responseText) : null;
+        } catch (e) {
+          console.warn('Response is not JSON:', responseText);
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            data?.message || 
+            responseText || 
+            'Failed to confirm quotation'
+          );
+        }
+
+        // Update state only if request was successful
+        setServiceQuotation(prev => 
+          prev.map(q => 
+            q.serviceQuotationId === serviceQuotationId
+              ? { ...q, confirm: true }
+              : q
+          )
+        );
+
+        toast.success('Quotation confirmed successfully');
+
+        // Refresh data
+        await fetchQuotations();
       }
+    } catch (error) {
+      console.error('Confirmation error:', {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      toast.error(
+        error instanceof Error 
+          ? `Failed to confirm: ${error.message}`
+          : 'Failed to confirm quotation'
+      );
+    }
+  };
+
+  // Add fetch function
+  const fetchQuotations = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        'http://localhost:8080/api/service-quotations',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch quotations');
+      }
+
+      const data = await response.json();
+      setServiceQuotation(data);
+    } catch (error) {
+      console.error('Error fetching quotations:', error);
     }
   };
 
