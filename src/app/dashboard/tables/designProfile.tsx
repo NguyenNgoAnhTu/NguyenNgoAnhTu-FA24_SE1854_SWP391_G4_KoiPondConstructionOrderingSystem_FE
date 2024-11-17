@@ -8,6 +8,8 @@ function DesignProfile() {
   const [form] = Form.useForm();
   const [selectedDesignProfileId, setSelectedDesignProfileId] = useState<number | null>(null);
   const [designs, setDesigns] = useState([]);
+  const [pondDesigns, setPondDesigns] = useState([]);
+const [showPondDesignModal, setShowPondDesignModal] = useState(false);
 
   // Fetch design profiles
   const fetchData = async () => {
@@ -125,7 +127,32 @@ function DesignProfile() {
       alert(err);
     }
   };
-
+  // view pond design template
+  const handleViewPondDesign = async (designProfileId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log('Starting API call for designProfileId:', designProfileId);
+      const response = await fetch(
+        `http://localhost:8080/api/pondDesignTemplate/getPondByDesignProfileId/${designProfileId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setPondDesigns(data);
+      setShowPondDesignModal(true);
+    } catch (err) {
+      alert(err);
+    }
+  };
+  
   useEffect(() => {
     fetchData();
   }, []);
@@ -186,6 +213,12 @@ function DesignProfile() {
           >
             View Designs
           </Button>
+          <Button 
+        type="primary"
+        onClick={() => handleViewPondDesign(designProfileId)}
+      >
+        View Pond 
+      </Button>
         </>
       ),
     },
@@ -216,26 +249,124 @@ function DesignProfile() {
     {
       title: "Action",
         key: "action",
-        render: (design: any) => (
-            <Popconfirm
+        // render: (design: any) => (
+            // <Popconfirm
+            //     title="Finish"
+            //     color="red"
+            //     description="Do you want to finish this construction?"
+            //     onConfirm={() => handleFinishDesign(design.designId)}
+            // >
+            //     <Button style={{ backgroundColor: "red", color: "white" }}>
+            //         Finish
+            //     </Button>
+            // </Popconfirm>
+          
+        
+          render: (design: any) => (
+            design.designStatus == "Complete"? (
+              <Button disabled style={{ backgroundColor: "gray", color: "white" }}>
+                Finished
+              </Button>
+            ) : (
+              <Popconfirm
                 title="Finish"
                 color="red"
                 description="Do you want to finish this construction?"
                 onConfirm={() => handleFinishDesign(design.designId)}
-            >
+              >
                 <Button style={{ backgroundColor: "red", color: "white" }}>
-                    Finish
+                  Finish
                 </Button>
-            </Popconfirm>
-        
-        // {!design.designStatus && ( // Hiển thị nút Confirm nếu chưa xác nhận
-        //   <Button type="link" onClick={() => handleConfirm(record.quotationId)}>
-        //     Confirm
-        //   </Button>
-      ),
+              </Popconfirm>
+              
+            )
+            
+          ),
+        }
+    //    ),
+    // },
+  ];
+  // pond design template
+  const pondDesignColumns = [
+    {
+      title: "Min_Size",
+      dataIndex: "minSize",
+      key: "minSize"
+    },
+    {
+      title: "Max_Size",
+      dataIndex: "maxSize",
+      key: "maxSize"
+    },
+    {
+      title: "Water Volume",
+      dataIndex: "waterVolume",
+      key: "waterVolume"
+    },
+    {
+      title: "Min_Depth",
+      dataIndex: "minDepth",
+      key: "minDepth"
+    },
+    {
+      title: "Max_Depth",
+      dataIndex: "maxDepth",
+      key: "maxDepth"
+    },
+    {
+      title: "Shape",
+      dataIndex: "shape",
+    },
+    {
+      title: "Filtration System",
+      dataIndex: "filtrationSystem",
+    },
+    {
+      title: "PH Level",
+      dataIndex: "phLevel",
+      key: "phLevel"
+    },
+    {
+      title: "Water Temperature",
+      dataIndex: "waterTemperature",
+      key:"waterTemperature"
+    },
+    {
+      title: "Pond Liner",
+      dataIndex: "pondLiner",
+      key:"pondLiner"
+    },
+    {
+      title: "Pond Bottom",
+      dataIndex: "pondBottom",
+      key:"pondBottom"
+    },
+    {
+      title: "Decoration",
+      dataIndex: "decoration",
+    },
+    {
+      title: "Min Estimated Cost",
+      dataIndex: "minEstimatedCost",
+    },
+    {
+      title: "Max Estimated Cost",
+      dataIndex: "maxEstimatedCost",
+    },
+    {
+      title: "Image",
+      dataIndex: "imageUrl",
+      render: (imageUrl : any) => <img src={imageUrl} alt="pond" style={{ width: 100 }} />,
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+    },
+    {
+      title: "Note",
+      dataIndex: "note",
     },
   ];
-  
 
   return (
     <div>
@@ -269,6 +400,7 @@ function DesignProfile() {
         open={showDesignModal}
         title="Designs"
         width={1000} // Tăng độ rộng của modal
+        footer ={null}
       >
         <div style={{ overflowX: 'auto' }}> {/* Thêm wrapper div với overflow */}
           <Table 
@@ -279,6 +411,22 @@ function DesignProfile() {
           />
         </div>
       </Modal>
+      <Modal
+      onCancel={() => setShowPondDesignModal(false)}
+      open={showPondDesignModal}
+      title="Pond Design Templates"
+      width={1000}
+      footer ={null}
+    >
+      <div style={{ overflowX: 'auto' }}>
+        <Table 
+          dataSource={pondDesigns} 
+          columns={pondDesignColumns}
+          pagination={false}
+          scroll={{ x: 1500 }}
+        />
+      </div>
+    </Modal>
     </div>
   );
 }
