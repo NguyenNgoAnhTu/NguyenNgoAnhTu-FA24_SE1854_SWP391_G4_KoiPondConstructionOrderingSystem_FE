@@ -14,6 +14,7 @@ interface FormQuotationProps {
     };
     description: string;
     cost: number;
+    
   };
 }
 
@@ -25,7 +26,7 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
     description: "",
     note: "",
     cost: serviceRequest.serviceCategory.cost,
-    totalCost: "",
+    totalCost: serviceRequest.serviceCategory.cost * 1.1,
     vat: 10,
   });
   const [errors, setErrors] = useState({
@@ -94,7 +95,7 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
       };
     }
     
-    setFormData(updatedFormData);
+    setFormData(updatedFormData as any);
 
     let fieldError = '';
     switch (name) {
@@ -137,12 +138,15 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
   
     try {
       const token = localStorage.getItem('token');
+     // const calculatedTotalCost = calculateTotalCost(Number(formData.cost), Number(formData.vat));
+      
       const requestData = {
         serviceRequestId: formData.requestID,
         description: formData.description,
+      
         cost: Number(formData.cost),
-        totalCost: Number(formData.totalCost),
-        vat: Number(formData.vat),
+        
+      
       };
 
       console.log('Sending data:', requestData);
@@ -155,13 +159,22 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(requestData),
+          body: JSON.stringify({
+            serviceRequestId: formData.requestID,
+            description: formData.description,
+            cost: Number(formData.cost),
+            totalCost: Number(formData.totalCost),
+          }),
         }
       );
   
       if (!response.ok) {
-        throw new Error('Failed to create quotation');
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Failed to create quotation');
       }
+  
+      const result = await response.json();
+      console.log('Response:', result);
   
       await Swal.fire({
         title: 'Success!',
@@ -172,8 +185,14 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
   
       navigate('/admin/tables/table-service-quotation');
     } catch (error) {
-      toast.error('Failed to create quotation!');
       console.error('Error:', error);
+      
+      Swal.fire({
+        title: 'Error!',
+        text: error instanceof Error ? error.message : 'Failed to create quotation',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+      });
     } finally {
       setLoading(false);
     }

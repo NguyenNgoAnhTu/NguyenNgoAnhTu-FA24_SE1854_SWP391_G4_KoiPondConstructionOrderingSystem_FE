@@ -223,7 +223,7 @@ const User = () => {
     setRole(userRole || "");
   }, []);
 
-  const handleConfirmToggle = async (quotationId: string) => {
+  const handleConfirmToggle = async (serviceQuotationId: string) => {
     // Only show confirmation dialog if not already confirmed
     if (!serviceQuotation || serviceQuotation.length === 0) {
       console.warn('Service quotation data is not available.');
@@ -231,7 +231,7 @@ const User = () => {
       return;
     }
     const quotation = serviceQuotation.find(
-      (q) => q.serviceQuotationId === quotationId
+      (q) => q.serviceQuotationId === serviceQuotationId
     );
 
     if (!quotation?.confirm) {
@@ -249,7 +249,7 @@ const User = () => {
         try {
           const token = localStorage.getItem('token');
           const response = await fetch(
-            `http://localhost:8080/api/service-quotations/${quotationId}/toggle-confirm`,
+            `http://localhost:8080/api/service-quotations/${serviceQuotationId}/toggle-confirm`,
             {
               method: 'PATCH',
               headers: {
@@ -266,7 +266,7 @@ const User = () => {
           const updatedQuotation = await response.json();
           setServiceQuotation((prevData) =>
             prevData.map((quotation) =>
-              quotation.serviceQuotationId === quotationId
+              quotation.serviceQuotationId === serviceQuotationId
                 ? updatedQuotation
                 : quotation
             )
@@ -284,7 +284,7 @@ const User = () => {
   const handleShowMore = () => {
     setVisibleCount((prevCount) => prevCount + 3); // show 3 more cards on each click
   };
-  const handleOpen = () => {
+    const handleOpen = () => {
     setModal(!modal);
   };
   useEffect(() => {

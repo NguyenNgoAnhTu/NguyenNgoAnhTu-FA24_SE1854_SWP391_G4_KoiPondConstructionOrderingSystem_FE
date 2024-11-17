@@ -15,7 +15,8 @@ interface PondConfig {
   type: string,
   cost: number,
   description: string,
-  note: string
+  note: string,
+  imageUrl?: string
 }
 
 const Pond_slide = () => {
@@ -33,7 +34,7 @@ const Pond_slide = () => {
     setShowPopup(true); // Show the popup
     
   };
-  const images = [EventImg_1, EventImg_2, EventImg_3];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -109,17 +110,22 @@ const Pond_slide = () => {
         </div>
 
         <Slider {...settings} className="w-full mx-auto mt-[50px]">
-          {blog.map((data: PondConfig,index:any) => (
+          {blog.map((data: PondConfig) => (
             <a
-              onClick={() => handleOpen(data.serviceCategoryId, data.type)} // Pass the id and type to handleOpen
+              onClick={() => handleOpen(data.serviceCategoryId, data.type)}
               key={data.serviceCategoryId}
               className="bg-white flex flex-col items-center gap-10 w-full rounded-3xl shadow-md hover:opacity-60"
             >
               <div className="w-full">
                 <img
-                  src={images[index % images.length]}
-                  alt=""
+                  src={data.imageUrl}
+                  alt={data.type}
                   className="w-full h-[300px] object-cover rounded-t-3xl"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = EventImg_1;
+                    console.log(`Failed to load image for ${data.type}, using fallback`);
+                  }}
                 />
               </div>
 
