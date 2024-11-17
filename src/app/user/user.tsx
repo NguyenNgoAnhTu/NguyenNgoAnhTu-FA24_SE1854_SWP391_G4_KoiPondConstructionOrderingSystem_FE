@@ -9,6 +9,7 @@ import FeedbackModal from './feedbackModal';
 import Swal from 'sweetalert2';
 import ServiceRequestLogs from './service-request-logs';
 import RequestLog from './request-log';
+import ServiceProgressModal from './service-progress.modal';
 
 const User = () => {
   interface ServiceRequest {
@@ -217,6 +218,9 @@ const User = () => {
 
   const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
   const [isRequestLogsModalOpen, setIsRequestLogsModalOpen] = useState(false);
+  const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
+  const [progressModalMode, setProgressModalMode] = useState<'logs' | 'reject'>('logs');
+  const [selectedProgressId, setSelectedProgressId] = useState<string | null>(null);
 
   useEffect(() => {
     const userRole = localStorage.getItem("role");
@@ -437,12 +441,24 @@ const User = () => {
       });
 
       if (response.ok) {
-        message.success(`Successfully confirmed service progress with ID: ${service.serviceProgressID}`); // Show success message
+        message.success(`Successfully confirmed service progress with ID: ${service.serviceProgressID}`);
         setServiceProgress((prevList) =>
-          prevList.map((service) =>
-            service.serviceProgressID === service.serviceProgressID ? { ...service, isComfirmed: true } : service
+          prevList.map((prevService) =>
+            prevService.serviceProgressID === service.serviceProgressID
+              ? { ...prevService, isComfirmed: true }
+              : prevService
           )
         );
+        await fetch(`http://localhost:8080/api/create-progress-log`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            serviceProgressId: service.serviceProgressID,
+          }),
+        });
         const resPayment = await fetch(`http://localhost:8080/api/service-payment`, {
           method: "POST",
           headers: {
@@ -467,6 +483,10 @@ const User = () => {
         message.error(error.message); // Show error message
       }
     }
+  }
+
+  const handleRejected = async (service: ServiceProgress) => {
+    console.log(service);
   }
 
   const handlePaymentClick = (quotation: ServiceQuotation) => {
@@ -1036,7 +1056,7 @@ const User = () => {
                                 </p>
                                 <p className="text-sm">
                                   <span className="font-medium">VAT:</span>{" "}
-                                   {quotation.vat.toLocaleString()}%
+                                  {quotation.vat.toLocaleString()}%
                                 </p>
                                 <p className="text-lg font-semibold text-green-600">
                                   <span className="font-medium">Total:</span>{" "}
@@ -1133,17 +1153,39 @@ const User = () => {
                               </p>
                               <p><strong>Confirmed:  </strong> {service.isComfirmed ? "✔️" : "❌"}</p>
 
-
                               <div className="flex justify-center mt-4">
-
+                                <button
+                                  type="button"
+                                  className="mx-1 text-[#2dd4bf] bg-white hover:text-white hover:bg-[#2dd4bf] focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-4 py-2"
+                                  onClick={() => {
+                                    setSelectedProgressId(service.serviceProgressID);
+                                    setProgressModalMode('logs');
+                                    setIsProgressModalOpen(true);
+                                  }}
+                                >
+                                  View Logs
+                                </button>
                                 {!service.isComfirmed && service.endDate && service.step == "Complete" && (
-                                  <button
-                                    type="button"
-                                    className="mx-1 text-red bg-white hover:text-white  hover:bg-red focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
-                                    onClick={() => handleConfirmed(service)}
-                                  >
-                                    Confirm
-                                  </button>
+                                  <>
+                                    <button
+                                      type="button"
+                                      className="mx-1 text-green bg-white hover:text-white hover:bg-green focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-4 py-2"
+                                      onClick={() => handleConfirmed(service)}
+                                    >
+                                      Confirm
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="mx-1 text-red bg-white hover:text-white hover:bg-red focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-4 py-2"
+                                      onClick={() => {
+                                        setSelectedProgressId(service.serviceProgressID);
+                                        setProgressModalMode('reject');
+                                        setIsProgressModalOpen(true);
+                                      }}
+                                    >
+                                      Reject
+                                    </button>
+                                  </>
                                 )}
                               </div>
                             </div>
@@ -1328,6 +1370,15 @@ const User = () => {
           setSelectedRequestId(null);
         }}
         requestId={selectedRequestId || ''}
+      />
+      <ServiceProgressModal
+        isOpen={isProgressModalOpen}
+        onClose={() => {
+          setIsProgressModalOpen(false);
+          setSelectedProgressId(null);
+        }}
+        serviceProgressId={selectedProgressId}
+        mode={progressModalMode}
       />
     </div>
   );
