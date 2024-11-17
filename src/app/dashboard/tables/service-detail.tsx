@@ -439,10 +439,22 @@ function ServiceRequestTable() {
                   if (!response.ok) {
                     throw new Error("Failed to create service progress");
                   }
-                  navigate('/admin/tables/table-service-progress');
+
                   setShowProgressForm(false);
                   setProgressDetail(null);
                   toast.success("Service progress created successfully!");
+                  const data = await response.json();
+                  await fetch(`http://localhost:8080/api/create-progress-log`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                      serviceProgressId: data.serviceProgressID,
+                    }),
+                  });
+                  navigate('/admin/maintenances/service-progress');
                 } catch (error) {
                   console.error("Create progress error:", error);
                   toast.error("Failed to create service progress!");

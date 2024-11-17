@@ -71,7 +71,7 @@ function ServiceCategoryTable() {
       const downloadURL = await getDownloadURL(uploadResult.ref);
       console.log("Download URL:", downloadURL); // Kiểm tra URL
       return downloadURL;
-    } catch (error) {       
+    } catch (error) {
       console.error("Upload error:", error);
       throw error;
     }
@@ -80,7 +80,7 @@ function ServiceCategoryTable() {
   // Thêm hàm validate
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
-    
+
     // Validate type
     if (!formData.type.trim()) {
       newErrors.type = "Type is required";
@@ -134,7 +134,7 @@ function ServiceCategoryTable() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setLoading(true);
@@ -154,7 +154,7 @@ function ServiceCategoryTable() {
       }
 
       const token = localStorage.getItem("token");
-      const url = isEditMode 
+      const url = isEditMode
         ? `http://localhost:8080/api/service-categories/${categoryToEdit?.serviceCategoryId}`
         : "http://localhost:8080/api/service-categories";
 
@@ -174,11 +174,11 @@ function ServiceCategoryTable() {
       });
 
       if (!response.ok) throw new Error(isEditMode ? "Failed to update category" : "Failed to create category");
-      
+
       const data = await response.json();
-      
+
       if (isEditMode) {
-        setCategories(prev => prev.map(cat => 
+        setCategories(prev => prev.map(cat =>
           cat.serviceCategoryId === categoryToEdit?.serviceCategoryId ? data : cat
         ));
         toast.success('Category updated successfully!');
@@ -193,7 +193,7 @@ function ServiceCategoryTable() {
       setCategoryToEdit(null);
       setFormData({ type: "", cost: 0, note: "", description: "", image: null });
       setImagePreview(null);
-      
+
     } catch (error) {
       console.error("Submit error:", error);
       toast.error(isEditMode ? 'Failed to update category!' : 'Failed to create category!');
@@ -267,9 +267,9 @@ function ServiceCategoryTable() {
         const token = localStorage.getItem("token");
         const response = await fetch(
           "http://localhost:8080/api/service-categories",
-          { 
+          {
             method: "GET",
-            headers: {  
+            headers: {
               Authorization: `Bearer ${token}`,
             },
           }
@@ -290,7 +290,7 @@ function ServiceCategoryTable() {
 
     fetchCategories();
   }, []);
-  
+
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
   }
@@ -392,7 +392,7 @@ function ServiceCategoryTable() {
                       }}
                     />
                   ) : (
-                    <img 
+                    <img
                       src={PLACEHOLDER_IMAGE}
                       alt="No image"
                       className="w-16 h-16 object-cover rounded mx-auto"
@@ -437,7 +437,7 @@ function ServiceCategoryTable() {
       </div>
 
       {showForm && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40"
           onClick={handleFormClickOutside}
         >
@@ -452,14 +452,13 @@ function ServiceCategoryTable() {
                 </label>
                 <input
                   type="text"
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                    errors.type ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${errors.type ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   value={formData.type}
                   onChange={(e) => {
-                    setFormData({...formData, type: e.target.value});
+                    setFormData({ ...formData, type: e.target.value });
                     if (errors.type) {
-                      setErrors({...errors, type: undefined});
+                      setErrors({ ...errors, type: undefined });
                     }
                   }}
                   required
@@ -475,22 +474,21 @@ function ServiceCategoryTable() {
                 </label>
                 <input
                   type="number"
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                    errors.cost ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${errors.cost ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   value={formData.cost}
                   onChange={(e) => {
                     const value = e.target.value;
                     // Cho phép nhập số âm nhưng hiển thị lỗi
-                    setFormData({...formData, cost: Number(value)});
-                    
+                    setFormData({ ...formData, cost: Number(value) });
+
                     // Validate ngay khi nhập
                     if (Number(value) <= 0) {
-                      setErrors(prev => ({...prev, cost: "Cost must be greater than 0"}));
+                      setErrors(prev => ({ ...prev, cost: "Cost must be greater than 0" }));
                     } else if (Number(value) > 1000000000) {
-                      setErrors(prev => ({...prev, cost: "Cost is too high"}));
+                      setErrors(prev => ({ ...prev, cost: "Cost is too high" }));
                     } else {
-                      setErrors(prev => ({...prev, cost: undefined}));
+                      setErrors(prev => ({ ...prev, cost: undefined }));
                     }
                   }}
                   min="0"
@@ -507,14 +505,13 @@ function ServiceCategoryTable() {
                   Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                    errors.description ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${errors.description ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   value={formData.description}
                   onChange={(e) => {
-                    setFormData({...formData, description: e.target.value});
+                    setFormData({ ...formData, description: e.target.value });
                     if (errors.description) {
-                      setErrors({...errors, description: undefined});
+                      setErrors({ ...errors, description: undefined });
                     }
                   }}
                   required
@@ -529,14 +526,13 @@ function ServiceCategoryTable() {
                   Note
                 </label>
                 <textarea
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                    errors.note ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${errors.note ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   value={formData.note}
                   onChange={(e) => {
-                    setFormData({...formData, note: e.target.value});
+                    setFormData({ ...formData, note: e.target.value });
                     if (errors.note) {
-                      setErrors({...errors, note: undefined});
+                      setErrors({ ...errors, note: undefined });
                     }
                   }}
                 />
@@ -553,9 +549,8 @@ function ServiceCategoryTable() {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                    errors.image ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 ${errors.image ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   required
                 />
                 {errors.image && (
@@ -595,80 +590,80 @@ function ServiceCategoryTable() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && categoryToDelete && (
-  <div 
-    className="fixed inset-0 z-50 overflow-y-auto" 
-    aria-labelledby="modal-title" 
-    role="dialog" 
-    aria-modal="true"
-    onClick={handleModalClickOutside}
-  >
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-70 backdrop-blur-sm transition-opacity duration-300"></div>
-    
-    <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
-      <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg">
-        <div className="bg-gradient-to-r from-red-500 to-red-700 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 rounded-t-lg">
-          <div className="sm:flex sm:items-start">
-            {/* Enhanced warning icon */}
-            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10 shadow-lg">
-              <svg
-                className="h-6 w-6 text-red-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                />
-              </svg>
-            </div>
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto"
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
+          onClick={handleModalClickOutside}
+        >
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-70 backdrop-blur-sm transition-opacity duration-300"></div>
 
-            {/* Modal content with enhanced styling */}
-            <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-              <h3
-                className="text-lg font-bold text-white sm:text-xl"
-                id="modal-title"
-              >
-                Delete Category
-              </h3>
-              <div className="mt-2">
-                <p className="text-sm text-gray-200">
-                  Are you sure you want to delete <span className="font-medium text-gray-100">"{categoryToDelete.type}"</span>? 
-                  <br />
-                  <span className="text-red-200">This action cannot be undone.</span>
-                </p>
+          <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+            <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg">
+              <div className="bg-gradient-to-r from-red-500 to-red-700 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 rounded-t-lg">
+                <div className="sm:flex sm:items-start">
+                  {/* Enhanced warning icon */}
+                  <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10 shadow-lg">
+                    <svg
+                      className="h-6 w-6 text-red-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                      />
+                    </svg>
+                  </div>
+
+                  {/* Modal content with enhanced styling */}
+                  <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <h3
+                      className="text-lg font-bold text-white sm:text-xl"
+                      id="modal-title"
+                    >
+                      Delete Category
+                    </h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-200">
+                        Are you sure you want to delete <span className="font-medium text-gray-100">"{categoryToDelete.type}"</span>?
+                        <br />
+                        <span className="text-red-200">This action cannot be undone.</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal actions with button animation */}
+              <div className="bg-rgb(236,248,242) px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 rounded-b-lg">
+                <button
+                  type="button"
+                  className="inline-flex w-full justify-center rounded-md bg-red px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-red-500 hover:shadow-lg hover:ring-2 hover:ring-red-500 sm:ml-3 sm:w-auto transition duration-200 ease-in-out transform hover:scale-105"
+                  onClick={confirmDelete}
+                >
+                  Delete
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-md ring-1 ring-gray-300 hover:bg-gray-100 hover:shadow-lg sm:mt-0 sm:w-auto transition duration-200 ease-in-out transform hover:scale-105"
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setCategoryToDelete(null);
+                  }}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Modal actions with button animation */}
-        <div className="bg-rgb(236,248,242) px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 rounded-b-lg">
-          <button
-            type="button"
-            className="inline-flex w-full justify-center rounded-md bg-red px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-red-500 hover:shadow-lg hover:ring-2 hover:ring-red-500 sm:ml-3 sm:w-auto transition duration-200 ease-in-out transform hover:scale-105"
-            onClick={confirmDelete}
-          >
-            Delete
-          </button>
-          <button
-            type="button"
-            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-md ring-1 ring-gray-300 hover:bg-gray-100 hover:shadow-lg sm:mt-0 sm:w-auto transition duration-200 ease-in-out transform hover:scale-105"
-            onClick={() => {
-              setShowDeleteModal(false);
-              setCategoryToDelete(null);
-            }}
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }

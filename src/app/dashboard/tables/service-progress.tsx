@@ -138,12 +138,15 @@ function ServiceProgressTable() {
 
   const handleOk = async () => {
     if (!selectedService) return;
-    if (selectedService.step === "Canceled") {
-      if (!selectedService.description || selectedService.description.trim() === "")
-        message.error("Description is required when status is Canceled");
-      else if (selectedService.description.length < 0 || selectedService.description.length > 100)
-        message.error("Description must be between 0 and 100 characters");
+    if (!selectedService.description || selectedService.description.trim() === "") {
+      message.error("Description is required");
       return;
+    }
+    if (selectedService.step === "Canceled") {
+      if (selectedService.description?.length < 10 || selectedService.description?.length > 100) {
+        message.error("Description must be between 10 and 100 characters");
+        return;
+      }
     }
     if (!image) {
       message.error("Image is required");
@@ -159,7 +162,7 @@ function ServiceProgressTable() {
         ...selectedService,
         imageUrl: imageUrl
       };
-
+      console.log(selectedService.step);
       const response = await fetch(
         `http://localhost:8080/api/service-progress/${selectedService.serviceProgressID}`,
         {
@@ -246,6 +249,16 @@ function ServiceProgressTable() {
             service.serviceProgressID === service.serviceProgressID ? { ...service, isComfirmed: true } : service
           )
         );
+        await fetch(`http://localhost:8080/api/create-progress-log`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            serviceProgressId: service.serviceProgressID,
+          }),
+        });
         const resPayment = await fetch(`http://localhost:8080/api/service-payment`, {
           method: "POST",
           headers: {
@@ -376,7 +389,7 @@ function ServiceProgressTable() {
                   >
                     View Logs
                   </button>
-                  {!service.isComfirmed && (
+                  {(service.step != "Canceled" && service.step != "Complete") && !service.isComfirmed && (
                     <button
                       type="button"
                       className="mx-1 text-white bg-green hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
@@ -430,7 +443,13 @@ function ServiceProgressTable() {
                 />
               </div>
             ),
-            children: `${log.step || ''} - ${log.description || ''}`,
+            children: (
+              <>
+                <p>{log.step || ''}</p>
+                <p>{log.description || ''}</p>
+              </>
+            ),
+
           }))}
         />
       </Modal>
