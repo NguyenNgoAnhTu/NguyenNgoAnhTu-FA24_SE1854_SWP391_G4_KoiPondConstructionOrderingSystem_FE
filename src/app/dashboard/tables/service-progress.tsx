@@ -295,13 +295,14 @@ function ServiceProgressTable() {
   ) => {
     if (selectedService) {
       if (typeof eOrName === "string") {
-        // Handle Select change
+        if (eOrName === "step" && (!value || value === selectedService.step)) {
+          return;
+        }
         setSelectedService({
           ...selectedService,
           [eOrName]: value,
         });
       } else {
-        // Handle input/textarea change
         const { name, value } = eOrName.target;
         setSelectedService({
           ...selectedService,
@@ -317,6 +318,29 @@ function ServiceProgressTable() {
       setImage(file);
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
+    }
+  };
+
+  const getAllowedSteps = (currentStep?: string) => {
+    switch (currentStep) {
+      case "In progress":
+        return [
+          { value: "In progress", label: "In progress" },
+          { value: "Completed", label: "Completed" },
+          { value: "Canceled", label: "Canceled" }
+        ];
+      case "Completed":
+        return [
+          { value: "Completed", label: "Completed" }
+        ];
+      case "Canceled":
+        return [
+          { value: "Canceled", label: "Canceled" }
+        ];
+      default:
+        return [
+          { value: "In progress", label: "In progress" }
+        ];
     }
   };
 
@@ -348,7 +372,10 @@ function ServiceProgressTable() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {serviceProgressData.map((service, index) => (
-              <tr key={service.serviceProgressID} className="hover:bg-gray-50 transition duration-200">
+              <tr key={service.serviceProgressID} className={`transition duration-200
+                ${service.step === "Rejected" ? 'bg-red bg-opacity-50' : 'hover:bg-gray'}`
+              }
+              >
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{index + 1}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceProgressID}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center w-16 h-16">
@@ -373,7 +400,7 @@ function ServiceProgressTable() {
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.description || ""}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.isComfirmed ? "✔️" : "❌"}</td>
                 <td className="px-2 py-4 text-sm">
-                  {!service.isComfirmed && service.endDate && service.step == "Complete" && (
+                  {!service.isComfirmed && service.endDate && service.step == "Completed" && (
                     <button
                       type="button"
                       className="mx-1 text-white bg-brown focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
@@ -389,7 +416,7 @@ function ServiceProgressTable() {
                   >
                     View Logs
                   </button>
-                  {(service.step != "Canceled" && service.step != "Complete") && !service.isComfirmed && (
+                  {(service.step != "Canceled" && service.step != "Completed") && !service.isComfirmed && (
                     <button
                       type="button"
                       className="mx-1 text-white bg-green hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
@@ -464,10 +491,11 @@ function ServiceProgressTable() {
               <label>
                 <strong>Step:</strong>
                 <Select
-                  defaultValue={selectedService.step}
+                  value={selectedService.step}
                   style={{ width: '100%' }}
                   onChange={(value) => handleInputChange("step", value)}
-                  options={options}
+                  options={getAllowedSteps(selectedService.step)}
+                  disabled={selectedService.step === "Complete" || selectedService.step === "Canceled"}
                 />
               </label>
               <label className="mt-1">

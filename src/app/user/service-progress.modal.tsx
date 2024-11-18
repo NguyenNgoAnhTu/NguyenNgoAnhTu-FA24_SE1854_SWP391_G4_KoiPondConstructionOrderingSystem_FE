@@ -81,7 +81,7 @@ const ServiceProgressModal: React.FC<ServiceProgressModalProps> = ({
                     },
                     body: JSON.stringify({
                         "serviceDetailID": serviceProgressId,
-                        "step": "Reject",
+                        "step": "Rejected",
                         "description": rejectReason,
                         "imageUrl": ""
                     }),

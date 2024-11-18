@@ -214,7 +214,7 @@ const User = () => {
   const [role, setRole] = useState(localStorage.getItem("role") || "");
 
   const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [address, setAddress] = useState(localStorage.getItem("address") || "N/A");  
+  const [address, setAddress] = useState(localStorage.getItem("address") || "N/A");
 
   const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
   const [isRequestLogsModalOpen, setIsRequestLogsModalOpen] = useState(false);
@@ -432,12 +432,19 @@ const User = () => {
 
   const handleConfirmed = async (service: ServiceProgress) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/acceptance-service-progress/${service.serviceProgressID}`, {
+      const response = await fetch(
+        `http://localhost:8080/api/service-progress/${service.serviceProgressID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({
+          "serviceDetailID": service.serviceProgressID,
+          "step": "Completed",
+          "description": "Confirmed",
+          "imageUrl": ""
+        }),
       });
 
       if (response.ok) {
@@ -582,27 +589,27 @@ const User = () => {
       if (!response.ok) {
         throw new Error("Failed to update profile");
       }
-      if(response.ok){
-      const updatedProfile = await response.json();
+      if (response.ok) {
+        const updatedProfile = await response.json();
 
-      // Update local storage với dữ liệu từ response
-      localStorage.setItem("name", updatedProfile.name);
-      localStorage.setItem("email", updatedProfile.email);
-      localStorage.setItem("phone", updatedProfile.phoneNumber);
-      localStorage.setItem("address", updatedProfile.address);
-      console.log(updatedProfile.address);
-      console.log(updatedProfile.name);
-      // Update state với dữ liệu từ response
-      setName(updatedProfile.name);
-      setEmail(updatedProfile.email);
-      setPhone(updatedProfile.phoneNumber);
-      setAddress(updatedProfile.address);
+        // Update local storage với dữ liệu từ response
+        localStorage.setItem("name", updatedProfile.name);
+        localStorage.setItem("email", updatedProfile.email);
+        localStorage.setItem("phone", updatedProfile.phoneNumber);
+        localStorage.setItem("address", updatedProfile.address);
+        console.log(updatedProfile.address);
+        console.log(updatedProfile.name);
+        // Update state với dữ liệu từ response
+        setName(updatedProfile.name);
+        setEmail(updatedProfile.email);
+        setPhone(updatedProfile.phoneNumber);
+        setAddress(updatedProfile.address);
 
-      // Reset editing states
-      setIsEditingName(false);
-      setIsEditingEmail(false);
-      setIsEditingPhone(false);
-      setIsEditingAddress(false);
+        // Reset editing states
+        setIsEditingName(false);
+        setIsEditingEmail(false);
+        setIsEditingPhone(false);
+        setIsEditingAddress(false);
 
         toast.success("Profile updated successfully");
       }
@@ -920,7 +927,7 @@ const User = () => {
                       <h2 className="text-2xl font-bold mb-4">Service Requests</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                         {serviceRequests.slice(0, visibleCount).map((service) => (
-                          <div 
+                          <div
                             key={service.serviceRequestId}
                             className={`rounded-lg bg-[#EBF8F2] shadow-md p-4 hover:shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 relative
                               ${!service.isActive ? 'opacity-60' : ''}`}
@@ -1165,7 +1172,7 @@ const User = () => {
                                 >
                                   View Logs
                                 </button>
-                                {!service.isComfirmed && service.endDate && service.step == "Complete" && (
+                                {!service.isComfirmed && service.endDate && service.step == "Completed" && (
                                   <>
                                     <button
                                       type="button"
