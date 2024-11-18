@@ -178,7 +178,7 @@ const ConsultForm = () => {
         console.log("Response data:", data);
 
         toast.success("Consult created successfully!");
-        navigate("/admin/tables/table-consult");
+        navigate("/admin/constructions/consult");
       } catch (error) {
         console.error("Error creating consult:", error);
         toast.error(error instanceof Error ? error.message : "Create consult failed!");
