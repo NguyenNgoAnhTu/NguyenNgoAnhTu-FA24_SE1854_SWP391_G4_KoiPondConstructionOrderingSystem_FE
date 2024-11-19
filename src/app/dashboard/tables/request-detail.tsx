@@ -13,6 +13,10 @@ function RequestDetailTable() {
   const [form] = Form.useForm();
   const [selectedRequestDetail, setSelectedRequestDetail] = useState<{ requestDetailId: number } | null>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  // Thêm các state mới
+  const [showCancelReasonModal, setShowCancelReasonModal] = useState(false);
+  const [cancelReasonForm] = Form.useForm();
+  const [deletingRequestDetailId, setDeletingRequestDetailId] = useState<number | null>(null);
 
   type RequestType = {
     id: number;
@@ -106,9 +110,23 @@ function RequestDetailTable() {
   };
 
   // Thêm hàm delete
-  const handleDelete = async (requestDetailId: number) => {
+  const handleDelete = async (requestDetailId: number, cancelReason?: string) => {
     try {
+      // Nếu chưa có cancelReason, mở modal để nhập
+      if (!cancelReason) {
+        setDeletingRequestDetailId(requestDetailId);
+        setShowCancelReasonModal(true);
+        return;
+      }
       const token = localStorage.getItem("token");
+
+      const requestBody = {
+        requestDetailId: requestDetailId,
+        cancelReason: cancelReason
+      };
+
+      console.log('Sending delete request with:', requestBody); // Log để debug
+
       const response = await fetch(
         `http://localhost:8080/api/requestDetail/${requestDetailId}`,
         {
@@ -117,19 +135,25 @@ function RequestDetailTable() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          // Thêm cancelReason vào body của request
+          body: JSON.stringify({ cancelReason }),
         }
       );
 
       if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error response:', errorData);
         toast.error("Failed to delete request detail");
         return;
       }
 
       toast.success("Request detail deleted successfully!");
+      setShowCancelReasonModal(false);
+      cancelReasonForm.resetFields();
       fetchRequestDetails();
     } catch (err) {
+      console.error('Delete error:', err);
       toast.error("Error deleting request detail");
-      console.error(err);
     }
   };
 
@@ -294,10 +318,10 @@ function RequestDetailTable() {
         </>
       ),
     },
-    { 
-      title: "Note", 
-      dataIndex: "note", 
-      key: "note", 
+    {
+      title: "Note",
+      dataIndex: "note",
+      key: "note",
     },
     {
       title: "Actions",
@@ -305,7 +329,7 @@ function RequestDetailTable() {
       render: (record: RequestDetailType) => {
         const disabled = isActionDisabled(record.note);
         const consultDisabled = isConsultDisabled(record.note);
-        
+
         return (
           <div style={{ display: 'flex', gap: '8px' }}>
             {/* Consult Button */}
@@ -328,11 +352,11 @@ function RequestDetailTable() {
               }}
               onClick={() => !consultDisabled && handleConsult(record)}
               title={
-                record.note === "Consult completed!" 
-                  ? "Cannot consult completed requests" 
+                record.note === "Consult completed!"
+                  ? "Cannot consult completed requests"
                   : record.note === "Consult is in progressing!"
-                  ? "Request is already in progress"
-                  : "Consult"
+                    ? "Request is already in progress"
+                    : "Consult"
               }
             />
 
@@ -603,6 +627,52 @@ function RequestDetailTable() {
             rules={[{ required: true, message: "Please input the note!" }]}
           >
             <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        title="Enter Cancel Reason"
+        open={showCancelReasonModal}
+        onCancel={() => {
+          setShowCancelReasonModal(false);
+          cancelReasonForm.resetFields();
+        }}
+        footer={[
+          <Button
+            key="cancel"
+            style={{ backgroundColor: "red", color: "white" }}
+            onClick={() => {
+              setShowCancelReasonModal(false);
+              cancelReasonForm.resetFields();
+            }}
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            style={{ backgroundColor: "LimeGreen", color: "white" }}
+            onClick={() => {
+              cancelReasonForm
+                .validateFields()
+                .then((values) => {
+                  handleDelete(deletingRequestDetailId!, values.cancelReason);
+                })
+                .catch((info) => {
+                  console.log("Validate Failed:", info);
+                });
+            }}
+          >
+            Delete
+          </Button>,
+        ]}
+      >
+        <Form form={cancelReasonForm} layout="vertical">
+          <Form.Item
+            name="cancelReason"
+            label="Cancel Reason"
+            rules={[{ required: true, message: "Please input the reason for cancellation!" }]}
+          >
+            <Input.TextArea rows={4} />
           </Form.Item>
         </Form>
       </Modal>
