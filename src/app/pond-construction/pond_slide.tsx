@@ -1,4 +1,4 @@
-import {  Modal, Form, Input } from "antd";
+import { Modal, Form, Input } from "antd";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import Typography from "components/typography";
@@ -66,7 +66,33 @@ function Pond_slide() {
       }
 
       const token = localStorage.getItem("token");
-      
+
+      // First update the customer's address
+      const updateCustomerResponse = await fetch(
+        `http://localhost:8080/api/customer/${customerId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: localStorage.getItem("name"),
+            email: localStorage.getItem("email"),
+            phoneNumber: localStorage.getItem("phone"),
+            address: values.address
+          }),
+        }
+      );
+
+      if (updateCustomerResponse.ok) {
+        // Update localStorage with new address
+        localStorage.setItem("address", values.address);
+      } else {
+        toast.error("Failed to update customer address");
+        return;
+      }
+
       const requestBody = {
         customerId: customerId,
         description: values.description,
@@ -89,7 +115,7 @@ function Pond_slide() {
       }
 
       const requestData = await response.json();
-      
+
       const requestBodyRequestDetail = {
         pondDesignTemplateId: selectedId,
         requestId: requestData.id,
@@ -131,6 +157,18 @@ function Pond_slide() {
     fetchData();
   }, []);
 
+  // Thêm useEffect để set giá trị mặc định cho form khi mở modal
+  useEffect(() => {
+    if (showModal) {
+      const savedAddress = localStorage.getItem("address");
+      if (savedAddress) {
+        form.setFieldsValue({
+          address: savedAddress
+        });
+      }
+    }
+  }, [showModal, form]);
+
   return (
     <div className="max-w-[1440px] w-[90%] mx-auto mt-[50px] phone:w-[95%]">
       <div className="flex flex-col gap-6 mb-10">
@@ -145,7 +183,7 @@ function Pond_slide() {
 
       <div className="grid grid-cols-3 gap-8 phone:grid-cols-1 tablet:grid-cols-2">
         {datas.map((data) => (
-          <div 
+          <div
             key={data.pondDesignTemplateId}
             className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
           >
@@ -156,12 +194,12 @@ function Pond_slide() {
                 className="w-full h-full object-cover"
               />
             </div>
-            
+
             <div className="p-6">
               <Typography className="text-[24px] font-bold mb-4 text-center">
                 ${data.minEstimatedCost.toLocaleString()} - ${data.maxEstimatedCost.toLocaleString()}
               </Typography>
-              
+
               <Typography className="text-[18px] font-semibold mb-4 text-center">
                 {data.description || "Pond Design"}
               </Typography>
@@ -211,11 +249,14 @@ function Pond_slide() {
         width={600}
         className="custom-modal"
       >
-        <Form 
-          onFinish={handleFormCreate} 
-          form={form} 
+        <Form
+          onFinish={handleFormCreate}
+          form={form}
           layout="vertical"
           className="mt-4"
+          initialValues={{
+            address: localStorage.getItem("address") || "" // Set giá trị mặc định
+          }}
         >
           <Form.Item
             label="Description"
@@ -224,7 +265,7 @@ function Pond_slide() {
           >
             <Input.TextArea rows={4} className="rounded-lg" />
           </Form.Item>
-          
+
           <Form.Item
             label="Address"
             name="address"
@@ -232,7 +273,7 @@ function Pond_slide() {
           >
             <Input.TextArea rows={3} className="rounded-lg" />
           </Form.Item>
-          
+
           <Form.Item
             label="Additional Notes"
             name="note"

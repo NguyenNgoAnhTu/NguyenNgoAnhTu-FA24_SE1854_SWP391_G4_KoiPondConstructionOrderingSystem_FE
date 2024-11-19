@@ -313,7 +313,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
                             <li>
                               <NavLink
-                                to="/admin/tables/table-pondDesignTemplate"
+                                to="/admin/constructions/pondDesignTemplate"
                                 className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
                               >
                                 Pond Design Template
