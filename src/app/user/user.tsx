@@ -159,6 +159,7 @@ const User = () => {
     mainCost: number;
     createdAt: string;
     updatedAt: string;
+    url?: string;
   }
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
   const [serviceQuotation, setServiceQuotation] = useState<ServiceQuotation[]>(
@@ -1398,14 +1399,35 @@ const User = () => {
                                   quotation.consult.requestDetail.request.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
                                     'bg-gray-100 text-gray-800'}`}
                               >
-                                {quotation.consult.requestDetail.request.status}
+                                {quotation.isConfirm ? 'QUOTATION CONFIRMED' : 
+                                quotation.consult.requestDetail.request.status}
                               </span>
+                            </p>
+                            <p className="text-sm text-gray-700 mb-2">
+                              <strong></strong> ${quotation.vat.toLocaleString()}
                             </p>
 
 
+                          {/* Hiển thị URL của quotation */}
+                          {quotation.url && (
+                              <div className="mt-4 border-t pt-4">
+                                <p className="text-sm text-gray-700 mb-2">
+                                  <strong>Quotation Detail:</strong>{" "}
+                                  <a 
+                                    href={quotation.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:text-blue-800 underline"
+                                  >
+                                    detail
+                                  </a>
+                                </p>
+                                
+                              </div>
+                            )}
                           </div>
                         ))}
-                      </div>
+                        </div>
                       {visibleCount < quotationConstructions.length && (
                         <div className="flex justify-center mt-6">
                           <button
