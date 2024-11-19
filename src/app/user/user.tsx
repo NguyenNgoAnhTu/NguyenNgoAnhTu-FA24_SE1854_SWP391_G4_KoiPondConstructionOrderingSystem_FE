@@ -98,6 +98,7 @@ const User = () => {
     createDate: string;
     updatedAt: string;
     isActive: boolean;
+    cancelReason?: string;
   }
 
   interface GetAllQuotationResponse {
@@ -270,7 +271,7 @@ const User = () => {
         }
 
         // Log request details
-     
+
 
         const response = await fetch(
           `http://localhost:8080/api/service-quotations/${serviceQuotationId}/toggle-confirm`,
@@ -285,7 +286,7 @@ const User = () => {
 
         // Read response text first
         const responseText = await response.text();
-      //  console.log('Response text:', responseText);
+        //  console.log('Response text:', responseText);
 
         // Try to parse JSON if possible
         let data;
@@ -297,15 +298,15 @@ const User = () => {
 
         if (!response.ok) {
           throw new Error(
-            data?.message || 
-            responseText || 
+            data?.message ||
+            responseText ||
             'Failed to confirm quotation'
           );
         }
 
         // Update state only if request was successful
-        setServiceQuotation(prev => 
-          prev.map(q => 
+        setServiceQuotation(prev =>
+          prev.map(q =>
             q.serviceQuotationId === serviceQuotationId
               ? { ...q, confirm: true }
               : q
@@ -322,9 +323,9 @@ const User = () => {
         error,
         message: error instanceof Error ? error.message : 'Unknown error'
       });
-      
+
       toast.error(
-        error instanceof Error 
+        error instanceof Error
           ? `Failed to confirm: ${error.message}`
           : 'Failed to confirm quotation'
       );
@@ -358,7 +359,7 @@ const User = () => {
   const handleShowMore = () => {
     setVisibleCount((prevCount) => prevCount + 3); // show 3 more cards on each click
   };
-    const handleOpen = () => {
+  const handleOpen = () => {
     setModal(!modal);
   };
   useEffect(() => {
@@ -1316,13 +1317,21 @@ const User = () => {
                             <p className="text-sm text-gray-700 mb-2">
                               <strong>Status:</strong>{" "}
                               <span className={`px-2 py-1 rounded-full text-xs font-semibold
-                                    ${request.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+              ${request.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
                                   request.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                                    'bg-gray-100 text-gray-800'}`}
+                                    request.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                                      'bg-gray-100 text-gray-800'}`}
                               >
                                 {request.status}
                               </span>
                             </p>
+
+                            {/* Hiển thị Cancel Reason khi status là CANCELLED */}
+                            {request.status === 'CANCELLED' && (
+                              <p className="text-sm text-red-600 mb-2">
+                                <strong>Cancel Reason:</strong> {request.cancelReason || "No reason provided"}
+                              </p>
+                            )}
 
                             <div className="flex justify-center mt-4 gap-2">
                               <button
