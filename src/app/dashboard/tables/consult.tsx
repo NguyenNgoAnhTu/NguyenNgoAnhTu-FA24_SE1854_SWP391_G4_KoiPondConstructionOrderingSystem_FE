@@ -220,7 +220,7 @@ function Consult() {
       console.log("Quotation created successfully!");
       setShowQuotationModal(false);
       toast.success("Quotation created!");
-      navigate('/admin/tables/table-quotation');
+      navigate('/admin/constructions/quotation');
     } catch (err) {
       alert(err);
     }
@@ -711,13 +711,13 @@ function Consult() {
         rules={[{ required: true, message: "Please upload a file!" }]}
       >
         <Upload
-          accept=".pdf"
+          accept=".pdf,.doc,.docx,.xls,.xlsx"
           customRequest={({ file, onSuccess, onError }) =>
             handleUpload(file, onSuccess, onError)
           }
           listType="text"
         >
-          <Button icon={<UploadOutlined />}>Upload PDF</Button>
+          <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
       </Form.Item>
         </Form>

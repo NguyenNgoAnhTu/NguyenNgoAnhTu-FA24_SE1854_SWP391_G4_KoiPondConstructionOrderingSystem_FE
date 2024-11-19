@@ -123,7 +123,7 @@ const routesAdmin = [
     element: <PondDesignTemplateTable />,
   },
   {
-    path: "/admin/tables/table-quotation",
+    path: "/admin/constructions/quotation",
     element: <Quotation />,
 
   },

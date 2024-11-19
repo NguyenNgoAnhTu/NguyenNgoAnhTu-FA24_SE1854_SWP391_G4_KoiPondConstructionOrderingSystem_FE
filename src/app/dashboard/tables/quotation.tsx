@@ -105,13 +105,14 @@ const [consultData, setConsultData] = useState<ConsultType | null>(null);
 
   const handleUpdateSave = async (values: any) => {
     try {
+     
       const token = localStorage.getItem("token");
       if (!selectedQuotation) {
         toast.error("No quotation selected for update");
         return;
       }
-      let newFileUrl = selectedQuotation.url;
-
+      let newFileUrl = selectedQuotation?.url;
+      console.log("Current URL:", newFileUrl);
       // Xử lý upload file nếu có file mới
       if (fileList.length > 0) {
         const file = fileList[0].originFileObj;
@@ -130,6 +131,7 @@ const [consultData, setConsultData] = useState<ConsultType | null>(null);
         mainCost: values.mainCost,
         subCost: values.subCost,
         vat: values.vat,
+        url: newFileUrl ,
       };
 
       const response = await fetch(
@@ -150,6 +152,7 @@ const [consultData, setConsultData] = useState<ConsultType | null>(null);
 
       console.log("Quotation updated successfully!");
       setShowModal(false);
+      setFileList([]);
       toast.success("Quotation updated!");
       fetchData();
     } catch (err) {
@@ -159,6 +162,9 @@ const [consultData, setConsultData] = useState<ConsultType | null>(null);
         toast.error("An unknown error occurred");
       }
     }
+  };
+  const handleFileChange = (info: any) => {
+    setFileList(info.fileList);
   };
 
   const handleCancel = () => {
@@ -252,7 +258,7 @@ const [consultData, setConsultData] = useState<ConsultType | null>(null);
 
 
       setShowCreateProfileModal(false);
-      navigate('/admin/tables/design-profile-manager');
+      navigate('/admin/constructions/design-profile-manager');
     } catch (error) {
       console.error(error);
       toast.error("Failed to create design profile");
@@ -596,14 +602,17 @@ const [consultData, setConsultData] = useState<ConsultType | null>(null);
           rules={[{ required: true, message: "Please upload a file!" }]}
         >
           <Upload
-            accept=".pdf"
-            customRequest={({ file, onSuccess, onError }) =>
-              props(file, onSuccess, onError)
-            }
-            listType="text"
-          >
-            <Button icon={<UploadOutlined />}>Upload PDF</Button>
-          </Upload>
+  accept=".pdf,.doc,.docx,.xls,.xlsx"
+  fileList={fileList}
+  onChange={handleFileChange}
+  customRequest={({ file, onSuccess }: { file: any, onSuccess?: (response: any) => void }) => {
+    if (onSuccess) {
+      onSuccess("ok");
+    }
+  }}
+>
+  <Button icon={<UploadOutlined />}>Select File</Button>
+</Upload>
         </Form.Item>
       </Modal>
       <Modal
