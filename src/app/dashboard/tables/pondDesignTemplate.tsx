@@ -80,6 +80,10 @@ function PondDesignTemplateTable() {
 
   const handleUpdateSave = async (values: any) => {
     try {
+      // Validate form values
+      if (!validateFormValues(values)) {
+        return;
+      }
       const token = localStorage.getItem("token");
       if (!selectedTemplate) {
         toast.error("No template selected!");
@@ -349,8 +353,29 @@ function PondDesignTemplateTable() {
     },
   ];
 
+  // Thêm function validation chung cho cả Add và Update
+  const validateFormValues = (values: any) => {
+    if (Number(values.maxSize) <= Number(values.minSize)) {
+      toast.error('Maximum size must be greater than minimum size!');
+      return false;
+    }
+    if (Number(values.maxDepth) <= Number(values.minDepth)) {
+      toast.error('Maximum depth must be greater than minimum depth!');
+      return false;
+    }
+    if (Number(values.maxEstimatedCost) <= Number(values.minEstimatedCost)) {
+      toast.error('Maximum cost must be greater than minimum cost!');
+      return false;
+    }
+    return true;
+  };
+
   const handleAdd = async (values: any) => {
     try {
+      // Validate form values
+      if (!validateFormValues(values)) {
+        return;
+      }
       setLoading(true);
       const token = localStorage.getItem("token");
       // Kiểm tra imageUrl
@@ -419,6 +444,26 @@ function PondDesignTemplateTable() {
     </div>
   );
 
+  // Thêm các hàm validation helper
+  const validateNumber = (_: any, value: string) => {
+    if (isNaN(Number(value))) {
+      return Promise.reject('Please input number!');
+    }
+    if (Number(value) < 0) {
+      return Promise.reject('Value must be greater than 0!');
+    }
+    return Promise.resolve();
+  };
+
+  const validateCost = (_: any, value: string) => {
+    if (isNaN(Number(value))) {
+      return Promise.reject('Please input number!');
+    }
+    if (Number(value) <= 0) {
+      return Promise.reject('Cost must be greater than 0!');
+    }
+    return Promise.resolve();
+  };
 
 
   return (
@@ -494,7 +539,11 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="minSize"
             label="Min Size"
-            rules={[{ required: true, message: 'Please input min size!' }]}
+            rules={[
+              { required: true, message: 'Please input minimum size!' },
+              { validator: validateNumber },
+              { max: 1000, message: 'Size cannot exceed 1000!' }
+            ]}
           >
             <Input />
           </Form.Item>
@@ -502,7 +551,12 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="maxSize"
             label="Max Size"
-            rules={[{ required: true, message: 'Please input max size!' }]}
+            rules={[
+              { required: true, message: 'Please input maximum size!' },
+              { validator: validateNumber },
+              { max: 1000, message: 'Size cannot exceed 1000!' }
+            ]}
+            dependencies={['minSize']}
           >
             <Input />
           </Form.Item>
@@ -510,7 +564,10 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="waterVolume"
             label="Water Volume"
-            rules={[{ required: true, message: 'Please input water volume!' }]}
+            rules={[
+              { required: true, message: 'Please input water volume!' },
+              { validator: validateNumber }
+            ]}
           >
             <Input />
           </Form.Item>
@@ -518,7 +575,11 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="minDepth"
             label="Min Depth"
-            rules={[{ required: true, message: 'Please input min depth!' }]}
+            rules={[
+              { required: true, message: 'Please input minimum depth!' },
+              { validator: validateNumber },
+              { max: 10, message: 'Depth cannot exceed 10!' }
+            ]}
           >
             <Input />
           </Form.Item>
@@ -526,7 +587,12 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="maxDepth"
             label="Max Depth"
-            rules={[{ required: true, message: 'Please input max depth!' }]}
+            rules={[
+              { required: true, message: 'Please input maximum depth!' },
+              { validator: validateNumber },
+              { max: 10, message: 'Depth cannot exceed 10!' }
+            ]}
+            dependencies={['minDepth']}
           >
             <Input />
           </Form.Item>
@@ -550,7 +616,11 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="phLevel"
             label="pH Level"
-            rules={[{ required: true, message: 'Please input pH level!' }]}
+            rules={[
+              { required: true, message: 'Please input pH level!' },
+              { validator: validateNumber },
+              { min: 0, max: 14, message: 'pH must be between 0-14!' }
+            ]}
           >
             <Input />
           </Form.Item>
@@ -558,7 +628,11 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="waterTemperature"
             label="Water Temperature"
-            rules={[{ required: true, message: 'Please input water temperature!' }]}
+            rules={[
+              { required: true, message: 'Please input water temperature!' },
+              { validator: validateNumber },
+              { min: 0, max: 40, message: 'Temperature must be between 0-40!' }
+            ]}
           >
             <Input />
           </Form.Item>
@@ -590,7 +664,10 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="minEstimatedCost"
             label="Min Estimated Cost"
-            rules={[{ required: true, message: 'Please input min estimated cost!' }]}
+            rules={[
+              { required: true, message: 'Please input minimum cost!' },
+              { validator: validateCost }
+            ]}
           >
             <Input />
           </Form.Item>
@@ -598,7 +675,11 @@ function PondDesignTemplateTable() {
           <Form.Item
             name="maxEstimatedCost"
             label="Max Estimated Cost"
-            rules={[{ required: true, message: 'Please input max estimated cost!' }]}
+            rules={[
+              { required: true, message: 'Please input maximum cost!' },
+              { validator: validateCost }
+            ]}
+            dependencies={['minEstimatedCost']}
           >
             <Input />
           </Form.Item>
@@ -728,7 +809,6 @@ function PondDesignTemplateTable() {
           <Form.Item name="maxEstimatedCost" label="Max Estimated Cost" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          // Trong Update Modal, cập nhật Form.Item của imageUrl tương tự:
           <Form.Item
             name="imageUrl"
             label="Image"

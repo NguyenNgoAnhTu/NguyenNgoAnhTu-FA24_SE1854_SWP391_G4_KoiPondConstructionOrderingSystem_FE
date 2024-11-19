@@ -503,16 +503,15 @@ function Consult() {
           <Form.Item
             name="customerId"
             label="Customer ID"
-            rules={[{ required: true, message: "Please input the customer ID!" }]}
           >
-            <Input type="number" />
+            <Input type="number" disabled />
           </Form.Item>
           <Form.Item
             name="requestDetailId"
             label="Request Detail ID"
             rules={[{ required: true, message: "Please input the Request Detail ID!" }]}
           >
-            <Input type="number" />
+            <Input type="number" disabled />
           </Form.Item>
           <Form.Item
             name="consultDate"

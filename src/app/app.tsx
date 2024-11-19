@@ -119,7 +119,7 @@ const routesAdmin = [
     element: <RequestDetailTable />,
   },
   {
-    path: "/admin/tables/table-pondDesignTemplate",
+    path: "/admin/constructions/pondDesignTemplate",
     element: <PondDesignTemplateTable />,
   },
   {
