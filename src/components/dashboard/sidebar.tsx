@@ -250,6 +250,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                        {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                            <li>
+                              <NavLink
+                                to="/admin/constructors-detail"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Constructors detail
+                              </NavLink>
+                            </li>
+                          )}
                           {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
                             <li>
                               <NavLink
