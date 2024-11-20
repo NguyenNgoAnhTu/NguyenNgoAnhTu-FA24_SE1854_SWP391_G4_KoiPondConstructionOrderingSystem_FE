@@ -35,6 +35,7 @@ import ShowQuotation from "app/dashboard/tables/showQuotationCus";
 import Constructors from "app/dashboard/tables/constructors.tsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MaintenanceStaff from "./dashboard/tables/maintenanceStaff";
 
 
 const routes = [
@@ -139,6 +140,10 @@ const routesAdmin = [
   {
     path: "/admin/constructors-detail",
     element: <Constructors />,
+  },
+  {
+    path: "/admin/maintenance-staff",
+    element: <MaintenanceStaff />,
   },
 ];
 

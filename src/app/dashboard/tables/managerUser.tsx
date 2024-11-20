@@ -271,7 +271,7 @@ function CustomerTable() {
           className="text-white bg-green hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2"
           onClick={() => setShowAddForm(true)}
         >
-          Add New {selectedRole}  
+          Add New Staff  
         </button>
         
         <div className="flex items-center">
