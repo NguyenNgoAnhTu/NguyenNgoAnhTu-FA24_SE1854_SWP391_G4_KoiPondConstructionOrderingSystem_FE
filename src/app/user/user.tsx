@@ -1042,7 +1042,7 @@ const User = () => {
                               >
                                 View Logs
                               </button>
-                              {service.isActive && service.status === "Finish" && (
+                              {service.isActive && service.status === "FINISH" && (
                                 <button
                                   onClick={() => {
                                     setSelectedRequestId(service.serviceRequestId);
