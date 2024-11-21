@@ -189,7 +189,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </svg>
                         User Management
                       </NavLink>
-                      
+
                     );
                   }}
                 </SidebarLinkGroup>
@@ -198,10 +198,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 <SidebarLinkGroup
                   activeCondition={
                     pathname === "/maintenance-staff" || pathname.includes("maintenance-staff")
-                    }
-                > 
+                  }
+                >
                   {() => {
-                    return ( <NavLink 
+                    return (<NavLink
                       to="/admin/maintenance-staff"
                       className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname.includes(
                         "maintenance-staff"
@@ -219,7 +219,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       </svg>
                       Maintenance Staff
                     </NavLink>
-                  );
+                    );
                   }}
                 </SidebarLinkGroup>
               )}
@@ -252,8 +252,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     );
                   }}
                 </SidebarLinkGroup>
-              )}  
-                {hasAccess(["MANAGER", "STAFF", "DESIGNER"]) && (
+              )}
+              {hasAccess(["MANAGER", "STAFF", "DESIGNER"]) && (
                 <SidebarLinkGroup
                   activeCondition={
                     pathname === "/designers-detail" || pathname.includes("designers-detail")
@@ -282,8 +282,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     );
                   }}
                 </SidebarLinkGroup>
-              )}  
-        
+              )}
+
 
               {/* <!-- Menu Item Forms --> */}
               <SidebarLinkGroup
@@ -342,7 +342,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                        {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
                             <li>
                               <NavLink
                                 to="/admin/constructors-detail"
@@ -353,7 +353,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             </li>
                           )}
 
-                            {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
                             <li>
                               <NavLink
                                 to="/admin/designers-detail"
@@ -393,7 +393,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               </NavLink>
                             </li>
                           )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "DESIGNER") && (
+                          {(userRole === "MANAGER" || userRole === "STAFF") && (
                             <li>
                               <NavLink
                                 to="/admin/constructions/design-profile-manager"

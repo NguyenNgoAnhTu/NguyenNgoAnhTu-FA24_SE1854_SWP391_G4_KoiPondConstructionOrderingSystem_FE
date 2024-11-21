@@ -471,11 +471,11 @@ function ServiceRequestTable() {
                     className="w-full p-2 border rounded bg-white text-gray-800"
                     required
                   >
-                    <option value="Not started">Not started</option>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="NOT STARTED">NOT STARTED</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="IN PROGRESS">IN PROGRESS</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="CANCELED">CANCELLED</option>
                   </select>
                 </div>
 
