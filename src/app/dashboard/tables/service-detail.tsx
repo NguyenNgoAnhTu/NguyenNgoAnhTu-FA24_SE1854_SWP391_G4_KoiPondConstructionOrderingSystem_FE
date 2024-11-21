@@ -163,7 +163,7 @@ function ServiceRequestTable() {
     setProgressDetail({
       serviceDetailId: serviceDetail.serviceDetailId,
       description: '',
-      step: 'Not started',
+      step: 'NOT STARTED',
     });
     setShowProgressForm(true);
   };
@@ -246,7 +246,7 @@ function ServiceRequestTable() {
                       ${serviceDetail.serviceQuotation.serviceRequest.status === "PROCESSING"
                         ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
                         : "bg-[#d3d3d3] cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     Edit
                   </button>
@@ -254,7 +254,7 @@ function ServiceRequestTable() {
                     type="button"
                     onClick={() => handleCreateProgress(serviceDetail)}
                     className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
-                      ${  serviceDetail.serviceQuotation.serviceRequest.status === "PROCESSING"
+                      ${serviceDetail.serviceQuotation.serviceRequest.status === "PROCESSING"
                         ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
                         : "bg-[#d3d3d3] cursor-not-allowed"
                       }`}
@@ -456,17 +456,19 @@ function ServiceRequestTable() {
                   setShowProgressForm(false);
                   setProgressDetail(null);
                   toast.success("Service progress created successfully!");
-                  const data = await response.json();
-                  await fetch(`http://localhost:8080/api/create-progress-log`, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                      serviceProgressId: data.serviceProgressID,
-                    }),
-                  });
+                  if (progressDetail.step !== "NOT STARTED") {
+                    const data = await response.json();
+                    await fetch(`http://localhost:8080/api/create-progress-log`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
+                        serviceProgressId: data.serviceProgressID,
+                      }),
+                    });
+                  }
                   navigate('/admin/maintenances/service-progress');
                 } catch (error) {
                   console.error("Create progress error:", error);
@@ -484,11 +486,8 @@ function ServiceRequestTable() {
                     className="w-full p-2 border rounded bg-white text-gray-800"
                     required
                   >
-                    <option value="Not started">Not started</option>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="NOT STARTED">NOT STARTED</option>
+                    <option value="PENDING">PENDING</option>
                   </select>
                 </div>
 
