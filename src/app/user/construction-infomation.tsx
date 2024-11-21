@@ -270,6 +270,11 @@ function ConstructionInfomation() {
           title: "Design",
           dataIndex: "design",
           key: "design",
+          render: (text: any, record: any) => (
+            <a href={record.design} target="_blank" rel="noopener noreferrer">
+              View
+            </a>
+          ),
         },
         {
           title: "DesignStatus",

@@ -357,6 +357,11 @@ function Consult() {
       }
     }
   };
+  const calculateTotalCost = (mainCost: number, subCost: number) => {
+    const vat = 10;
+    const vatAmount = (mainCost + subCost) * (vat / 100);
+    return mainCost + subCost + vatAmount;
+  };
 
 
 
@@ -445,7 +450,7 @@ function Consult() {
                   mainCost: 0,
                   subCost: 0,
                   vat: 10,
-                 
+                  
                 });
 
                 setShowQuotationModal(true);
@@ -585,6 +590,7 @@ function Consult() {
             <Input />
           </Form.Item>
 
+        
           <Form.Item
             name="mainCost"
             label="Main Cost"
@@ -600,10 +606,18 @@ function Consult() {
               }),
             ]}
           >
-            <Input type="number" />
+            <Input 
+    type="number" 
+    onChange={(e) => {
+      const mainCost = parseFloat(e.target.value) || 0;
+      const subCost = parseFloat(quotationForm.getFieldValue('subCost')) || 0;
+      const totalCost = calculateTotalCost(mainCost, subCost);
+      quotationForm.setFieldsValue({ totalCost });
+    }}
+  />
           </Form.Item>
 {/* form cũ */}
-          {/* <Form.Item
+          <Form.Item
             name="subCost"
             label="Sub Cost"
             rules={[
@@ -618,8 +632,14 @@ function Consult() {
               }),
             ]}
           >
-            <Input type="number" />
-          </Form.Item> */}
+            <Input type="number"
+            onChange={(e) => {
+              const subCost = parseFloat(e.target.value) || 0;
+              const mainCost = parseFloat(quotationForm.getFieldValue('mainCost')) || 0;
+              const totalCost = calculateTotalCost(mainCost, subCost);
+              quotationForm.setFieldsValue({ totalCost });
+            }} />
+          </Form.Item>
 
           {/* form text cho sub cost rate */}
           {/* <Form.Item
@@ -659,32 +679,48 @@ function Consult() {
 
 
 {/* combo box */}
-<Form.Item
+{/* <Form.Item
   name="subRate"
   label="Sub Rate (%)"
   rules={[{ required: true, message: "Please select the sub rate!" }]}
 >
   <Select
-    onChange={(value) => {
-      const mainCost = quotationForm.getFieldValue('mainCost');
-      if (mainCost) {
-        const subCost = (mainCost * value) / 100;
-        quotationForm.setFieldsValue({ subCost });
-      }
-    }}
+  //   onChange={(value) => {
+  //     const mainCost = quotationForm.getFieldValue('mainCost');
+  //    // if (mainCost) {
+  //       const subCost = (mainCost * value) / 100;
+        
+  //       quotationForm.setFieldsValue({ subCost });
+  //  //   }
+  //     const totalCost = calculateTotalCost(mainCost, value);
+  //     quotationForm.setFieldsValue({ 
+  //       subCost,
+  //       totalCost
+  //     });
+  //   }}
+  onChange={(value) => {
+    const mainCost = Number(quotationForm.getFieldValue('mainCost')) || 0;
+    const subCost = (mainCost * Number(value)) / 100;
+    const totalCost = calculateTotalCost(mainCost, Number(value));
+
+    quotationForm.setFieldsValue({ 
+      subCost,
+      totalCost
+    });
+  }}
   >
     <Select.Option value={10}>10%</Select.Option>
     <Select.Option value={20}>20%</Select.Option>
     <Select.Option value={30}>30%</Select.Option>
   </Select>
-</Form.Item>
+</Form.Item> */}
 
-<Form.Item
+{/* <Form.Item
   name="subCost"
   label="Sub Cost"
 >
-  <Input type="number" disabled />
-</Form.Item>
+  <Input type="number"  />
+</Form.Item> */}
 
           <Form.Item
             name="vat"
@@ -701,8 +737,20 @@ function Consult() {
             //   }),
             // ]}
           >
-            <Input type="number" readOnly />
+            <Input type="number" readOnly 
+                   suffix="%" 
+                   style={{ width: '100%' }}
+            />
           </Form.Item>
+          <Form.Item
+  label="Total Cost"
+  name="totalCost"
+>
+  <Input 
+    readOnly
+    style={{ fontWeight: 'bold' }}
+  />
+</Form.Item>
           <Form.Item
         label="Upload PDF"
         name="url"
