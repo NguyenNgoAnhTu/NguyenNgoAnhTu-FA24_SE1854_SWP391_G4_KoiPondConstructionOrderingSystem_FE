@@ -27,7 +27,7 @@ function ServiceRequestTable() {
   const [showQuotationForm, setShowQuotationForm] = useState(false);
 
   const canDelete = (status: string) => {
-    const allowedStatuses = ['PENDING', 'PROCESSING', 'QUOTING'];
+    const allowedStatuses = ['PENDING'];
     return allowedStatuses.includes(status);
   };
 

@@ -31,6 +31,7 @@ function ServiceRequestTable() {
           note: string;
         };
         address: string;
+        status: string;
       };
       description: string;
       note: string;
@@ -241,27 +242,39 @@ function ServiceRequestTable() {
                   <button
                     type="button"
                     onClick={() => handleEdit(serviceDetail)}
-                    className="mx-1 text-white bg-green hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
+                    className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
+                      ${serviceDetail.serviceQuotation.serviceRequest.status === "PROCESSING"
+                        ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
+                        : "bg-[#d3d3d3] cursor-not-allowed"
+                    }`}
                   >
                     Edit
                   </button>
                   <button
                     type="button"
                     onClick={() => handleCreateProgress(serviceDetail)}
-                    className="mx-1 text-white bg-green hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
+                    className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
+                      ${  serviceDetail.serviceQuotation.serviceRequest.status === "PROCESSING"
+                        ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
+                        : "bg-[#d3d3d3] cursor-not-allowed"
+                      }`}
                   >
                     Create Progress
                   </button>
-                  <button
+                  {/* <button
                     type="button"
                     onClick={() => {
                       setDetailToDelete(serviceDetail);
                       setShowDeleteModal(true);
                     }}
-                    className="mx-1 text-white bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
+                    className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
+                      ${serviceDetail.serviceQuotation.serviceRequest.status === "PROCESSING"
+                        ? "bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300"
+                        : "bg-[#d3d3d3] cursor-not-allowed"
+                      }`}
                   >
                     Delete
-                  </button>
+                  </button> */}
                   <br></br>
                 </td>
               </tr>
@@ -471,11 +484,11 @@ function ServiceRequestTable() {
                     className="w-full p-2 border rounded bg-white text-gray-800"
                     required
                   >
-                    <option value="NOT STARTED">NOT STARTED</option>
-                    <option value="PENDING">PENDING</option>
-                    <option value="IN PROGRESS">IN PROGRESS</option>
-                    <option value="COMPLETED">COMPLETED</option>
-                    <option value="CANCELED">CANCELLED</option>
+                    <option value="Not started">Not started</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
                   </select>
                 </div>
 
