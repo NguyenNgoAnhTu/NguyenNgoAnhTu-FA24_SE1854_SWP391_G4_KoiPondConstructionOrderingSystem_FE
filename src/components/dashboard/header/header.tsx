@@ -1,6 +1,24 @@
+import { useEffect, useState } from "react";
 import DropdownUser from "./DropdownUser";
 
-const Header = ({ sidebarOpen, setSidebarOpen }) => {
+const Header = ({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean, setSidebarOpen: (value: boolean) => void }) => {
+  const [userInfo, setUserInfo] = useState({
+    name: '',
+    role: ''
+  });
+
+  useEffect(() => {
+    // Lấy thông tin từ localStorage
+    const name = localStorage.getItem('name');
+    const role = localStorage.getItem('role');
+    if (name && role) {
+      setUserInfo({
+        name: name,
+        role: role
+      });
+    }
+  }, []);
+
   return (
     <header className="sticky top-0 z-[1100] flex w-full bg-[#4A6CF7] drop-shadow-1">
       <div className="flex w-full items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
@@ -11,6 +29,17 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
           >
             {/* ... burger menu icon ... */}
           </button>
+
+          {/* Thêm thông tin user */}
+          <div className="hidden lg:flex items-center space-x-3 text-white">
+            <div className="text-sm">
+              Welcome, <span className="font-semibold">{userInfo.name}</span>
+            </div>
+            <div className="h-4 w-[1px] bg-blue-400"></div>
+            <div className="text-sm">
+              Role: <span className="font-semibold">{userInfo.role}</span>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 2xsm:gap-7">
