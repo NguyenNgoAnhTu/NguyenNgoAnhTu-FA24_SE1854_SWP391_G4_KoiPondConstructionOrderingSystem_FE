@@ -36,6 +36,7 @@ import Constructors from "app/dashboard/tables/constructors.tsx";
 import Designers from "app/dashboard/tables/designers"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MaintenanceStaff from "./dashboard/tables/maintenanceStaff";
 
 
 const routes = [
@@ -142,8 +143,13 @@ const routesAdmin = [
     element: <Constructors />,
   },
   {
+
     path: "/admin/designers-detail",
     element: <Designers />,
+
+    path: "/admin/maintenance-staff",
+    element: <MaintenanceStaff />,
+
   },
 ];
 

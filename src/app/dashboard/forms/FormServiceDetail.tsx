@@ -28,6 +28,12 @@ interface FormServiceDetailProps {
 //   };
 }
 
+// Thêm interface cho ServiceProgress
+interface ServiceProgress {
+  serviceProgressID: string;
+  isComfirmed: boolean;
+}
+
 const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotation }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -37,6 +43,8 @@ const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotatio
     staffId:"",
   });
   const [staffList, setStaffList] = useState<Array<{ customerId: string; name: string }>>([]);
+  const [staffProgress, setStaffProgress] = useState<Record<string, ServiceProgress[]>>({});
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -48,31 +56,66 @@ const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotatio
   };
 
   useEffect(() => {
-    const fetchStaff = async () => {
+    const fetchStaffAndProgress = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8080/api/customer/MAINTENANCE  ", {   
-          method: "GET",
-            headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
         
-        if (!response.ok) {
+        // Fetch staff list
+        const staffResponse = await fetch(
+          "http://localhost:8080/api/customer/MAINTENANCE",
+          {   
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!staffResponse.ok) {
           throw new Error("Failed to fetch staff");
         }
         
-        const data = await response.json();
-        setStaffList(data);
-        console.log(data);
+        const staffData = await staffResponse.json();
+        
+        // Fetch progress for each staff
+        const progressData: Record<string, ServiceProgress[]> = {};
+        
+        for (const staff of staffData) {
+          const progressResponse = await fetch(
+            `http://localhost:8080/api/service-progress/maintenance-staff/${staff.customerId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (progressResponse.ok) {
+            const progress = await progressResponse.json();
+            progressData[staff.customerId] = progress;
+          }
+        }
+
+        setStaffProgress(progressData);
+
+        // Filter available staff
+        const availableStaff = staffData.filter(staff => {
+          const staffProgress = progressData[staff.customerId] || [];
+          return staffProgress.length === 0 || staffProgress.every(p => p.isComfirmed);
+        });
+
+        setStaffList(availableStaff);
+        console.log("Available staff:", availableStaff);
       } catch (error) {
         console.error("Error fetching staff:", error);
+        toast.error("Failed to load staff list");
       }
     };
   
-    fetchStaff();
+    fetchStaffAndProgress();
   }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -131,24 +174,29 @@ const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotatio
             />
           </div>
           <div className="mb-4">
-  <label className="block text-gray-700 mb-2">Staff Name</label>
-  <select
-    name="staffId"
-    value={formData.staffId}
-    onChange={handleChange}
-    className="w-full p-2 border rounded"
-    required
-  >
-    <option value=""></option>
-    {staffList.map((staff) => (
-      <option key={staff.customerId} value={staff.customerId}>
-        {staff.name}
-      </option>
-      
-    ))}
-  </select>
-  
-</div>
+            <label className="block text-gray-700 mb-2">Staff Name</label>
+            <select
+              name="staffId"
+              value={formData.staffId}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              required
+            >
+              <option value="">Select available staff</option>
+              {staffList.map((staff) => (
+                <option 
+                  key={staff.customerId} 
+                  value={staff.customerId}
+                  className="py-2"
+                >
+                  {staff.name} (Available)
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-sm text-gray-500">
+              Only showing staff members who are available for new assignments
+            </p>
+          </div>
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Description</label>
             <textarea

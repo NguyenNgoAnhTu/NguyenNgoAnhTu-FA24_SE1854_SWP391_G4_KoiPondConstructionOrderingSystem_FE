@@ -189,10 +189,72 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </svg>
                         User Management
                       </NavLink>
+                      
                     );
                   }}
                 </SidebarLinkGroup>
               )}
+              {hasAccess(["MANAGER", "STAFF", "MAINTENANCE"]) && (
+                <SidebarLinkGroup
+                  activeCondition={
+                    pathname === "/maintenance-staff" || pathname.includes("maintenance-staff")
+                    }
+                > 
+                  {() => {
+                    return ( <NavLink 
+                      to="/admin/maintenance-staff"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname.includes(
+                        "maintenance-staff"
+                      )}`}
+                    >
+                      <svg
+                        className="fill-current"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 512 512"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 400c-18 0-32-14-32-32s14-32 32-32s32 14 32 32s-14 32-32 32zM296 328c0 17.36-14.36 32-32 32s-32-14.64-32-32c0-35.36 29.28-64 64-64s64 28.64 64 64z" />
+                      </svg>
+                      Maintenance Staff
+                    </NavLink>
+                  );
+                  }}
+                </SidebarLinkGroup>
+              )}
+              {hasAccess(["MANAGER", "STAFF", "CONSTRUCTOR"]) && (
+                <SidebarLinkGroup
+                  activeCondition={
+                    pathname === "/constructors-detail" || pathname.includes("constructors-detail")
+                  }
+                >
+                  {() => {
+                    return (
+                      <NavLink
+                        to="/admin/constructors-detail"
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out text-gray hover:text-white  ${pathname.includes(
+                          "constructors-detail"
+                        )}`}
+                      >
+                        <svg
+                          className="fill-current"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 512 512"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 400c-18 0-32-14-32-32s14-32 32-32s32 14 32 32s-14 32-32 32z" />
+                        </svg>
+                        Constructors Detail
+                      </NavLink>
+                    );
+                  }}
+                </SidebarLinkGroup>
+              )}  
+        
+
               {/* <!-- Menu Item Forms --> */}
               <SidebarLinkGroup
                 activeCondition={
