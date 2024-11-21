@@ -308,6 +308,31 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
     }
   };
 
+  const handleDelete = async (constructionHistoryId: any) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/construction_history/delete-construction_history/${constructionHistoryId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        toast.error("You don't have permission!");
+        return;
+      }
+      console.log("Deleted successfully!");
+      toast.success("Deleted successfully!");
+      setShowHistoryModal(false);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
   useEffect(() => {
     fetchData("");
   }, []);
@@ -392,6 +417,27 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
         });
         return `${formattedDate} ${formattedTime}`;
       },
+    },
+    {
+      title: "Action",
+      dataIndex: "constructionHistoryId",
+      key: "constructionHistoryId",
+      render: (constructionHistoryId: any) => (
+        <>
+          <Popconfirm
+            title="Delete"
+            color="orange"
+            cancelButtonProps={{ style: { color: "white" } }}
+            okButtonProps={{ style: { borderColor: "white" } }}
+            description="Do you want to delete this?"
+            onConfirm={() => handleDelete(constructionHistoryId)}
+          >
+            <Button style={{ backgroundColor: "red", color: "white" }}>
+              Delete
+            </Button>
+          </Popconfirm>
+        </>
+      ),
     },
   ];
 
