@@ -332,11 +332,41 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
       title: "Start date",
       dataIndex: "startDate",
       key: "startDate",
+      render: (startDate: any) => {
+        const date = new Date(startDate);
+        const formattedDate = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const formattedTime = date.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        });
+        return `${formattedDate} ${formattedTime}`;
+      },
     },
     {
       title: "Expected end date",
       dataIndex: "endDate",
       key: "endDate",
+      render: (endDate: any) => {
+        const date = new Date(endDate);
+        const formattedDate = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const formattedTime = date.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        });
+        return `${formattedDate} ${formattedTime}`;
+      },
     },
     {
       title: "Note",
@@ -347,6 +377,21 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
       title: "Created",
       dataIndex: "createDate",
       key: "createDate",
+      render: (createDate: any) => {
+        const date = new Date(createDate);
+        const formattedDate = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const formattedTime = date.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        });
+        return `${formattedDate} ${formattedTime}`;
+      },
     },
   ];
 
@@ -360,6 +405,21 @@ const handleUpload = (file: any, onSuccess: any, onError: any) => {
       title: "Confirm date",
       dataIndex: "confirmDate",
       key: "confirmDate",
+      render: (confirmDate: any) => {
+        const date = new Date(confirmDate);
+        const formattedDate = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const formattedTime = date.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        });
+        return `${formattedDate} ${formattedTime}`;
+      },
     },
     {
       title: "Description",
