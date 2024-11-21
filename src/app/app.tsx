@@ -33,6 +33,7 @@ import DesignProfileTable from "app/dashboard/tables/designProfile.tsx";
 import Quotation from "app/dashboard/tables/quotation.tsx";
 import ShowQuotation from "app/dashboard/tables/showQuotationCus";
 import Constructors from "app/dashboard/tables/constructors.tsx";
+import Designers from "app/dashboard/tables/designers"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -139,6 +140,10 @@ const routesAdmin = [
   {
     path: "/admin/constructors-detail",
     element: <Constructors />,
+  },
+  {
+    path: "/admin/designers-detail",
+    element: <Designers />,
   },
 ];
 
