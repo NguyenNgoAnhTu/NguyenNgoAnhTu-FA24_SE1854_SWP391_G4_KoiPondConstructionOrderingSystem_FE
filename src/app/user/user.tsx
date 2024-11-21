@@ -11,6 +11,7 @@ import ServiceRequestLogs from './service-request-logs';
 import RequestLog from './request-log';
 import ServiceProgressModal from './service-progress.modal';
 
+
 const User = () => {
   interface ServiceRequest {
     serviceRequestId: string;
@@ -504,18 +505,12 @@ const User = () => {
   const handleConfirmed = async (service: ServiceProgress) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/service-progress/${service.serviceProgressID}`, {
+        `http://localhost:8080/api/acceptance-service-progress/${service.serviceProgressID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          "serviceDetailID": service.serviceProgressID,
-          "step": "Completed",
-          "description": "Confirmed",
-          "imageUrl": ""
-        }),
       });
 
       if (response.ok) {
@@ -1408,8 +1403,8 @@ const User = () => {
                                   quotation.consult.requestDetail.request.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
                                     'bg-gray-100 text-gray-800'}`}
                               >
-                                {quotation.isConfirm ? 'QUOTATION CONFIRMED' : 
-                                quotation.consult.requestDetail.request.status}
+                                {quotation.isConfirm ? 'QUOTATION CONFIRMED' :
+                                  quotation.consult.requestDetail.request.status}
                               </span>
                             </p>
                             <p className="text-sm text-gray-700 mb-2">
@@ -1417,26 +1412,26 @@ const User = () => {
                             </p>
 
 
-                          {/* Hiển thị URL của quotation */}
-                          {quotation.url && (
+                            {/* Hiển thị URL của quotation */}
+                            {quotation.url && (
                               <div className="mt-4 border-t pt-4">
                                 <p className="text-sm text-gray-700 mb-2">
                                   <strong>Quotation Detail:</strong>{" "}
-                                  <a 
-                                    href={quotation.url} 
-                                    target="_blank" 
+                                  <a
+                                    href={quotation.url}
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-600 hover:text-blue-800 underline"
                                   >
                                     detail
                                   </a>
                                 </p>
-                                
+
                               </div>
                             )}
                           </div>
                         ))}
-                        </div>
+                      </div>
                       {visibleCount < quotationConstructions.length && (
                         <div className="flex justify-center mt-6">
                           <button
