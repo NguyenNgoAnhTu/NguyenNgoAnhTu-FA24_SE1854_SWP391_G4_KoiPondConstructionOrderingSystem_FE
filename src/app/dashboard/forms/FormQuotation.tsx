@@ -183,7 +183,7 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
         confirmButtonColor: '#3085d6',
       });
   
-      navigate('/admin/tables/table-service-quotation');
+      navigate('/admin/maintenances/service-quotation');
     } catch (error) {
       console.error('Error:', error);
       

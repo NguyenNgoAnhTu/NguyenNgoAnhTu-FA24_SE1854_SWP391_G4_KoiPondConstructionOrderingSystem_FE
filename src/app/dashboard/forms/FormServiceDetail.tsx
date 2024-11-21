@@ -150,7 +150,7 @@ const FormServiceDetail: React.FC<FormServiceDetailProps> = ({ onClose, quotatio
         confirmButtonColor: '#3085d6',
       });
   
-      navigate("/admin/tables/table-service-details");
+      navigate("/admin/maintenances/service-details");
     } catch (error) {
       toast.error("Failed to create service detail!");
       console.error("Error:", error);
