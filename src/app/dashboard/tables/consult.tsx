@@ -26,6 +26,7 @@ type ConsultType = {
   isCustomerConfirm: boolean; // Thêm trường isCustomerConfirm
   // customers: number;
   customers: { customerId: number }[];
+  requestDetail: { requestDetailId: number };
 };
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
@@ -234,10 +235,11 @@ function Consult() {
 
     form.setFieldsValue({
       description: record.description,
-      customerId: record.customers[1].customerId, // Lấy customerId từ mảng customers
-      requestDetailId: record.requestDetailId,
+      customerId: record.customers[1].customerId,
+      requestDetailId: record.requestDetail.requestDetailId, 
       consultDate: record.consultDate,
     });
+    
 
     setShowModal(true);
   }
@@ -514,9 +516,9 @@ function Consult() {
           <Form.Item
             name="requestDetailId"
             label="Request Detail ID"
-            rules={[{ required: true, message: "Please input the Request Detail ID!" }]}
+            initialValue={selectedConsult?.requestDetailId}
           >
-            <Input type="number" disabled />
+            <Input type="number" disabled/>
           </Form.Item>
           <Form.Item
             name="consultDate"
