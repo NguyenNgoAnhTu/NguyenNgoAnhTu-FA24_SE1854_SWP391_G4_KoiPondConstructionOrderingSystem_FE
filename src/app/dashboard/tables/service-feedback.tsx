@@ -152,9 +152,7 @@ function ServiceFeedbackTable() {
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.feedback}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.rating}</td>
                                 <td className="px-2 py-4 text-sm text-black-15 text-center">{new Date(service.createDate).toLocaleString()}</td>
-                                {service.updateDate && (
-                                    <td className="px-2 py-4 text-sm text-black-15 text-center">{new Date(service.updateDate).toLocaleString()}</td>
-                                )}
+                                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.updateDate ? new Date(service.updateDate).toLocaleString() : ""}</td>
                                 <td className="px-2 py-4 text-sm">
                                     <button
                                         type="button"

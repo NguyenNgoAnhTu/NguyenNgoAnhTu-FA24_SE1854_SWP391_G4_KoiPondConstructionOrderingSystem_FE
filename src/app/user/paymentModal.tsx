@@ -1,5 +1,6 @@
 import { Modal, Select, message } from 'antd';
 import { useState, useEffect } from 'react';
+import { number } from 'yup';
 
 interface ServicePayment {
     servicePaymentID: string;
@@ -45,8 +46,8 @@ interface PaymentModalProps {
 }
 
 const paymentMethodOptions = [
-    { value: "Cash", label: "Cash" },
-    { value: "Online", label: "Online" },
+    { value: "CASH", label: "CASH" },
+    { value: "ONLINE", label: "ONLINE" },
 ];
 
 const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) => {
@@ -148,7 +149,7 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
     const updateOrderStatus = async (paymentData: VNPayResponse) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/vnpay/payment_info?vnp_Amount=${paymentData.amount}&vnp_BankCode=${paymentData.bankCode}&vnp_OrderInfo=${paymentData.orderInfo}&vnp_ResponseCode=${paymentData.responseCode}&paymentId=${paymentData.paymentId}`,
+                `http://localhost:8080/api/vnpay/payment_info?vnp_Amount=${paymentData.amount}&vnp_BankCode=${paymentData.bankCode}&vnp_BankTranNo=${paymentData.bankTranNo}&vnp_ResponseCode=${paymentData.responseCode}&paymentId=${paymentData.paymentId}`,
                 {
                     method: 'GET',
                     headers: {
@@ -161,11 +162,10 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
             if (!response.ok) {
                 throw new Error("Failed to update payment status");
             }
-            message.success("Payment status updated successfully by method online!");
+            console.log("Payment status updated successfully by method online!");
             onClose();
         } catch (error) {
             console.error('Error updating payment status:', error);
-            message.error('Failed to update payment status');
         }
     };
 
@@ -174,9 +174,10 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
 
         setLoadingPayment(true);
         try {
-            if (servicePaymentData.paymentMethod === "Online") {
+            if (servicePaymentData.paymentMethod === "ONLINE") {
+                const amountInVND = Math.round(servicePaymentData.serviceQuotation.totalCost * 24000);
                 const responseVNPay = await fetch(
-                    `http://localhost:8080/api/vnpay/create_payment?amount=${servicePaymentData.serviceQuotation.totalCost}&paymentId=${servicePaymentData.servicePaymentID}`,
+                    `http://localhost:8080/api/vnpay/create_payment?amount=${amountInVND}&paymentId=${servicePaymentData.servicePaymentID}`,
                     {
                         method: "GET",
                         headers: {
@@ -205,7 +206,7 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
                         serviceQuotationId: servicePaymentData.serviceQuotation.serviceQuotationId,
                         paymentMethod: servicePaymentData.paymentMethod,
                         maintenanceStaffID: servicePaymentData.maintenanceStaff.customerId,
-                        status: "Paid"
+                        status: "PAID"
                     }),
                 }
             );
@@ -251,11 +252,11 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
             open={isOpen}
             onCancel={handleClose}
             confirmLoading={loadingPayment}
-            onOk={servicePaymentData?.status !== "Paid" ? handlePayment : undefined}
-            okText={servicePaymentData?.status !== "Paid" ? "Confirm Payment" : "Transaction completed successfully"}
+            onOk={servicePaymentData?.status !== "PAID" ? handlePayment : undefined}
+            okText={servicePaymentData?.status !== "PAID" ? "Confirm Payment" : "Transaction completed successfully"}
             okButtonProps={{
-                disabled: servicePaymentData?.status === "Paid",
-                style: servicePaymentData?.status === "Paid" ? { backgroundColor: '#d9d9d9' } : undefined
+                disabled: servicePaymentData?.status === "PAID",
+                style: servicePaymentData?.status === "PAID" ? { backgroundColor: '#d9d9d9' } : undefined
             }}
             cancelText="Cancel"
         >
@@ -268,7 +269,7 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
                         <p><strong>Customer:</strong> {servicePaymentData.serviceQuotation.customer.name}</p>
                         <p><strong>Cost:</strong> ${servicePaymentData.serviceQuotation.cost}</p>
                         <p><strong>VAT:</strong> {servicePaymentData.serviceQuotation.vat}%</p>
-                        {servicePaymentData.status !== "Paid" ? (
+                        {servicePaymentData.status !== "PAID" ? (
                             <div className="space-y-3">
                                 <h3 className="text-lg font-semibold">Payment Method</h3>
                                 <div className="space-y-2">
@@ -283,12 +284,12 @@ const PaymentModal = ({ isOpen, onClose, servicePayment }: PaymentModalProps) =>
                         ) : (
                             <>
                                 <p><strong>Payment Method: </strong> {servicePaymentData.paymentMethod}</p>
-                                {servicePaymentData.transactionID && servicePaymentData.paymentMethod === "Online" && (
+                                {servicePaymentData.transactionID && servicePaymentData.paymentMethod === "ONLINE" && (
                                     <p><strong>Transaction ID:</strong> {servicePaymentData.transactionID}</p>
                                 )}
                             </>
                         )}
-                        <p><strong>Description:</strong> {servicePaymentData.description}</p>
+                        {/* <p><strong>Description:</strong> {servicePaymentData.description}</p> */}
                         <p><strong>Status:</strong> {servicePaymentData.status}</p>
                         <p className="text-xl font-bold text-green-600">
                             <strong>Total Amount:</strong> ${servicePaymentData.serviceQuotation.totalCost.toFixed(2)}

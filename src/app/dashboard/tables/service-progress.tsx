@@ -17,6 +17,7 @@ function ServiceProgressTable() {
       serviceQuotation: {
         serviceQuotationId: string;
       };
+      description: string;
     };
     imageUrl?: string;
     startDate: string;
@@ -142,7 +143,7 @@ function ServiceProgressTable() {
       message.error("Description is required");
       return;
     }
-    if (selectedService.step === "Canceled") {
+    if (selectedService.step === "CANCELED") {
       if (selectedService.description?.length < 10 || selectedService.description?.length > 100) {
         message.error("Description must be between 10 and 100 characters");
         return;
@@ -269,7 +270,7 @@ function ServiceProgressTable() {
             "serviceQuotationID": service.serviceDetail.serviceQuotation.serviceQuotationId,
             "paymentMethod": "Cash",
             "maintenanceStaffID": service.serviceDetail.staff.customerId,
-            "status": "Pending"
+            "status": "PROCESSING"
           }),
         });
         if (!resPayment.ok) {
@@ -295,13 +296,33 @@ function ServiceProgressTable() {
   ) => {
     if (selectedService) {
       if (typeof eOrName === "string") {
-        if (eOrName === "step" && (!value || value === selectedService.step)) {
-          return;
+        if (eOrName === "step") {
+          if (!value || value === selectedService.step) {
+            return;
+          }
+          if (value === "CANCELED" || value === "COMPLETED") {
+            Modal.confirm({
+              title: 'Confirm',
+              content: `Are you sure you want to ${value} this service?`,
+              okText: 'Yes',
+              cancelText: 'No',
+              onOk() {
+                setSelectedService({
+                  ...selectedService,
+                  [eOrName]: value,
+                });
+              },
+              onCancel() {
+                return;
+              },
+            });
+          } else {
+            setSelectedService({
+              ...selectedService,
+              [eOrName]: value,
+            });
+          }
         }
-        setSelectedService({
-          ...selectedService,
-          [eOrName]: value,
-        });
       } else {
         const { name, value } = eOrName.target;
         setSelectedService({
@@ -323,23 +344,23 @@ function ServiceProgressTable() {
 
   const getAllowedSteps = (currentStep?: string) => {
     switch (currentStep) {
-      case "In progress":
+      case "IN PROGRESS":
         return [
-          { value: "In progress", label: "In progress" },
-          { value: "Completed", label: "Completed" },
-          { value: "Canceled", label: "Canceled" }
+          { value: "IN PROGRESS", label: "IN PROGRESS" },
+          { value: "COMPLETED", label: "COMPLETED" },
+          { value: "CANCELED", label: "CANCELED" }
         ];
-      case "Completed":
+      case "COMPLETED":
         return [
-          { value: "Completed", label: "Completed" }
+          { value: "COMPLETED", label: "COMPLETED" }
         ];
-      case "Canceled":
+      case "CANCELED":
         return [
-          { value: "Canceled", label: "Canceled" }
+          { value: "CANCELED", label: "CANCELED" }
         ];
       default:
         return [
-          { value: "In progress", label: "In progress" }
+          { value: "IN PROGRESS", label: "IN PROGRESS" }
         ];
     }
   };
@@ -353,7 +374,6 @@ function ServiceProgressTable() {
               {[
                 "Index",
                 "Service Progress ID",
-                "Image",
                 "Start Date",
                 "End Date",
                 "Step",
@@ -373,31 +393,15 @@ function ServiceProgressTable() {
           <tbody className="bg-white divide-y divide-gray-200">
             {serviceProgressData.map((service, index) => (
               <tr key={service.serviceProgressID} className={`transition duration-200
-                ${service.step === "Rejected" ? 'bg-red bg-opacity-50' : 'hover:bg-gray'}`
+                ${service.step === "REJECTED" ? 'bg-red bg-opacity-50' : 'hover:bg-gray'}`
               }
               >
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{index + 1}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceProgressID}</td>
-                <td className="px-2 py-4 text-sm text-black-15 text-center w-16 h-16">
-                  {service.imageUrl ? (
-                    <Image
-                      src={service.imageUrl}
-                      className="w-16 h-16 object-cover rounded mx-auto"
-                      onError={(e) => {
-                        e.currentTarget.src = PLACEHOLDER_IMAGE;
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src={PLACEHOLDER_IMAGE}
-                      alt="No image"
-                      className="w-16 h-16 object-cover rounded mx-auto"
-                    />
-                  )}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{new Date(service.startDate).toLocaleString()}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.endDate ? new Date(service.endDate).toLocaleString() : "Unfinished"}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.step}</td>
-                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.description || ""}</td>
+                <td className="px-2 py-4 text-sm text-black-15 text-center">{service.serviceDetail.description || ""}</td>
                 <td className="px-2 py-4 text-sm text-black-15 text-center">{service.isComfirmed ? "✔️" : "❌"}</td>
                 <td className="px-2 py-4 text-sm">
                   {!service.isComfirmed && service.endDate && service.step == "Completed" && (
@@ -416,7 +420,7 @@ function ServiceProgressTable() {
                   >
                     View Logs
                   </button>
-                  {(service.step != "Canceled" && service.step != "Completed") && !service.isComfirmed && (
+                  {(service.step != "CANCELED" && service.step != "COMPLETED") && !service.isComfirmed && (
                     <button
                       type="button"
                       className="mx-1 text-white bg-green hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
@@ -495,7 +499,7 @@ function ServiceProgressTable() {
                   style={{ width: '100%' }}
                   onChange={(value) => handleInputChange("step", value)}
                   options={getAllowedSteps(selectedService.step)}
-                  disabled={selectedService.step === "Complete" || selectedService.step === "Canceled"}
+                  disabled={selectedService.step === "COMPLETED" || selectedService.step === "CANCELED"}
                 />
               </label>
               <label className="mt-1">

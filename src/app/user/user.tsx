@@ -82,6 +82,7 @@ const User = () => {
       serviceQuotation: {
         serviceQuotationId: string;
       };
+      description: string;
     };
     startDate: string;
     endDate?: string;
@@ -540,9 +541,9 @@ const User = () => {
           },
           body: JSON.stringify({
             "serviceQuotationID": service.serviceDetail.serviceQuotation.serviceQuotationId,
-            "paymentMethod": "Cash",
+            "paymentMethod": "CASH",
             "maintenanceStaffID": service.serviceDetail.staff.customerId,
-            "status": "Pending"
+            "status": "PROCESSING"
           }),
         });
         if (!resPayment.ok) {
@@ -1222,7 +1223,7 @@ const User = () => {
                                 {service.step}
                               </p><p className="text-sm text-gray-700 mb-2">
                                 <strong>Description:  </strong>
-                                {service.description}
+                                {service.serviceDetail.description}
                               </p>
                               <p><strong>Confirmed:  </strong> {service.isComfirmed ? "✔️" : "❌"}</p>
 
@@ -1238,7 +1239,7 @@ const User = () => {
                                 >
                                   View Logs
                                 </button>
-                                {!service.isComfirmed && service.endDate && service.step == "Completed" && (
+                                {!service.isComfirmed && service.endDate && service.step == "COMPLETED" && (
                                   <>
                                     <button
                                       type="button"

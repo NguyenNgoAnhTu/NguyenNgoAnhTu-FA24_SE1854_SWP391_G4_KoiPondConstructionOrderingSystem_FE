@@ -81,7 +81,7 @@ const ServiceProgressModal: React.FC<ServiceProgressModalProps> = ({
                     },
                     body: JSON.stringify({
                         "serviceDetailID": serviceProgressId,
-                        "step": "Rejected",
+                        "step": "REJECTED",
                         "description": rejectReason,
                         "imageUrl": ""
                     }),
@@ -91,7 +91,7 @@ const ServiceProgressModal: React.FC<ServiceProgressModalProps> = ({
             if (!response.ok) {
                 throw new Error('Failed to reject service progress');
             }
-
+            location.reload();
             message.success('Service progress rejected successfully');
             await fetch(`http://localhost:8080/api/create-progress-log`, {
                 method: "POST",
