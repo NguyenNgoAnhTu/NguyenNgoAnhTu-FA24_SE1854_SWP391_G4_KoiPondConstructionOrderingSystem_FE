@@ -322,6 +322,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               </NavLink>
                             </li>
                           )}
+
+                            {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
+                            <li>
+                              <NavLink
+                                to="/admin/designers-detail"
+                                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out text-gray hover:text-white "
+                              >
+                                Designers detail
+                              </NavLink>
+                            </li>
+                          )}
                           {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "CONSULTANT") && (
                             <li>
                               <NavLink
