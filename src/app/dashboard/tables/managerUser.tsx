@@ -296,7 +296,7 @@ function CustomerTable() {
             <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md">
               <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 rounded-t-lg">
                 <h3 className="text-lg font-bold text-black">
-                  Add New {selectedRole}
+                  Add New Staff
                 </h3>
               </div>
               

@@ -70,7 +70,7 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
   };
 
   const calculateTotalCost = (cost: number, vat: number): number => {
-    return Number((cost * (1 + vat/100)).toFixed(2));
+    return Math.round(cost * (1 + vat/100));
   };
 
   const handleChange = (
@@ -83,10 +83,11 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
     let updatedFormData;
     if (name === 'cost') {
       const newCost = Number(value);
+      const roundedTotalCost = calculateTotalCost(newCost, formData.vat);
       updatedFormData = {
         ...formData,
         cost: newCost,
-        totalCost: calculateTotalCost(newCost, formData.vat).toString()
+        totalCost: roundedTotalCost
       };
     } else {
       updatedFormData = {
@@ -183,7 +184,7 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
         confirmButtonColor: '#3085d6',
       });
   
-      navigate('/admin/tables/table-service-quotation');
+      navigate('/admin/maintenances/service-quotation');
     } catch (error) {
       console.error('Error:', error);
       
@@ -272,12 +273,18 @@ const FormQuotation: React.FC<FormQuotationProps> = ({ onClose, serviceRequest }
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Total Cost</label>
             <input
-              type="number"
+              type="text"
               name="totalCost"
-              value={formData.totalCost.toString()}
+              value={formData.totalCost.toLocaleString('vi-VN')}
               readOnly
               className="w-full p-2 border rounded bg-gray-100"
             />
+            <p className="text-sm text-gray-500 mt-1">
+              {new Intl.NumberFormat('vi-VN', { 
+                style: 'currency', 
+                currency: 'VND' 
+              }).format(formData.totalCost)}
+            </p>
           </div>
 
           <div className="flex gap-4">
