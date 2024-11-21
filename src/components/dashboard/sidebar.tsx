@@ -403,7 +403,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               </NavLink>
                             </li>
                           )}
-                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "DESIGNER") && (
+                          {(userRole === "MANAGER" || userRole === "STAFF" || userRole === "DESIGNER" || userRole === "CONSTRUCTOR") && (
                             <li>
                               <NavLink
                                 to="/admin/constructions/design-profile"

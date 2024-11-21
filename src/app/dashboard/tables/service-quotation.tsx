@@ -26,6 +26,7 @@ function ServiceQuotationTable() {
         note: string;
       };
       address: string;
+      status: string;
     };
     description: string;
     note: string;
@@ -268,7 +269,7 @@ function ServiceQuotationTable() {
                   <button
                     type="button"
                     className={`mx-1 text-white font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 
-                      ${quotation.confirm
+                      ${quotation.confirm && quotation.serviceRequest.status === "QUOTING"
                         ? "bg-green hover:bg-green-600 focus:ring-4 focus:ring-green-300"
                         : "bg-[#d3d3d3] cursor-not-allowed"
                       }`}
@@ -277,9 +278,14 @@ function ServiceQuotationTable() {
                         toast.error("Can only create detail for confirmed quotations");
                         return;
                       }
+                      if (quotation.serviceRequest.status !== "QUOTING") {
+                        toast.error("Can only create detail when request status is QUOTING");
+                        return;
+                      }
                       setSelectedQuotation(quotation);
                       setShowDetailForm(true);
                     }}
+                    disabled={!quotation.confirm || quotation.serviceRequest.status !== "QUOTING"}
                   >
                     Create Detail
                   </button>
@@ -296,7 +302,8 @@ function ServiceQuotationTable() {
                   </button>
                   <button
                     type="button"
-                    className="mx-1 text-white bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2"
+                    className={`mx-1 text-white bg-red hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2
+                      ${quotation.confirm ? "cursor-not-allowed bg-[#d3d3d3]" : ""}`}
                     onClick={() => handleDelete(quotation.serviceQuotationId)}
                   >
                     Delete
