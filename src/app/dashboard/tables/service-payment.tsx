@@ -20,6 +20,7 @@ function ServicePaymentTable() {
         maintenanceStaff: {
             name: string;
         };
+        transactionID: string;
         createDate: string;
         status: string;
     }
@@ -75,47 +76,47 @@ function ServicePaymentTable() {
         fetchServicePayment();
     }, []);
 
-    const handleEdit = (service: ServicePayment) => {
+    const handleView = (service: ServicePayment) => {
         setSelectedService(service);
         setIsModalOpen(true);
     };
 
-    const handleOk = async () => {
-        if (!selectedService) return;
-        setLoadingUpdate(true);
-        try {
-            const response = await fetch(
-                `http://localhost:8080/api/service-payment/${selectedService.servicePaymentID}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ ...selectedService })
-                });
+    // const handleOk = async () => {
+    //     if (!selectedService) return;
+    //     setLoadingUpdate(true);
+    //     try {
+    //         const response = await fetch(
+    //             `http://localhost:8080/api/service-payment/${selectedService.servicePaymentID}`,
+    //             {
+    //                 method: "PUT",
+    //                 headers: {
+    //                     "Content-Type": "application/json",
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //                 body: JSON.stringify({ ...selectedService })
+    //             });
 
-            if (!response.ok) {
-                throw new Error("Failed to update service payment");
-            }
-            location.reload();
-            message.success("Service payment updated successfully");
-            setServicePaymentData((prevData) =>
-                prevData.map((service) =>
-                    service.servicePaymentID === selectedService.servicePaymentID ? selectedService : service
-                )
-            );
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                message.error(error.message);
-                console.log(error);
-            }
-        } finally {
-            setLoadingUpdate(false);
-            setIsModalOpen(false);
-            setSelectedService(null);
-        }
-    };
+    //         if (!response.ok) {
+    //             throw new Error("Failed to update service payment");
+    //         }
+    //         location.reload();
+    //         message.success("Service payment updated successfully");
+    //         setServicePaymentData((prevData) =>
+    //             prevData.map((service) =>
+    //                 service.servicePaymentID === selectedService.servicePaymentID ? selectedService : service
+    //             )
+    //         );
+    //     } catch (error: unknown) {
+    //         if (error instanceof Error) {
+    //             message.error(error.message);
+    //             console.log(error);
+    //         }
+    //     } finally {
+    //         setLoadingUpdate(false);
+    //         setIsModalOpen(false);
+    //         setSelectedService(null);
+    //     }
+    // };
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -225,17 +226,19 @@ function ServicePaymentTable() {
                                     <button
                                         type="button"
                                         className="mx-1 text-white bg-green hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
-                                        onClick={() => handleEdit(service)}
+                                        onClick={() => handleView(service)}
                                     >
-                                        Edit
+                                        View
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="mx-1 text-white bg-red hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
-                                        onClick={() => handleDelete(service.servicePaymentID)}
-                                    >
-                                        Delete
-                                    </button>
+                                    {service.status == "Pending" && (
+                                        <button
+                                            type="button"
+                                            className="mx-1 text-white bg-red hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
+                                            onClick={() => handleDelete(service.servicePaymentID)}
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -243,37 +246,22 @@ function ServicePaymentTable() {
                 </table>
             </div>
 
-            <Modal title="Edit Service Payement" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} confirmLoading={loadingUpdate}>
+            <Modal title="View Detail Payement" open={isModalOpen} onCancel={handleCancel} confirmLoading={loadingUpdate} footer={null}>
                 {selectedService && (
                     <div>
                         <p><strong>Service Payment ID:</strong> {selectedService.servicePaymentID}</p>
                         <p><strong>Customer:</strong> {selectedService.serviceQuotation.customer.name}</p>
                         <div className="mt-1">
-                            <label className="mt-1">
-                                <strong>Method:</strong>
-                                <Select
-                                    defaultValue={selectedService.paymentMethod}
-                                    style={{ width: '100%' }}
-                                    onChange={(value) => handleInputChange("paymentMethod", value)}
-                                    options={methodOptions}
-                                />
-                            </label>
-                        </div>
-                        <p><strong>Cost:</strong> {selectedService.serviceQuotation.cost}</p>
-                        <p><strong>VAT:</strong> {selectedService.serviceQuotation.cost}</p>
-                        <p><strong>Total Cost:</strong> {selectedService.serviceQuotation.totalCost}</p>
-                        <p><strong>Create Date:</strong> {new Date(selectedService.createDate).toLocaleString()}</p>
-                        <p><strong>Staff:</strong> {selectedService.maintenanceStaff.name}</p>
-                        <div className="mt-1">
-                            <label className="mt-1">
-                                <strong>Status:</strong>
-                                <Select
-                                    defaultValue={selectedService.status}
-                                    style={{ width: '100%' }}
-                                    onChange={(value) => handleInputChange("status", value)}
-                                    options={statusOptions}
-                                />
-                            </label>
+                            <p><strong>Method:</strong> {selectedService.paymentMethod}</p>
+                            {selectedService.transactionID && selectedService.paymentMethod == "ONLINE" && (
+                                <p><strong>Transaction ID:</strong> {selectedService.transactionID}</p>
+                            )}
+                            <p><strong>Cost:</strong> {selectedService.serviceQuotation.cost}</p>
+                            <p><strong>VAT:</strong> {selectedService.serviceQuotation.vat}%</p>
+                            <p><strong>Total Cost:</strong> {selectedService.serviceQuotation.totalCost}</p>
+                            <p><strong>Create Date:</strong> {new Date(selectedService.createDate).toLocaleString()}</p>
+                            <p><strong>Staff:</strong> {selectedService.maintenanceStaff.name}</p>
+                            <p><strong>Status:</strong> {selectedService.status}</p>
                         </div>
                     </div>
                 )}

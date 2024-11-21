@@ -429,7 +429,7 @@ function ServiceProgressTable() {
                       Edit
                     </button>
                   )}
-                  {role == "MANAGER" && (
+                  {role == "MANAGER" && service.step != "COMPLETED" && service.step != "CANCELED" && (
                     <button
                       type="button"
                       className="mx-1 text-white bg-red hover:bg-blue focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center"
