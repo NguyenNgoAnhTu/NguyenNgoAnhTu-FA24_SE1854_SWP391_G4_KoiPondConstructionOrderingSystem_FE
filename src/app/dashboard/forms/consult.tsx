@@ -204,6 +204,7 @@ const ConsultForm = () => {
             className={`w-full p-3 border ${errors.customerId ? "border-red-500" : "border-gray-300"
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400`}
             placeholder="Enter customer ID"
+            disabled={!!customerId}
           />
           {errors.customerId && (
             <p className="text-red-500 text-sm mt-1">{errors.customerId}</p>
@@ -220,6 +221,7 @@ const ConsultForm = () => {
             className={`w-full p-3 border ${errors.requestDetailId ? "border-red-500" : "border-gray-300"
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400`}
             placeholder="Enter request detail ID"
+            disabled={!!requestDetailId}
           />
           {errors.requestDetailId && (
             <p className="text-red-500 text-sm mt-1">{errors.requestDetailId}</p>
